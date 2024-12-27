@@ -85,7 +85,8 @@ class _GroundedTuneBarState extends State<GroundedTuneBar>
     var bottomTextStyle = const TextStyle(fontSize: 10.0, color: Colors.white);
     double bottomIconSize = 22.0;
     return Container(
-      color: imageEditorTheme.bottomBarBackgroundColor,
+      color: mainEditorConfigs.style.bottomBarBackground,
+      width: double.infinity,
       child: FadeInUp(
         duration: GROUNDED_FADE_IN_DURATION,
         child: Column(
@@ -143,7 +144,7 @@ class _GroundedTuneBarState extends State<GroundedTuneBar>
                             item.icon,
                             size: bottomIconSize,
                             color: tuneEditor.selectedIndex == index
-                                ? imageEditorPrimaryColor
+                                ? kImageEditorPrimaryColor
                                 : Colors.white,
                           ),
                           onPressed: () {

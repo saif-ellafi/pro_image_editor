@@ -64,8 +64,7 @@ class _GroundedEmojiEditorState extends State<GroundedEmojiEditor> {
 
   @override
   Widget build(BuildContext context) {
-    Color foreGroundColor =
-        widget.configs.imageEditorTheme.appBarForegroundColor;
+    Color foreGroundColor = widget.configs.mainEditor.style.appBarColor;
     return FrostedGlassEffect(
       radius: BorderRadius.zero,
       child: Scaffold(
@@ -100,7 +99,7 @@ class _GroundedEmojiEditorState extends State<GroundedEmojiEditor> {
                         }
                       },
                       icon: Icon(
-                        widget.configs.icons.closeEditor,
+                        widget.configs.mainEditor.icons.closeEditor,
                         color: foreGroundColor,
                       ),
                     ),

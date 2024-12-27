@@ -1,5 +1,12 @@
+import '../custom_widgets/tune_editor_widgets.dart';
+import '../icons/tune_editor_icons.dart';
+import '../styles/tune_editor_style.dart';
 import '../tune_editor/tune_adjustment_item.dart';
 import 'utils/editor_safe_area.dart';
+
+export '../custom_widgets/tune_editor_widgets.dart';
+export '../icons/tune_editor_icons.dart';
+export '../styles/tune_editor_style.dart';
 
 /// A configuration class for the Tune Editor.
 ///
@@ -19,6 +26,9 @@ class TuneEditorConfigs {
     this.showLayers = true,
     this.tuneAdjustmentOptions,
     this.safeArea = const EditorSafeArea(),
+    this.style = const TuneEditorStyle(),
+    this.icons = const TuneEditorIcons(),
+    this.widgets = const TuneEditorWidgets(),
   });
 
   /// Indicates whether the tune editor is enabled.
@@ -42,6 +52,15 @@ class TuneEditorConfigs {
   /// or other tune adjustments.
   final List<TuneAdjustmentItem>? tuneAdjustmentOptions;
 
+  /// Style configuration for the tune editor.
+  final TuneEditorStyle style;
+
+  /// Icons used in the tune editor.
+  final TuneEditorIcons icons;
+
+  /// Widgets associated with the tune editor.
+  final TuneEditorWidgets widgets;
+
   /// Creates a copy of this [TuneEditorConfigs] object with the given fields
   /// replaced with new values.
   ///
@@ -58,6 +77,9 @@ class TuneEditorConfigs {
     bool? showLayers,
     EditorSafeArea? safeArea,
     List<TuneAdjustmentItem>? tuneAdjustmentOptions,
+    TuneEditorStyle? style,
+    TuneEditorIcons? icons,
+    TuneEditorWidgets? widgets,
   }) {
     return TuneEditorConfigs(
       enabled: enabled ?? this.enabled,
@@ -65,6 +87,9 @@ class TuneEditorConfigs {
       showLayers: showLayers ?? this.showLayers,
       tuneAdjustmentOptions:
           tuneAdjustmentOptions ?? this.tuneAdjustmentOptions,
+      style: style ?? this.style,
+      icons: icons ?? this.icons,
+      widgets: widgets ?? this.widgets,
     );
   }
 }

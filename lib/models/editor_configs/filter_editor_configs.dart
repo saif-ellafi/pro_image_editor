@@ -1,7 +1,14 @@
 // Project imports:
 import 'package:pro_image_editor/modules/filter_editor/utils/filter_generator/filter_model.dart';
 
+import '../custom_widgets/filter_editor_widgets.dart';
+import '../icons/filter_editor_icons.dart';
+import '../styles/filter_editor_style.dart';
 import 'utils/editor_safe_area.dart';
+
+export '../custom_widgets/filter_editor_widgets.dart';
+export '../icons/filter_editor_icons.dart';
+export '../styles/filter_editor_style.dart';
 
 /// Configuration options for a filter editor.
 ///
@@ -30,6 +37,9 @@ class FilterEditorConfigs {
     this.safeArea = const EditorSafeArea(),
     this.fadeInUpDuration = const Duration(milliseconds: 220),
     this.fadeInUpStaggerDelayDuration = const Duration(milliseconds: 25),
+    this.style = const FilterEditorStyle(),
+    this.icons = const FilterEditorIcons(),
+    this.widgets = const FilterEditorWidgets(),
   });
 
   /// Indicates whether the filter editor is enabled.
@@ -58,6 +68,15 @@ class FilterEditorConfigs {
   /// Defines the safe area configuration for the editor.
   final EditorSafeArea safeArea;
 
+  /// Style configuration for the filter editor.
+  final FilterEditorStyle style;
+
+  /// Icons used in the filter editor.
+  final FilterEditorIcons icons;
+
+  /// Widgets associated with the filter editor.
+  final FilterEditorWidgets widgets;
+
   /// Creates a copy of this `FilterEditorConfigs` object with the given fields
   /// replaced with new values.
   ///
@@ -71,6 +90,9 @@ class FilterEditorConfigs {
     Duration? fadeInUpDuration,
     Duration? fadeInUpStaggerDelayDuration,
     EditorSafeArea? safeArea,
+    FilterEditorStyle? style,
+    FilterEditorIcons? icons,
+    FilterEditorWidgets? widgets,
   }) {
     return FilterEditorConfigs(
       safeArea: safeArea ?? this.safeArea,
@@ -78,8 +100,11 @@ class FilterEditorConfigs {
       showLayers: showLayers ?? this.showLayers,
       filterList: filterList ?? this.filterList,
       fadeInUpDuration: fadeInUpDuration ?? this.fadeInUpDuration,
+      style: style ?? this.style,
       fadeInUpStaggerDelayDuration:
           fadeInUpStaggerDelayDuration ?? this.fadeInUpStaggerDelayDuration,
+      icons: icons ?? this.icons,
+      widgets: widgets ?? this.widgets,
     );
   }
 }

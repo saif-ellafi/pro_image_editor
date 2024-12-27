@@ -61,10 +61,16 @@ class CropRotateEditorInitConfigs extends EditorInitConfigs {
     super.onImageEditingComplete,
     super.onImageEditingStarted,
     super.convertToUint8List,
+    super.enableCloseButton,
     required super.theme,
     this.onDone,
+    this.enablePopWhenDone = true,
     this.enableFakeHero = false,
   });
+
+  /// Indicates whether the widget should automatically pop from the navigation
+  /// stack when done.
+  final bool enablePopWhenDone;
 
   /// A callback function called when editing is completed.
   final CropRotateEditorDone? onDone;

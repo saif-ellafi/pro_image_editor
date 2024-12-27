@@ -48,6 +48,7 @@ export 'widgets/color_picker/bar_color_picker.dart';
 export 'widgets/custom_widgets/reactive_custom_appbar.dart';
 export 'widgets/custom_widgets/reactive_custom_widget.dart';
 export 'widgets/extended/extended_pop_scope.dart';
+export 'common/editor_style_constants.dart';
 
 /// Widgets
 export 'widgets/animated/fade_in_up.dart';

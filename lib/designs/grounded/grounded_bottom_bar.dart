@@ -56,8 +56,7 @@ class GroundedBottomBar extends StatefulWidget {
 class _GroundedBottomBarState extends State<GroundedBottomBar> {
   @override
   Widget build(BuildContext context) {
-    Color foreGroundColor =
-        widget.configs.imageEditorTheme.appBarForegroundColor;
+    Color foreGroundColor = widget.configs.mainEditor.style.appBarColor;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
       color: const Color(0xFF222222),
@@ -68,7 +67,7 @@ class _GroundedBottomBarState extends State<GroundedBottomBar> {
             tooltip: widget.configs.i18n.cancel,
             onPressed: widget.close,
             icon: Icon(
-              widget.configs.icons.closeEditor,
+              widget.configs.mainEditor.icons.closeEditor,
               color: foreGroundColor,
             ),
           ),
@@ -79,7 +78,7 @@ class _GroundedBottomBarState extends State<GroundedBottomBar> {
                   tooltip: widget.configs.i18n.undo,
                   onPressed: widget.undo,
                   icon: Icon(
-                    widget.configs.icons.undoAction,
+                    widget.configs.mainEditor.icons.undoAction,
                     color: widget.enableUndo
                         ? foreGroundColor
                         : foreGroundColor.withAlpha(80),
@@ -90,7 +89,7 @@ class _GroundedBottomBarState extends State<GroundedBottomBar> {
                   tooltip: widget.configs.i18n.redo,
                   onPressed: widget.redo,
                   icon: Icon(
-                    widget.configs.icons.redoAction,
+                    widget.configs.mainEditor.icons.redoAction,
                     color: widget.enableRedo
                         ? foreGroundColor
                         : foreGroundColor.withAlpha(80),
@@ -102,7 +101,7 @@ class _GroundedBottomBarState extends State<GroundedBottomBar> {
             tooltip: widget.configs.i18n.done,
             onPressed: widget.done,
             icon: Icon(
-              widget.configs.icons.doneIcon,
+              widget.configs.mainEditor.icons.doneIcon,
               color: foreGroundColor,
             ),
           ),

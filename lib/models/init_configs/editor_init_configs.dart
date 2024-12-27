@@ -43,7 +43,11 @@ abstract class EditorInitConfigs {
     this.onImageEditingComplete,
     this.onImageEditingStarted,
     this.convertToUint8List = false,
+    this.enableCloseButton = true,
   });
+
+  /// Determines whether the close button is displayed on the widget.
+  final bool enableCloseButton;
 
   /// The configuration options for the image editor.
   final ProImageEditorConfigs configs;

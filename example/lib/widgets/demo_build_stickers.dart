@@ -161,7 +161,7 @@ class DemoBuildStickers extends StatelessWidget {
               LoadingDialog.instance.show(
                 context,
                 configs: const ProImageEditorConfigs(),
-                theme: ThemeData.dark(),
+                theme: Theme.of(context),
               );
 
               await precacheImage(NetworkImage(url), context);

@@ -2,7 +2,14 @@
 import 'package:flutter/widgets.dart';
 
 import '../../modules/paint_editor/utils/paint_editor_enum.dart';
+import '../custom_widgets/paint_editor_widgets.dart';
+import '../icons/paint_editor_icons.dart';
+import '../styles/paint_editor_style.dart';
 import 'utils/editor_safe_area.dart';
+
+export '../custom_widgets/paint_editor_widgets.dart';
+export '../icons/paint_editor_icons.dart';
+export '../styles/paint_editor_style.dart';
 
 /// Configuration options for a paint editor.
 ///
@@ -58,6 +65,9 @@ class PaintEditorConfigs {
     this.freeStyleHighPerformanceHero = false,
     this.initialPaintMode = PaintModeE.freeStyle,
     this.safeArea = const EditorSafeArea(),
+    this.style = const PaintEditorStyle(),
+    this.icons = const PaintEditorIcons(),
+    this.widgets = const PaintEditorWidgets(),
   })  : assert(maxScale >= minScale,
             'maxScale must be greater than or equal to minScale'),
         assert(editorMaxScale > editorMinScale,
@@ -185,6 +195,15 @@ class PaintEditorConfigs {
   /// Defines the safe area configuration for the editor.
   final EditorSafeArea safeArea;
 
+  /// Style configuration for the paint editor.
+  final PaintEditorStyle style;
+
+  /// Icons used in the paint editor.
+  final PaintEditorIcons icons;
+
+  /// Widgets associated with the paint editor.
+  final PaintEditorWidgets widgets;
+
   /// Creates a copy of this `PaintEditorConfigs` object with the given fields
   /// replaced with new values.
   ///
@@ -215,6 +234,9 @@ class PaintEditorConfigs {
     double? maxScale,
     EditorSafeArea? safeArea,
     EdgeInsets? boundaryMargin,
+    PaintEditorStyle? style,
+    PaintEditorIcons? icons,
+    PaintEditorWidgets? widgets,
   }) {
     return PaintEditorConfigs(
       safeArea: safeArea ?? this.safeArea,
@@ -243,6 +265,9 @@ class PaintEditorConfigs {
       boundaryMargin: boundaryMargin ?? this.boundaryMargin,
       minScale: minScale ?? this.minScale,
       maxScale: maxScale ?? this.maxScale,
+      style: style ?? this.style,
+      icons: icons ?? this.icons,
+      widgets: widgets ?? this.widgets,
     );
   }
 }

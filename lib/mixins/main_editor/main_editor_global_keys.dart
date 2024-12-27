@@ -12,9 +12,9 @@ import '../../modules/tune_editor/tune_editor.dart';
 
 /// Mixin which contains all global keys for the main-editor
 mixin MainEditorGlobalKeys {
-  /// A GlobalKey for the Painting Editor, used to access and control the state
-  /// of the painting editor.
-  final paintingEditor = GlobalKey<PaintingEditorState>();
+  /// A GlobalKey for the Paint Editor, used to access and control the state
+  /// of the paint editor.
+  final paintEditor = GlobalKey<PaintEditorState>();
 
   /// A GlobalKey for the Text Editor, used to access and control the state of
   /// the text editor.

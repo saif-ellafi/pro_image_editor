@@ -2,8 +2,15 @@
 import 'package:flutter/widgets.dart';
 
 // Project imports:
+import '../custom_widgets/text_editor_widgets.dart';
+import '../icons/text_editor_icons.dart';
 import '../layer/layer_background_mode.dart';
+import '../styles/text_editor_style.dart';
 import 'utils/editor_safe_area.dart';
+
+export '../custom_widgets/text_editor_widgets.dart';
+export '../icons/text_editor_icons.dart';
+export '../styles/text_editor_style.dart';
 
 /// Configuration options for a text editor.
 ///
@@ -43,6 +50,9 @@ class TextEditorConfigs {
     this.customTextStyles,
     this.initialBackgroundColorMode = LayerBackgroundMode.backgroundAndColor,
     this.safeArea = const EditorSafeArea(),
+    this.style = const TextEditorStyle(),
+    this.icons = const TextEditorIcons(),
+    this.widgets = const TextEditorWidgets(),
   })  : assert(initFontSize > 0, 'initFontSize must be positive'),
         assert(maxScale >= minScale,
             'maxScale must be greater than or equal to minScale');
@@ -107,6 +117,15 @@ class TextEditorConfigs {
   /// Defines the safe area configuration for the editor.
   final EditorSafeArea safeArea;
 
+  /// Style configuration for the text editor.
+  final TextEditorStyle style;
+
+  /// Icons used in the text editor.
+  final TextEditorIcons icons;
+
+  /// Widgets associated with the text editor.
+  final TextEditorWidgets widgets;
+
   /// Creates a copy of this `TextEditorConfigs` object with the given fields
   /// replaced with new values.
   ///
@@ -131,6 +150,9 @@ class TextEditorConfigs {
     bool? enableSuggestions,
     bool? autocorrect,
     EditorSafeArea? safeArea,
+    TextEditorStyle? style,
+    TextEditorIcons? icons,
+    TextEditorWidgets? widgets,
   }) {
     return TextEditorConfigs(
       safeArea: safeArea ?? this.safeArea,
@@ -153,6 +175,9 @@ class TextEditorConfigs {
       maxScale: maxScale ?? this.maxScale,
       enableSuggestions: enableSuggestions ?? this.enableSuggestions,
       autocorrect: autocorrect ?? this.autocorrect,
+      style: style ?? this.style,
+      icons: icons ?? this.icons,
+      widgets: widgets ?? this.widgets,
     );
   }
 }

@@ -211,7 +211,7 @@ class TuneEditorState extends State<TuneEditor>
 
     var items = tuneEditorConfigs.tuneAdjustmentOptions ??
         tunePresets(
-          icons: icons.tuneEditor,
+          icons: tuneEditorConfigs.icons,
           i18n: i18n.tuneEditor,
         );
     tuneAdjustmentList = items.map((item) {
@@ -370,7 +370,7 @@ class TuneEditorState extends State<TuneEditor>
           tooltipTheme: theme.tooltipTheme.copyWith(preferBelow: true)),
       child: ExtendedPopScope(
         child: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: imageEditorTheme.uiOverlayStyle,
+          value: tuneEditorConfigs.style.uiOverlayStyle,
           child: SafeArea(
             top: tuneEditorConfigs.safeArea.top,
             bottom: tuneEditorConfigs.safeArea.bottom,
@@ -379,7 +379,7 @@ class TuneEditorState extends State<TuneEditor>
             child: RecordInvisibleWidget(
               controller: screenshotCtrl,
               child: Scaffold(
-                backgroundColor: imageEditorTheme.tuneEditor.background,
+                backgroundColor: tuneEditorConfigs.style.background,
                 appBar: _buildAppBar(),
                 body: _buildBody(),
                 bottomNavigationBar: _buildBottomNavBar(),
@@ -393,19 +393,19 @@ class TuneEditorState extends State<TuneEditor>
 
   /// Builds the app bar for the tune editor.
   PreferredSizeWidget? _buildAppBar() {
-    if (customWidgets.tuneEditor.appBar != null) {
-      return customWidgets.tuneEditor.appBar!
+    if (tuneEditorConfigs.widgets.appBar != null) {
+      return tuneEditorConfigs.widgets.appBar!
           .call(this, rebuildController.stream);
     }
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: imageEditorTheme.tuneEditor.appBarBackgroundColor,
-      foregroundColor: imageEditorTheme.tuneEditor.appBarForegroundColor,
+      backgroundColor: tuneEditorConfigs.style.appBarBackground,
+      foregroundColor: tuneEditorConfigs.style.appBarColor,
       actions: [
         IconButton(
           tooltip: i18n.tuneEditor.back,
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(icons.backButton),
+          icon: Icon(tuneEditorConfigs.icons.backButton),
           onPressed: close,
         ),
         const Spacer(),
@@ -413,7 +413,7 @@ class TuneEditorState extends State<TuneEditor>
           tooltip: i18n.tuneEditor.undo,
           padding: const EdgeInsets.symmetric(horizontal: 8),
           icon: Icon(
-            icons.undoAction,
+            tuneEditorConfigs.icons.undoAction,
             color: canUndo ? Colors.white : Colors.white.withAlpha(80),
           ),
           onPressed: canUndo ? undo : null,
@@ -422,7 +422,7 @@ class TuneEditorState extends State<TuneEditor>
           tooltip: i18n.tuneEditor.redo,
           padding: const EdgeInsets.symmetric(horizontal: 8),
           icon: Icon(
-            icons.redoAction,
+            tuneEditorConfigs.icons.redoAction,
             color: canRedo ? Colors.white : Colors.white.withAlpha(80),
           ),
           onPressed: canRedo ? redo : null,
@@ -430,7 +430,7 @@ class TuneEditorState extends State<TuneEditor>
         IconButton(
           tooltip: i18n.tuneEditor.done,
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(icons.applyChanges),
+          icon: Icon(tuneEditorConfigs.icons.applyChanges),
           iconSize: 28,
           onPressed: done,
         ),
@@ -492,14 +492,14 @@ class TuneEditorState extends State<TuneEditor>
                     layers: layers!,
                     clipBehavior: Clip.none,
                   ),
-                if (customWidgets.tuneEditor.bodyItemsRecorded != null)
-                  ...customWidgets.tuneEditor.bodyItemsRecorded!(
+                if (tuneEditorConfigs.widgets.bodyItemsRecorded != null)
+                  ...tuneEditorConfigs.widgets.bodyItemsRecorded!(
                       this, rebuildController.stream),
               ],
             ),
           ),
-          if (customWidgets.tuneEditor.bodyItems != null)
-            ...customWidgets.tuneEditor.bodyItems!(
+          if (tuneEditorConfigs.widgets.bodyItems != null)
+            ...tuneEditorConfigs.widgets.bodyItems!(
                 this, rebuildController.stream),
         ],
       );
@@ -508,8 +508,8 @@ class TuneEditorState extends State<TuneEditor>
 
   /// Builds the bottom navigation bar with tune options.
   Widget? _buildBottomNavBar() {
-    if (customWidgets.tuneEditor.bottomBar != null) {
-      return customWidgets.tuneEditor.bottomBar!
+    if (tuneEditorConfigs.widgets.bottomBar != null) {
+      return tuneEditorConfigs.widgets.bottomBar!
           .call(this, rebuildController.stream);
     }
     var bottomTextStyle = const TextStyle(fontSize: 10.0);
@@ -517,7 +517,7 @@ class TuneEditorState extends State<TuneEditor>
 
     return SafeArea(
       child: Container(
-        color: imageEditorTheme.tuneEditor.bottomBarColor,
+        color: tuneEditorConfigs.style.bottomBarBackground,
         padding: const EdgeInsets.only(top: 5),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -533,7 +533,7 @@ class TuneEditorState extends State<TuneEditor>
                       var activeMatrix = tuneAdjustmentMatrix[selectedIndex];
                       return SizedBox(
                         height: 40,
-                        child: customWidgets.tuneEditor.slider?.call(
+                        child: tuneEditorConfigs.widgets.slider?.call(
                               this,
                               rebuildController.stream,
                               activeMatrix.value,
@@ -580,20 +580,20 @@ class TuneEditorState extends State<TuneEditor>
                             item.label,
                             style: bottomTextStyle.copyWith(
                               color: selectedIndex == index
-                                  ? imageEditorTheme
-                                      .tuneEditor.bottomBarActiveItemColor
-                                  : imageEditorTheme
-                                      .tuneEditor.bottomBarInactiveItemColor,
+                                  ? tuneEditorConfigs
+                                      .style.bottomBarActiveItemColor
+                                  : tuneEditorConfigs
+                                      .style.bottomBarInactiveItemColor,
                             ),
                           ),
                           icon: Icon(
                             item.icon,
                             size: bottomIconSize,
                             color: selectedIndex == index
-                                ? imageEditorTheme
-                                    .tuneEditor.bottomBarActiveItemColor
-                                : imageEditorTheme
-                                    .tuneEditor.bottomBarInactiveItemColor,
+                                ? tuneEditorConfigs
+                                    .style.bottomBarActiveItemColor
+                                : tuneEditorConfigs
+                                    .style.bottomBarInactiveItemColor,
                           ),
                           onPressed: () {
                             setState(() {

@@ -1,6 +1,3 @@
-// Flutter imports:
-// Project imports:
-import 'package:example/utils/example_constants.dart';
 // Package imports:
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -8,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../common/example_constants.dart';
 import '../utils/example_helper.dart';
 
 /// The Firebase-Supabase example
@@ -24,6 +22,12 @@ class _FirebaseSupabaseExampleState extends State<FirebaseSupabaseExample>
     with ExampleHelperState<FirebaseSupabaseExample> {
   final _supabase = Supabase.instance.client;
   final String _path = 'your-storage-path/my-image-name.jpg';
+
+  @override
+  void initState() {
+    preCacheImage(assetPath: kImageEditorExampleAssetPath);
+    super.initState();
+  }
 
   Future<void> _uploadFirebase(Uint8List bytes) async {
     try {
@@ -51,27 +55,10 @@ class _FirebaseSupabaseExampleState extends State<FirebaseSupabaseExample>
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () async {
-        await precacheImage(
-            AssetImage(ExampleConstants.of(context)!.demoAssetPath), context);
-        if (!context.mounted) return;
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => _buildEditor(),
-          ),
-        );
-      },
-      leading: const Icon(Icons.cloud_upload_outlined),
-      title: const Text('Firebase and Supabase'),
-      trailing: const Icon(Icons.chevron_right),
-    );
-  }
+    if (!isPreCached) return const PrepareImageWidget();
 
-  Widget _buildEditor() {
     return ProImageEditor.asset(
-      ExampleConstants.of(context)!.demoAssetPath,
+      kImageEditorExampleAssetPath,
       callbacks: ProImageEditorCallbacks(
         onImageEditingStarted: onImageEditingStarted,
         onImageEditingComplete: (bytes) async {
@@ -87,10 +74,13 @@ class _FirebaseSupabaseExampleState extends State<FirebaseSupabaseExample>
           }
           setGenerationTime();
         },
-        onCloseEditor: onCloseEditor,
+        onCloseEditor: () => onCloseEditor(enablePop: !isDesktopMode(context)),
       ),
       configs: ProImageEditorConfigs(
         designMode: platformDesignMode,
+        mainEditor: MainEditorConfigs(
+          enableCloseButton: !isDesktopMode(context),
+        ),
         i18n: const I18n(doneLoadingMsg: 'Uploading image...'),
       ),
     );

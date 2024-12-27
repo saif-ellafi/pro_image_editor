@@ -242,7 +242,7 @@ class FilterEditorState extends State<FilterEditor>
           tooltipTheme: theme.tooltipTheme.copyWith(preferBelow: true)),
       child: ExtendedPopScope(
         child: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: imageEditorTheme.uiOverlayStyle,
+          value: filterEditorConfigs.style.uiOverlayStyle,
           child: SafeArea(
             top: filterEditorConfigs.safeArea.top,
             bottom: filterEditorConfigs.safeArea.bottom,
@@ -251,7 +251,7 @@ class FilterEditorState extends State<FilterEditor>
             child: RecordInvisibleWidget(
               controller: screenshotCtrl,
               child: Scaffold(
-                backgroundColor: imageEditorTheme.filterEditor.background,
+                backgroundColor: filterEditorConfigs.style.background,
                 appBar: _buildAppBar(),
                 body: _buildBody(),
                 bottomNavigationBar: _buildBottomNavBar(),
@@ -265,26 +265,26 @@ class FilterEditorState extends State<FilterEditor>
 
   /// Builds the app bar for the filter editor.
   PreferredSizeWidget? _buildAppBar() {
-    if (customWidgets.filterEditor.appBar != null) {
-      return customWidgets.filterEditor.appBar!
+    if (filterEditorConfigs.widgets.appBar != null) {
+      return filterEditorConfigs.widgets.appBar!
           .call(this, rebuildController.stream);
     }
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: imageEditorTheme.filterEditor.appBarBackgroundColor,
-      foregroundColor: imageEditorTheme.filterEditor.appBarForegroundColor,
+      backgroundColor: filterEditorConfigs.style.appBarBackground,
+      foregroundColor: filterEditorConfigs.style.appBarColor,
       actions: [
         IconButton(
           tooltip: i18n.filterEditor.back,
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(icons.backButton),
+          icon: Icon(filterEditorConfigs.icons.backButton),
           onPressed: close,
         ),
         const Spacer(),
         IconButton(
           tooltip: i18n.filterEditor.done,
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(icons.applyChanges),
+          icon: Icon(filterEditorConfigs.icons.applyChanges),
           iconSize: 28,
           onPressed: done,
         ),
@@ -346,14 +346,14 @@ class FilterEditorState extends State<FilterEditor>
                     layers: layers!,
                     clipBehavior: Clip.none,
                   ),
-                if (customWidgets.filterEditor.bodyItemsRecorded != null)
-                  ...customWidgets.filterEditor.bodyItemsRecorded!(
+                if (filterEditorConfigs.widgets.bodyItemsRecorded != null)
+                  ...filterEditorConfigs.widgets.bodyItemsRecorded!(
                       this, rebuildController.stream),
               ],
             ),
           ),
-          if (customWidgets.filterEditor.bodyItems != null)
-            ...customWidgets.filterEditor.bodyItems!(
+          if (filterEditorConfigs.widgets.bodyItems != null)
+            ...filterEditorConfigs.widgets.bodyItems!(
                 this, rebuildController.stream),
         ],
       );
@@ -362,14 +362,14 @@ class FilterEditorState extends State<FilterEditor>
 
   /// Builds the bottom navigation bar with filter options.
   Widget? _buildBottomNavBar() {
-    if (customWidgets.filterEditor.bottomBar != null) {
-      return customWidgets.filterEditor.bottomBar!
+    if (filterEditorConfigs.widgets.bottomBar != null) {
+      return filterEditorConfigs.widgets.bottomBar!
           .call(this, rebuildController.stream);
     }
 
     return SafeArea(
       child: Container(
-        color: imageEditorTheme.filterEditor.background,
+        color: filterEditorConfigs.style.background,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -383,7 +383,7 @@ class FilterEditorState extends State<FilterEditor>
                         height: 40,
                         child: selectedFilter == PresetFilters.none
                             ? null
-                            : customWidgets.filterEditor.slider?.call(
+                            : filterEditorConfigs.widgets.slider?.call(
                                   this,
                                   rebuildController.stream,
                                   filterOpacity,

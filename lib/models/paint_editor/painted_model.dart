@@ -10,11 +10,11 @@ import 'package:pro_image_editor/utils/parser/double_parser.dart';
 import '../../modules/paint_editor/utils/paint_editor_enum.dart';
 import '../../utils/unique_id_generator.dart';
 
-/// Represents a unit of shape or drawing information used in painting.
+/// Represents a unit of shape or drawing information used in paint.
 class PaintedModel {
   /// Factory constructor for creating a PaintedModel instance from a map.
   factory PaintedModel.fromMap(Map<String, dynamic> map) {
-    /// List to hold offset points for the painting.
+    /// List to hold offset points for the paint.
     List<Offset> offsets = [];
 
     /// Iterate over the offsets in the map and add them to the list.

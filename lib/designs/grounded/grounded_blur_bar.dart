@@ -57,7 +57,7 @@ class _GroundedBlurBarState extends State<GroundedBlurBar>
 
   Widget _buildFunctions(BoxConstraints constraints) {
     return Container(
-      color: imageEditorTheme.bottomBarBackgroundColor,
+      color: blurEditorConfigs.style.appBarBackgroundColor,
       child: FadeInUp(
         duration: GROUNDED_FADE_IN_DURATION,
         child: Slider(

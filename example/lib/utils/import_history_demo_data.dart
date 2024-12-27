@@ -130,7 +130,7 @@ Map<String, dynamic> importHistoryDemoData = {
           'scale': 1.0,
           'flipX': false,
           'flipY': false,
-          'type': 'painting',
+          'type': 'paint',
           'item': {
             'mode': 'arrow',
             'offsets': [
@@ -183,7 +183,7 @@ Map<String, dynamic> importHistoryDemoData = {
           'scale': 1.0,
           'flipX': false,
           'flipY': false,
-          'type': 'painting',
+          'type': 'paint',
           'item': {
             'mode': 'arrow',
             'offsets': [
@@ -282,7 +282,7 @@ Map<String, dynamic> importHistoryDemoData = {
           'scale': 1.0,
           'flipX': false,
           'flipY': false,
-          'type': 'painting',
+          'type': 'paint',
           'item': {
             'mode': 'arrow',
             'offsets': [

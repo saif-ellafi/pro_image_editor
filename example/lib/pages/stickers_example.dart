@@ -35,41 +35,29 @@ class _StickersExampleState extends State<StickersExample>
   final String _url = 'https://picsum.photos/id/176/2000';
 
   @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () async {
-        LoadingDialog.instance.show(
-          context,
-          configs: const ProImageEditorConfigs(),
-          theme: ThemeData.dark(),
-        );
-        await precacheImage(NetworkImage(_url), context);
-        LoadingDialog.instance.hide();
-        if (!context.mounted) return;
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => _buildEditor(),
-          ),
-        );
-      },
-      leading: const Icon(Icons.image_outlined),
-      title: const Text('Custom Stickers'),
-      trailing: const Icon(Icons.chevron_right),
-    );
+  void initState() {
+    preCacheImage(networkUrl: _url);
+    super.initState();
   }
 
-  Widget _buildEditor() {
+  @override
+  Widget build(BuildContext context) {
+    if (!isPreCached) return const PrepareImageWidget();
+
     return ProImageEditor.network(
       _url,
       callbacks: ProImageEditorCallbacks(
         onImageEditingStarted: onImageEditingStarted,
         onImageEditingComplete: onImageEditingComplete,
-        onCloseEditor: onCloseEditor,
+        onCloseEditor: () => onCloseEditor(enablePop: !isDesktopMode(context)),
       ),
       configs: ProImageEditorConfigs(
         designMode: platformDesignMode,
-        blurEditorConfigs: const BlurEditorConfigs(enabled: false),
-        stickerEditorConfigs: StickerEditorConfigs(
+        blurEditor: const BlurEditorConfigs(enabled: false),
+        mainEditor: MainEditorConfigs(
+          enableCloseButton: !isDesktopMode(context),
+        ),
+        stickerEditor: StickerEditorConfigs(
           enabled: true,
           buildStickers: (setLayer, scrollController) {
             return ClipRRect(
@@ -94,7 +82,7 @@ class _StickersExampleState extends State<StickersExample>
                       LoadingDialog.instance.show(
                         context,
                         configs: const ProImageEditorConfigs(),
-                        theme: ThemeData.dark(),
+                        theme: Theme.of(context),
                       );
                       await precacheImage(
                           NetworkImage(

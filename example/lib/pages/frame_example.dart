@@ -5,7 +5,6 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 // Flutter imports:
-import 'package:example/pages/pick_image_example.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +17,7 @@ import 'package:pro_image_editor/pro_image_editor.dart';
 // Project imports:
 import '../utils/example_helper.dart';
 import '../utils/pixel_transparent_painter.dart';
+import '../widgets/material_icon_button.dart';
 
 /// The example for a frame around the images
 class FrameExample extends StatefulWidget {
@@ -40,9 +40,14 @@ class _FrameExampleState extends State<FrameExample>
 
   final _bottomTextStyle = const TextStyle(fontSize: 10.0, color: Colors.white);
 
+  Uint8List? _transparentBytes;
+
   @override
   void initState() {
     _bottomBarScrollCtrl = ScrollController();
+    preCacheImage(assetPath: _frameUrl);
+    _createTransparentBackgroundImage();
+
     super.initState();
   }
 
@@ -203,16 +208,18 @@ class _FrameExampleState extends State<FrameExample>
       el.broken = true;
     }
 
+    /// To allow users to switch between multiple frames efficiently,
+    /// consider caching the image bytes.
+    await _createTransparentBackgroundImage();
+
     /// Set the background bounds
     editorKey.currentState!.editorImage = EditorImage(
-      /// To allow users to switch between multiple frames efficiently,
-      /// consider caching the image bytes.
-      byteArray: await _createTransparentBackgroundImage(),
+      byteArray: _transparentBytes,
     );
     await editorKey.currentState!.decodeImage();
   }
 
-  Future<Uint8List> _createTransparentBackgroundImage() async {
+  Future<void> _createTransparentBackgroundImage() async {
     Size frameSize = await _frameSize;
     double width = frameSize.width;
     double height = frameSize.height;
@@ -232,7 +239,8 @@ class _FrameExampleState extends State<FrameExample>
     // ignore: use_build_context_synchronously
     await precacheImage(MemoryImage(bytes), context);
 
-    return bytes;
+    _transparentBytes = bytes;
+    if (mounted) setState(() {});
   }
 
   Future<Size> get _frameSize async {
@@ -258,75 +266,45 @@ class _FrameExampleState extends State<FrameExample>
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () async {
-        LoadingDialog.instance.show(
-          context,
-          configs: const ProImageEditorConfigs(),
-          theme: ThemeData.dark(),
-        );
+    if (!isPreCached || _transparentBytes == null) {
+      return const PrepareImageWidget();
+    }
 
-        var transparentBytes = await _createTransparentBackgroundImage();
-
-        if (!context.mounted) return;
-
-        /// Important to precache the frame before we add it to the editor
-        await precacheImage(AssetImage(_frameUrl), context);
-
-        LoadingDialog.instance.hide();
-
-        if (!context.mounted) return;
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                LayoutBuilder(builder: (context, constraints) {
-              return CustomPaint(
-                size: Size(constraints.maxWidth, constraints.maxHeight),
-                painter: const PixelTransparentPainter(
-                  primary: Colors.white,
-                  secondary: Color(0xFFE2E2E2),
-                ),
-                child: _buildEditor(transparentBytes, constraints),
-              );
-            }),
-          ),
-        );
-      },
-      leading: const Icon(Icons.filter_frames_outlined),
-      title: const Text('Image inside a frame'),
-      trailing: const Icon(Icons.chevron_right),
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      return CustomPaint(
+        size: Size(constraints.maxWidth, constraints.maxHeight),
+        painter: const PixelTransparentPainter(
+          primary: Colors.white,
+          secondary: Color(0xFFE2E2E2),
+        ),
+        child: _buildEditor(constraints),
+      );
+    });
   }
 
-  Widget _buildEditor(Uint8List transparentBytes, BoxConstraints constraints) {
+  Widget _buildEditor(BoxConstraints constraints) {
     return ProImageEditor.memory(
-      transparentBytes,
+      _transparentBytes!,
       key: editorKey,
       callbacks: ProImageEditorCallbacks(
         onImageEditingStarted: onImageEditingStarted,
         onImageEditingComplete: onImageEditingComplete,
-        onCloseEditor: onCloseEditor,
+        onCloseEditor: () => onCloseEditor(enablePop: !isDesktopMode(context)),
       ),
       configs: ProImageEditorConfigs(
           designMode: platformDesignMode,
-          imageGenerationConfigs: const ImageGenerationConfigs(
+          imageGeneration: const ImageGenerationConfigs(
             enableUseOriginalBytes: false,
 
             /// Optional set the output format to png. Default format is jpeg
             /// outputFormat: OutputFormat.png,
           ),
-          layerInteraction: const LayerInteraction(
+          layerInteraction: const LayerInteractionConfigs(
             selectable: LayerInteractionSelectable.disabled,
           ),
-
-          /// Crop-Rotate, Filter, Tune and Blur editors are not supported
-          cropRotateEditorConfigs:
-              const CropRotateEditorConfigs(enabled: false),
-          filterEditorConfigs: const FilterEditorConfigs(enabled: false),
-          blurEditorConfigs: const BlurEditorConfigs(enabled: false),
-          customWidgets: ImageEditorCustomWidgets(
-            mainEditor: CustomWidgetsMainEditor(
+          mainEditor: MainEditorConfigs(
+            enableCloseButton: !isDesktopMode(context),
+            widgets: MainEditorWidgets(
               bodyItemsRecorded: (editor, rebuildStream) => [
                 _buildFrame(editor.sizesManager.bodySize, rebuildStream),
               ],
@@ -339,54 +317,63 @@ class _FrameExampleState extends State<FrameExample>
                 ),
               ),
             ),
-            paintEditor: CustomWidgetsPaintEditor(
-              bodyItemsRecorded: (editor, rebuildStream) => [
-                _buildFrame(editor.editorBodySize, rebuildStream),
-              ],
-            ),
-            // textEditor: CustomWidgetsTextEditor(
-            //   bodyItems: (editor, rebuildStream) => [
-            //     _buildFrame(editor.editorBodySize, rebuildStream),
-            //   ],
-            // ),
-            cropRotateEditor: CustomWidgetsCropRotateEditor(
-              bodyItems: (editor, rebuildStream) => [
-                _buildFrame(editor.editorBodySize, rebuildStream),
-              ],
-            ),
-            tuneEditor: CustomWidgetsTuneEditor(
-              bodyItemsRecorded: (editor, rebuildStream) => [
-                _buildFrame(editor.editorBodySize, rebuildStream),
-              ],
-            ),
-            filterEditor: CustomWidgetsFilterEditor(
-              bodyItemsRecorded: (editor, rebuildStream) => [
-                _buildFrame(editor.editorBodySize, rebuildStream),
-              ],
-            ),
-            blurEditor: CustomWidgetsBlurEditor(
-              bodyItemsRecorded: (editor, rebuildStream) => [
-                _buildFrame(editor.editorBodySize, rebuildStream),
-              ],
+            style: const MainEditorStyle(
+              background: Colors.transparent,
+              uiOverlayStyle:
+                  SystemUiOverlayStyle(statusBarColor: Colors.black),
             ),
           ),
-          imageEditorTheme: const ImageEditorTheme(
-            uiOverlayStyle: SystemUiOverlayStyle(
-              statusBarColor: Colors.black,
+          paintEditor: PaintEditorConfigs(
+            widgets: PaintEditorWidgets(
+              bodyItemsRecorded: (editor, rebuildStream) => [
+                _buildFrame(editor.editorBodySize, rebuildStream),
+              ],
             ),
-            background: Colors.transparent,
-            paintingEditor: PaintingEditorTheme(background: Colors.transparent),
+            style: const PaintEditorStyle(
+              background: Colors.transparent,
+              uiOverlayStyle:
+                  SystemUiOverlayStyle(statusBarColor: Colors.black),
+            ),
+          ),
 
-            /// Optionally remove background
-            /// cropRotateEditor:
-            ///   CropRotateEditorTheme(background:
-            ///                                 Colors.transparent),
-            /// filterEditor:
-            ///   FilterEditorTheme(background: Colors.transparent),
-            /// blurEditor:
-            ///   BlurEditorTheme(background: Colors.transparent),
+          /// Crop-Rotate, Filter, Tune and Blur editors are not supported
+          cropRotateEditor: const CropRotateEditorConfigs(
+            enabled: false,
+
+            /// widgets: CropRotateEditorWidgets(
+            ///   bodyItems: (editor, rebuildStream) => [
+            ///     _buildFrame(editor.editorBodySize, rebuildStream),
+            ///   ],
+            /// ),
           ),
-          stickerEditorConfigs: StickerEditorConfigs(
+          filterEditor: const FilterEditorConfigs(
+            enabled: false,
+
+            /// widgets: FilterEditorWidgets(
+            ///   bodyItemsRecorded: (editor, rebuildStream) => [
+            ///     _buildFrame(editor.editorBodySize, rebuildStream),
+            ///   ],
+            /// ),
+          ),
+          blurEditor: const BlurEditorConfigs(
+            enabled: false,
+
+            /// widgets: BlurEditorWidgets(
+            ///   bodyItemsRecorded: (editor, rebuildStream) => [
+            ///     _buildFrame(editor.editorBodySize, rebuildStream),
+            ///   ],
+            /// ),
+          ),
+          tuneEditor: const TuneEditorConfigs(
+            enabled: false,
+
+            /// widgets: TuneEditorWidgets(
+            ///   bodyItemsRecorded: (editor, rebuildStream) => [
+            ///     _buildFrame(editor.editorBodySize, rebuildStream),
+            ///   ],
+            /// ),
+          ),
+          stickerEditor: StickerEditorConfigs(
             enabled: false,
             initWidth: _layerInitWidth / _initScale,
             buildStickers: (setLayer, scrollController) {
@@ -465,7 +452,7 @@ class _FrameExampleState extends State<FrameExample>
                         size: 22.0,
                         color: Colors.white,
                       ),
-                      onPressed: editor.openPaintingEditor,
+                      onPressed: editor.openPaintEditor,
                     ),
                     FlatIconTextButton(
                       label: Text('Text', style: _bottomTextStyle),

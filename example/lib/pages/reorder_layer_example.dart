@@ -1,4 +1,5 @@
 // Flutter imports:
+import 'package:example/common/example_constants.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 
 // Project imports:
-import '../utils/example_constants.dart';
 import '../utils/example_helper.dart';
 
 /// A widget that demonstrates the ability to reorder layers within a UI.
@@ -38,38 +38,31 @@ class ReorderLayerExample extends StatefulWidget {
 class _ReorderLayerExampleState extends State<ReorderLayerExample>
     with ExampleHelperState<ReorderLayerExample> {
   @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () async {
-        await precacheImage(
-            AssetImage(ExampleConstants.of(context)!.demoAssetPath), context);
-        if (!context.mounted) return;
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => _buildEditor(),
-          ),
-        );
-      },
-      leading: const Icon(Icons.sort),
-      title: const Text('Reorder layer level'),
-      trailing: const Icon(Icons.chevron_right),
-    );
+  void initState() {
+    preCacheImage(assetPath: kImageEditorExampleAssetPath);
+    super.initState();
   }
 
-  Widget _buildEditor() {
+  @override
+  Widget build(BuildContext context) {
+    if (!isPreCached) return const PrepareImageWidget();
+
     return ProImageEditor.asset(
-      ExampleConstants.of(context)!.demoAssetPath,
+      kImageEditorExampleAssetPath,
       key: editorKey,
       callbacks: ProImageEditorCallbacks(
         onImageEditingStarted: onImageEditingStarted,
         onImageEditingComplete: onImageEditingComplete,
-        onCloseEditor: onCloseEditor,
+        onCloseEditor: () => onCloseEditor(enablePop: !isDesktopMode(context)),
       ),
       configs: ProImageEditorConfigs(
+        helperLines: const HelperLineConfigs(
+          hitVibration: false,
+        ),
         designMode: platformDesignMode,
-        customWidgets: ImageEditorCustomWidgets(
-          mainEditor: CustomWidgetsMainEditor(
+        mainEditor: MainEditorConfigs(
+          enableCloseButton: !isDesktopMode(context),
+          widgets: MainEditorWidgets(
             bodyItems: (editor, rebuildStream) {
               return [
                 ReactiveCustomWidget(
@@ -198,17 +191,17 @@ class _ReorderLayerSheetState extends State<ReorderLayerSheet> {
                       (layer as EmojiLayerData).emoji,
                       style: const TextStyle(fontSize: 24),
                     )
-                  : layer.runtimeType == PaintingLayerData
+                  : layer.runtimeType == PaintLayerData
                       ? SizedBox(
                           height: 40,
                           child: FittedBox(
                             alignment: Alignment.centerLeft,
                             child: CustomPaint(
-                              size: (layer as PaintingLayerData).size,
+                              size: (layer as PaintLayerData).size,
                               willChange: true,
                               isComplex:
                                   layer.item.mode == PaintModeE.freeStyle,
-                              painter: DrawPainting(
+                              painter: DrawPaintItem(
                                 item: layer.item,
                                 scale: layer.scale,
                                 enabledHitDetection: false,

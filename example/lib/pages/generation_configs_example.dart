@@ -36,21 +36,7 @@ class GenerationConfigsExample extends StatefulWidget {
 class _GenerationConfigsExampleState extends State<GenerationConfigsExample> {
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const GenerationConfig(),
-          ),
-        );
-      },
-      leading: const Icon(Icons.memory_outlined),
-      title: const Text('Generation Configurations'),
-      subtitle:
-          const Text('Adjust output format, set processor usage, and more'),
-      trailing: const Icon(Icons.chevron_right),
-    );
+    return const GenerationConfig();
   }
 }
 
@@ -156,7 +142,7 @@ class _GenerationConfigState extends State<GenerationConfig>
 
   Widget _buildGroupHeader(String title) {
     return ListTile(
-      tileColor: const Color.fromARGB(255, 201, 201, 201),
+      tileColor: const ui.Color.fromARGB(255, 30, 31, 36),
       title: Text(
         title,
         style: const TextStyle(
@@ -544,7 +530,7 @@ class _GenerationConfigState extends State<GenerationConfig>
       ),
       configs: ProImageEditorConfigs(
         designMode: platformDesignMode,
-        imageGenerationConfigs: generationConfigs,
+        imageGeneration: generationConfigs,
       ),
     );
   }

@@ -1,17 +1,31 @@
 import 'package:flutter/widgets.dart';
 import 'package:pro_image_editor/models/crop_rotate_editor/transform_factors.dart';
-import 'package:pro_image_editor/utils/decode_image.dart';
+import '../../utils/decode_image.dart';
+import '../custom_widgets/main_editor_widgets.dart';
+import '../icons/main_editor_icons.dart';
+import '../styles/main_editor_style.dart';
+
+export '../custom_widgets/main_editor_widgets.dart';
+export '../icons/main_editor_icons.dart';
+export '../styles/main_editor_style.dart';
 
 /// Configuration options for a main editor.
 class MainEditorConfigs {
   /// Creates an instance of MainEditorConfigs with optional settings.
   const MainEditorConfigs({
     this.enableZoom = false,
+    this.enableCloseButton = true,
     this.editorMinScale = 1.0,
     this.editorMaxScale = 5.0,
     this.transformSetup,
     this.boundaryMargin = EdgeInsets.zero,
+    this.style = const MainEditorStyle(),
+    this.icons = const MainEditorIcons(),
+    this.widgets = const MainEditorWidgets(),
   });
+
+  /// Determines whether the close button is displayed on the widget.
+  final bool enableCloseButton;
 
   /// {@template enableZoom}
   /// Indicates whether the editor supports zoom functionality.
@@ -67,6 +81,15 @@ class MainEditorConfigs {
   /// such as cropping, based on the provided setup.
   final MainEditorTransformSetup? transformSetup;
 
+  /// Style configuration for the main editor.
+  final MainEditorStyle style;
+
+  /// Icons used in the main editor.
+  final MainEditorIcons icons;
+
+  /// Widgets associated with the main editor.
+  final MainEditorWidgets widgets;
+
   /// Creates a copy of this `MainEditorConfigs` object with the given fields
   /// replaced with new values.
   ///
@@ -74,18 +97,26 @@ class MainEditorConfigs {
   /// [MainEditorConfigs] with some properties updated while keeping the
   /// others unchanged.
   MainEditorConfigs copyWith({
+    bool? enableCloseButton,
     bool? enableZoom,
     double? editorMinScale,
     double? editorMaxScale,
     MainEditorTransformSetup? transformSetup,
     EdgeInsets? boundaryMargin,
+    MainEditorStyle? style,
+    MainEditorIcons? icons,
+    MainEditorWidgets? widgets,
   }) {
     return MainEditorConfigs(
+      enableCloseButton: enableCloseButton ?? this.enableCloseButton,
       enableZoom: enableZoom ?? this.enableZoom,
       editorMinScale: editorMinScale ?? this.editorMinScale,
       editorMaxScale: editorMaxScale ?? this.editorMaxScale,
       transformSetup: transformSetup ?? this.transformSetup,
       boundaryMargin: boundaryMargin ?? this.boundaryMargin,
+      style: style ?? this.style,
+      widgets: widgets ?? this.widgets,
+      icons: icons ?? this.icons,
     );
   }
 }

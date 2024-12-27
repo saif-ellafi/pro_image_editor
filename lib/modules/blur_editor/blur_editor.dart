@@ -221,7 +221,7 @@ class BlurEditorState extends State<BlurEditor>
       data: theme.copyWith(
           tooltipTheme: theme.tooltipTheme.copyWith(preferBelow: true)),
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: imageEditorTheme.uiOverlayStyle,
+        value: blurEditorConfigs.style.uiOverlayStyle,
         child: SafeArea(
           top: blurEditorConfigs.safeArea.top,
           bottom: blurEditorConfigs.safeArea.bottom,
@@ -230,7 +230,7 @@ class BlurEditorState extends State<BlurEditor>
           child: RecordInvisibleWidget(
             controller: screenshotCtrl,
             child: Scaffold(
-              backgroundColor: imageEditorTheme.blurEditor.background,
+              backgroundColor: blurEditorConfigs.style.background,
               appBar: _buildAppBar(),
               body: _buildBody(),
               bottomNavigationBar: _buildBottomNavBar(),
@@ -243,27 +243,27 @@ class BlurEditorState extends State<BlurEditor>
 
   /// Builds the app bar for the blur editor.
   PreferredSizeWidget? _buildAppBar() {
-    if (customWidgets.blurEditor.appBar != null) {
-      return customWidgets.blurEditor.appBar!
+    if (blurEditorConfigs.widgets.appBar != null) {
+      return blurEditorConfigs.widgets.appBar!
           .call(this, rebuildController.stream);
     }
 
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: imageEditorTheme.blurEditor.appBarBackgroundColor,
-      foregroundColor: imageEditorTheme.blurEditor.appBarForegroundColor,
+      backgroundColor: blurEditorConfigs.style.appBarBackgroundColor,
+      foregroundColor: blurEditorConfigs.style.appBarForegroundColor,
       actions: [
         IconButton(
           tooltip: i18n.blurEditor.back,
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(icons.backButton),
+          icon: Icon(blurEditorConfigs.icons.backButton),
           onPressed: close,
         ),
         const Spacer(),
         IconButton(
           tooltip: i18n.blurEditor.done,
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(icons.applyChanges),
+          icon: Icon(blurEditorConfigs.icons.applyChanges),
           iconSize: 28,
           onPressed: done,
         ),
@@ -325,14 +325,14 @@ class BlurEditorState extends State<BlurEditor>
                     layers: layers!,
                     clipBehavior: Clip.none,
                   ),
-                if (customWidgets.blurEditor.bodyItemsRecorded != null)
-                  ...customWidgets.blurEditor.bodyItemsRecorded!(
+                if (blurEditorConfigs.widgets.bodyItemsRecorded != null)
+                  ...blurEditorConfigs.widgets.bodyItemsRecorded!(
                       this, rebuildController.stream),
               ],
             ),
           ),
-          if (customWidgets.blurEditor.bodyItems != null)
-            ...customWidgets.blurEditor.bodyItems!(
+          if (blurEditorConfigs.widgets.bodyItems != null)
+            ...blurEditorConfigs.widgets.bodyItems!(
                 this, rebuildController.stream),
         ],
       );
@@ -341,14 +341,14 @@ class BlurEditorState extends State<BlurEditor>
 
   /// Builds the bottom navigation bar with blur slider.
   Widget? _buildBottomNavBar() {
-    if (customWidgets.blurEditor.bottomBar != null) {
-      return customWidgets.blurEditor.bottomBar!
+    if (blurEditorConfigs.widgets.bottomBar != null) {
+      return blurEditorConfigs.widgets.bottomBar!
           .call(this, rebuildController.stream);
     }
 
     return SafeArea(
       child: Container(
-        color: imageEditorTheme.blurEditor.background,
+        color: blurEditorConfigs.style.background,
         height: 100,
         child: Align(
           alignment: Alignment.center,
@@ -358,7 +358,7 @@ class BlurEditorState extends State<BlurEditor>
               child: StreamBuilder(
                   stream: _uiBlurStream.stream,
                   builder: (context, snapshot) {
-                    return customWidgets.blurEditor.slider?.call(
+                    return blurEditorConfigs.widgets.slider?.call(
                           this,
                           rebuildController.stream,
                           blurFactor,

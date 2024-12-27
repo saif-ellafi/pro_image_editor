@@ -145,7 +145,7 @@ class _LayerWidgetState extends State<LayerWidget>
       case const (StickerLayerData):
         _layerType = _LayerType.sticker;
         break;
-      case const (PaintingLayerData):
+      case const (PaintLayerData):
         _layerType = _LayerType.canvas;
         break;
       default:
@@ -214,7 +214,7 @@ class _LayerWidgetState extends State<LayerWidget>
   /// Checks if the hit is outside the canvas for certain types of layers.
   bool _checkHitIsOutsideInCanvas() {
     return _layerType == _LayerType.canvas &&
-        !(_layer as PaintingLayerData).item.hit;
+        !(_layer as PaintLayerData).item.hit;
   }
 
   /// Calculates the transformation matrix for the layer's position and
@@ -279,7 +279,7 @@ class _LayerWidgetState extends State<LayerWidget>
             child: MouseRegion(
               hitTestBehavior: HitTestBehavior.translucent,
               cursor: _showMoveCursor
-                  ? imageEditorTheme.layerInteraction.hoverCursor
+                  ? layerInteraction.style.hoverCursor
                   : MouseCursor.defer,
               onEnter: (event) {
                 if (_layerType != _LayerType.canvas) {
@@ -290,7 +290,7 @@ class _LayerWidgetState extends State<LayerWidget>
               },
               onExit: (event) {
                 if (_layerType == _LayerType.canvas) {
-                  (widget.layerData as PaintingLayerData).item.hit = false;
+                  (widget.layerData as PaintLayerData).item.hit = false;
                 } else {
                   setState(() {
                     _showMoveCursor = false;
@@ -394,7 +394,7 @@ class _LayerWidgetState extends State<LayerWidget>
       child: Text(
         layer.emoji.toString(),
         textAlign: TextAlign.center,
-        style: imageEditorTheme.emojiEditor.textStyle.copyWith(
+        style: emojiEditorConfigs.style.textStyle.copyWith(
           fontSize: textEditorConfigs.initFontSize * _layer.scale,
         ),
       ),
@@ -405,7 +405,7 @@ class _LayerWidgetState extends State<LayerWidget>
   Widget _buildSticker() {
     var layer = _layer as StickerLayerData;
     return SizedBox(
-      width: (stickerEditorConfigs?.initWidth ?? 100) * layer.scale,
+      width: stickerEditorConfigs.initWidth * layer.scale,
       child: FittedBox(
         fit: BoxFit.contain,
         child: layer.sticker,
@@ -415,7 +415,7 @@ class _LayerWidgetState extends State<LayerWidget>
 
   /// Build the canvas widget
   Widget _buildCanvas() {
-    var layer = _layer as PaintingLayerData;
+    var layer = _layer as PaintLayerData;
     return Padding(
       // Better hit detection for mobile devices
       padding: EdgeInsets.all(isDesktop ? 0 : 15),
@@ -426,7 +426,7 @@ class _LayerWidgetState extends State<LayerWidget>
             size: layer.size,
             willChange: false,
             isComplex: layer.item.mode == PaintModeE.freeStyle,
-            painter: DrawPainting(
+            painter: DrawPaintItem(
               item: layer.item,
               scale: widget.layerData.scale,
               selected: widget.selected,

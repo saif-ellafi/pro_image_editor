@@ -69,7 +69,7 @@ class ImageGenerationConfigs {
   final bool captureOnlyBackgroundImageArea;
 
   /// Determines whether to capture only the content within the boundaries of
-  /// the painting when editing is complete.
+  /// the drawings when editing is complete.
   ///
   /// If set to `true`, editing completion will result in cropping all content
   /// outside the image boundaries.

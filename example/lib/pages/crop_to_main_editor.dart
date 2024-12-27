@@ -1,13 +1,12 @@
 // Flutter imports:
-import 'package:example/utils/example_constants.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:pro_image_editor/models/crop_rotate_editor/transform_factors.dart';
-import 'package:pro_image_editor/models/editor_configs/main_editor_configs.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 
 // Project imports:
+import '../common/example_constants.dart';
 import '../utils/example_helper.dart';
 
 /// A widget that demonstrates cropping functionality in the main editor.
@@ -41,34 +40,28 @@ class _CropToMainEditorExampleState extends State<CropToMainEditorExample>
     with ExampleHelperState<CropToMainEditorExample> {
   final ProImageEditorConfigs _editorConfigs = ProImageEditorConfigs(
     designMode: platformDesignMode,
-    cropRotateEditorConfigs: const CropRotateEditorConfigs(
+    cropRotateEditor: const CropRotateEditorConfigs(
       initAspectRatio: 1,
       provideImageInfos: true,
       canChangeAspectRatio: false,
     ),
   );
 
-  void _openCropEditor() {
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (_, animation, secondaryAnimation) =>
-            CropRotateEditor.asset(
-          ExampleConstants.of(context)!.demoAssetPath,
-          initConfigs: CropRotateEditorInitConfigs(
-            theme: ThemeData.dark(),
-            configs: _editorConfigs,
-            onDone: (transformations, fitToScreenFactor, imageInfos) {
-              /// Skip one frame before opening the main editor, as the crop
-              /// editor will call Navigator.pop(context).
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _openMainEditor(transformations, imageInfos!);
-              });
-            },
-          ),
-        ),
-      ),
+  final _cropEditorKey = GlobalKey<CropRotateEditorState>();
+
+  @override
+  void initState() {
+    preCacheImage(
+      assetPath: kImageEditorExampleAssetPath,
+      onDone: () {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) {
+            _cropEditorKey.currentState!.enableFakeHero = true;
+          }
+        });
+      },
     );
+    super.initState();
   }
 
   void _openMainEditor(
@@ -79,21 +72,22 @@ class _CropToMainEditorExampleState extends State<CropToMainEditorExample>
       context,
       PageRouteBuilder(
         pageBuilder: (_, animation, secondaryAnimation) => ProImageEditor.asset(
-          ExampleConstants.of(context)!.demoAssetPath,
+          kImageEditorExampleAssetPath,
           key: editorKey,
           callbacks: ProImageEditorCallbacks(
             onImageEditingStarted: onImageEditingStarted,
-            onCloseEditor: onCloseEditor,
+            onCloseEditor: () =>
+                onCloseEditor(enablePop: !isDesktopMode(context)),
             onImageEditingComplete: onImageEditingComplete,
           ),
           configs: _editorConfigs.copyWith(
-            mainEditorConfigs: MainEditorConfigs(
+            mainEditor: MainEditorConfigs(
               transformSetup: MainEditorTransformSetup(
                 transformConfigs: transformations,
                 imageInfos: imageInfos,
               ),
             ),
-            cropRotateEditorConfigs: const CropRotateEditorConfigs(
+            cropRotateEditor: const CropRotateEditorConfigs(
               enabled: false,
             ),
           ),
@@ -109,21 +103,27 @@ class _CropToMainEditorExampleState extends State<CropToMainEditorExample>
           return child;
         },
       ),
-    );
+    ).whenComplete(() {
+      if (mounted) Navigator.pop(context);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () async {
-        await precacheImage(
-            AssetImage(ExampleConstants.of(context)!.demoAssetPath), context);
-        if (!context.mounted) return;
-        _openCropEditor();
-      },
-      leading: const Icon(Icons.crop),
-      title: const Text('Start with Crop-Editor'),
-      trailing: const Icon(Icons.chevron_right),
+    if (!isPreCached) return const PrepareImageWidget();
+
+    return CropRotateEditor.asset(
+      kImageEditorExampleAssetPath,
+      key: _cropEditorKey,
+      initConfigs: CropRotateEditorInitConfigs(
+        theme: Theme.of(context),
+        configs: _editorConfigs,
+        enablePopWhenDone: false,
+        enableCloseButton: !isDesktopMode(context),
+        onDone: (transformations, fitToScreenFactor, imageInfos) {
+          _openMainEditor(transformations, imageInfos!);
+        },
+      ),
     );
   }
 }

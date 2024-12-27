@@ -136,7 +136,7 @@ class _PreviewImgPageState extends State<PreviewImgPage> {
         });
       }
       return Theme(
-        data: ThemeData.dark(),
+        data: Theme.of(context),
         child: Scaffold(
           appBar: AppBar(
             title: const Text('Result'),

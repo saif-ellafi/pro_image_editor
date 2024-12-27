@@ -8,7 +8,7 @@ import 'package:pro_image_editor/models/layer/layer.dart';
 ///
 /// The `LayerManager` provides methods for copying layers to create new
 /// instances of the same type. It supports various types of layers, including
-/// text, emoji, painting, and sticker layers.
+/// text, emoji, paint, and sticker layers.
 class LayerCopyManager {
   /// Copy a layer to create a new instance of the same type.
   ///
@@ -21,8 +21,8 @@ class LayerCopyManager {
       return createCopyTextLayer(layer);
     } else if (layer is EmojiLayerData) {
       return createCopyEmojiLayer(layer);
-    } else if (layer is PaintingLayerData) {
-      return createCopyPaintingLayer(layer);
+    } else if (layer is PaintLayerData) {
+      return createCopyPaintLayer(layer);
     } else if (layer is StickerLayerData) {
       return createCopyStickerLayer(layer);
     } else {
@@ -95,9 +95,9 @@ class LayerCopyManager {
     );
   }
 
-  /// Create a copy of a PaintingLayerData instance.
-  PaintingLayerData createCopyPaintingLayer(PaintingLayerData layer) {
-    return PaintingLayerData(
+  /// Create a copy of a PaintLayerData instance.
+  PaintLayerData createCopyPaintLayer(PaintLayerData layer) {
+    return PaintLayerData(
       id: layer.id,
       offset: Offset(layer.offset.dx, layer.offset.dy),
       rotation: layer.rotation,

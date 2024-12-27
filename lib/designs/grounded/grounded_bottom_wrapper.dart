@@ -64,7 +64,7 @@ class _GroundedBottomWrapperState extends State<GroundedBottomWrapper> {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Theme(
-          data: widget.theme ?? ThemeData.dark(),
+          data: widget.theme ?? Theme.of(context),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: widget.children(constraints),

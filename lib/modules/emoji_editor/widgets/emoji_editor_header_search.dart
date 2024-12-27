@@ -1,7 +1,8 @@
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:pro_image_editor/models/i18n/i18n.dart';
-import 'package:pro_image_editor/models/theme/theme_shared_values.dart';
+
+import '../../../common/editor_style_constants.dart';
 
 /// Search view header for the emoji editor, allowing search input and emoji
 /// display.
@@ -76,13 +77,13 @@ class HeaderSearchViewState extends SearchViewState {
                     onChanged: onTextInputChanged,
                     focusNode: focusNode,
                     style: const TextStyle(
-                      color: imageEditorTextColor,
+                      color: kImageEditorTextColor,
                     ),
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: i18n.emojiEditor.search,
                       hintStyle: const TextStyle(
-                        color: imageEditorTextColor,
+                        color: kImageEditorTextColor,
                         fontWeight: FontWeight.normal,
                       ),
                       contentPadding: EdgeInsets.zero,

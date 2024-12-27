@@ -348,10 +348,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
               editorBodySize.height,
             ),
             fadeInOpacity: _painterOpacity,
-            cornerThickness:
-                imageEditorTheme.cropRotateEditor.cropCornerThickness,
-            cornerLength: imageEditorTheme.cropRotateEditor.cropCornerLength,
-            imageEditorTheme: imageEditorTheme,
+            style: cropRotateEditorConfigs.style,
             drawCircle: cropRotateEditorConfigs.roundCropper,
           )
         : null;
@@ -707,7 +704,9 @@ class CropRotateEditorState extends State<CropRotateEditor>
 
       await initConfigs.onDone
           ?.call(transformC, _transformHelperScale, imageInfos);
-      if (mounted) Navigator.pop(context, transformC);
+      if (mounted && initConfigs.enablePopWhenDone) {
+        Navigator.pop(context, transformC);
+      }
     } else {
       LoadingDialog.instance.show(
         context,
@@ -971,10 +970,10 @@ class CropRotateEditorState extends State<CropRotateEditor>
     showModalBottomSheet<double>(
         context: context,
         backgroundColor:
-            imageEditorTheme.cropRotateEditor.aspectRatioSheetBackgroundColor,
+            cropRotateEditorConfigs.style.aspectRatioSheetBackgroundColor,
         isScrollControlled: true,
         builder: (BuildContext context) {
-          return customWidgets.cropRotateEditor.aspectRatioOptions?.call(
+          return cropRotateEditorConfigs.widgets.aspectRatioOptions?.call(
                 this,
                 rebuildController.stream,
                 aspectRatio,
@@ -1298,7 +1297,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
 
         double outsidePadding = _screenPadding * 2;
         double cornerGap =
-            imageEditorTheme.cropRotateEditor.cropCornerLength * 2.25;
+            cropRotateEditorConfigs.style.cropCornerLength * 2.25;
         double minCornerDistance = outsidePadding + cornerGap;
 
         double halfViewRectW = _viewRect.width / 2;
@@ -1943,14 +1942,14 @@ class CropRotateEditorState extends State<CropRotateEditor>
           },
           child: LayoutBuilder(builder: (context, constraints) {
             return AnnotatedRegion<SystemUiOverlayStyle>(
-              value: imageEditorTheme.uiOverlayStyle,
+              value: cropRotateEditorConfigs.style.uiOverlayStyle,
               child: Theme(
                 data: theme.copyWith(
                     tooltipTheme:
                         theme.tooltipTheme.copyWith(preferBelow: true)),
                 child: Scaffold(
                   resizeToAvoidBottomInset: false,
-                  backgroundColor: imageEditorTheme.cropRotateEditor.background,
+                  backgroundColor: cropRotateEditorConfigs.style.background,
                   appBar: _buildAppBar(constraints),
                   body: _buildBody(),
                   bottomNavigationBar: _buildBottomAppBar(),
@@ -1966,8 +1965,8 @@ class CropRotateEditorState extends State<CropRotateEditor>
   /// Builds the app bar for the editor, including buttons for actions such as
   /// back, rotate, aspect ratio, and done.
   PreferredSizeWidget? _buildAppBar(BoxConstraints constraints) {
-    if (customWidgets.cropRotateEditor.appBar != null) {
-      var customToolbar = customWidgets.cropRotateEditor.appBar!
+    if (cropRotateEditorConfigs.widgets.appBar != null) {
+      var customToolbar = cropRotateEditorConfigs.widgets.appBar!
           .call(this, rebuildController.stream);
       _hasToolbar = customToolbar != null;
       return customToolbar;
@@ -1975,21 +1974,22 @@ class CropRotateEditorState extends State<CropRotateEditor>
     _hasToolbar = true;
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: imageEditorTheme.cropRotateEditor.appBarBackgroundColor,
-      foregroundColor: imageEditorTheme.cropRotateEditor.appBarForegroundColor,
+      backgroundColor: cropRotateEditorConfigs.style.appBarBackground,
+      foregroundColor: cropRotateEditorConfigs.style.appBarColor,
       actions: [
-        IconButton(
-          tooltip: i18n.cropRotateEditor.back,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(icons.backButton),
-          onPressed: close,
-        ),
+        if (initConfigs.enableCloseButton)
+          IconButton(
+            tooltip: i18n.cropRotateEditor.back,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            icon: Icon(cropRotateEditorConfigs.icons.backButton),
+            onPressed: close,
+          ),
         const Spacer(),
         IconButton(
           tooltip: i18n.cropRotateEditor.undo,
           padding: const EdgeInsets.symmetric(horizontal: 8),
           icon: Icon(
-            icons.undoAction,
+            cropRotateEditorConfigs.icons.undoAction,
             color: canUndo ? Colors.white : Colors.white.withAlpha(80),
           ),
           onPressed: undoAction,
@@ -1998,7 +1998,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
           tooltip: i18n.cropRotateEditor.redo,
           padding: const EdgeInsets.symmetric(horizontal: 8),
           icon: Icon(
-            icons.redoAction,
+            cropRotateEditorConfigs.icons.redoAction,
             color: canRedo ? Colors.white : Colors.white.withAlpha(80),
           ),
           onPressed: redoAction,
@@ -2009,8 +2009,8 @@ class CropRotateEditorState extends State<CropRotateEditor>
   }
 
   Widget? _buildBottomAppBar() {
-    if (customWidgets.cropRotateEditor.bottomBar != null) {
-      return customWidgets.cropRotateEditor.bottomBar!
+    if (cropRotateEditorConfigs.widgets.bottomBar != null) {
+      return cropRotateEditorConfigs.widgets.bottomBar!
           .call(this, rebuildController.stream);
     }
 
@@ -2026,8 +2026,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
               thickness: isDesktop ? null : 0,
               child: BottomAppBar(
                 height: kToolbarHeight,
-                color:
-                    imageEditorTheme.cropRotateEditor.bottomBarBackgroundColor,
+                color: cropRotateEditorConfigs.style.bottomBarBackground,
                 padding: EdgeInsets.zero,
                 child: Center(
                   child: SingleChildScrollView(
@@ -2039,8 +2038,8 @@ class CropRotateEditorState extends State<CropRotateEditor>
                         maxWidth: 500,
                       ),
                       child: Builder(builder: (context) {
-                        Color foregroundColor = imageEditorTheme
-                            .cropRotateEditor.appBarForegroundColor;
+                        Color foregroundColor =
+                            cropRotateEditorConfigs.style.appBarColor;
                         return Wrap(
                           direction: Axis.horizontal,
                           alignment: WrapAlignment.spaceAround,
@@ -2054,7 +2053,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
                                   style: TextStyle(
                                       fontSize: 10.0, color: foregroundColor),
                                 ),
-                                icon: Icon(icons.cropRotateEditor.rotate,
+                                icon: Icon(cropRotateEditorConfigs.icons.rotate,
                                     color: foregroundColor),
                                 onPressed: rotate,
                               ),
@@ -2067,7 +2066,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
                                   style: TextStyle(
                                       fontSize: 10.0, color: foregroundColor),
                                 ),
-                                icon: Icon(icons.cropRotateEditor.flip,
+                                icon: Icon(cropRotateEditorConfigs.icons.flip,
                                     color: foregroundColor),
                                 onPressed: flip,
                               ),
@@ -2080,7 +2079,8 @@ class CropRotateEditorState extends State<CropRotateEditor>
                                   style: TextStyle(
                                       fontSize: 10.0, color: foregroundColor),
                                 ),
-                                icon: Icon(icons.cropRotateEditor.aspectRatio,
+                                icon: Icon(
+                                    cropRotateEditorConfigs.icons.aspectRatio,
                                     color: foregroundColor),
                                 onPressed: openAspectRatioOptions,
                               ),
@@ -2093,7 +2093,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
                                   style: TextStyle(
                                       fontSize: 10.0, color: foregroundColor),
                                 ),
-                                icon: Icon(icons.cropRotateEditor.reset,
+                                icon: Icon(cropRotateEditorConfigs.icons.reset,
                                     color: foregroundColor),
                                 onPressed: reset,
                               ),
@@ -2180,8 +2180,8 @@ class CropRotateEditorState extends State<CropRotateEditor>
                 ),
               ),
             ),
-            if (customWidgets.cropRotateEditor.bodyItems != null)
-              ...customWidgets.cropRotateEditor.bodyItems!(
+            if (cropRotateEditorConfigs.widgets.bodyItems != null)
+              ...cropRotateEditorConfigs.widgets.bodyItems!(
                   this, rebuildController.stream),
           ],
         ),
@@ -2408,7 +2408,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
     return IconButton(
       tooltip: i18n.cropRotateEditor.done,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      icon: Icon(icons.applyChanges),
+      icon: Icon(cropRotateEditorConfigs.icons.applyChanges),
       iconSize: 28,
       onPressed: done,
     );

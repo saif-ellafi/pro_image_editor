@@ -1,10 +1,26 @@
 # Changelog
 
+## 7.0.0
+### Changed
+- **File Structure Update**:
+  - Moved `custom widgets`, `icons`, and `theme` files into the `configs` directory for better organization.
+  - Renamed all `theme` files to `styles` to better reflect their purpose.
+
+### Breaking Changes
+- File renaming and restructuring require updates to your configuration file:
+  - `custom widgets`, `icons`, and `theme` files are now located directly in the `configs` directory of the editor.
+  - All theme classes are renamed to end with `Style` for consistency.
+
+  
+For more details on why these breaking changes were made and what improvements they bring, check out that [GitHub discussion](https://github.com/hm21/pro_image_editor/discussions/298).
+
+
+
 ## 6.2.3
 - **FIX**(layer): Resolve issue that layer reposition correctly after screen rotation. This resolves issue [#283](https://github.com/hm21/pro_image_editor/issues/283)
 
 ## 6.2.2
-- fix(version): Set minimum Flutter version to `3.27.0`. This resolves issue [#287](https://github.com/hm21/pro_image_editor/issues/287)
+- **Fix**(version): Set minimum Flutter version to `3.27.0`. This resolves issue [#287](https://github.com/hm21/pro_image_editor/issues/287)
 
 ## 6.2.1
 - **FIX**(lint): Resolve lint issues after upgrading to Flutter `3.27.0`
@@ -54,7 +70,7 @@
 - **FIX**(Example): Resolve all linting issues in the example code.
 
 ## 5.4.2
-- **FIX**(Painting-Editor): Resolve issue where undo-redo action capturing the incorrect image. This resolves issue [#239](https://github.com/hm21/pro_image_editor/issues/239)
+- **FIX**(Paint-Editor): Resolve issue where undo-redo action capturing the incorrect image. This resolves issue [#239](https://github.com/hm21/pro_image_editor/issues/239)
 
 ## 5.4.1
 - **FEAT**(Emoji-Editor): Update the emoji-editor to version `3.1.0` with custom view order configuration support.
@@ -419,7 +435,7 @@ configs: ProImageEditorConfigs(
   - More theme and configuration options
   - Hero animation for image and layers
   - Round "cropper" for profile pictures
-- **FEAT**: Painting-Editor
+- **FEAT**: Paint-Editor
   - Standalone drawing of signatures or paintings
 - **FEAT**: Emoji-Editor
   - Infinite scrolling through all categories
@@ -706,7 +722,7 @@ configs: ProImageEditorConfigs(
 
 ## 1.0.0
 
-- **FEAT**: PaintingEditor
+- **FEAT**: PaintEditor
 - **FEAT**: TextEditor
 - **FEAT**: CropRotateEditor
 - **FEAT**: FilterEditor

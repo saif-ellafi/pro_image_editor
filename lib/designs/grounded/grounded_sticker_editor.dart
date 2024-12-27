@@ -64,8 +64,7 @@ class _GroundedStickerEditorState extends State<GroundedStickerEditor> {
 
   @override
   Widget build(BuildContext context) {
-    Color foreGroundColor =
-        widget.configs.imageEditorTheme.appBarForegroundColor;
+    Color foreGroundColor = widget.configs.mainEditor.style.appBarColor;
     return FrostedGlassEffect(
       radius: BorderRadius.zero,
       child: Scaffold(
@@ -103,7 +102,7 @@ class _GroundedStickerEditorState extends State<GroundedStickerEditor> {
                         }
                       },
                       icon: Icon(
-                        widget.configs.icons.closeEditor,
+                        widget.configs.mainEditor.icons.closeEditor,
                         color: foreGroundColor,
                       ),
                     ),

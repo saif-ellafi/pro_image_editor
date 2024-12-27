@@ -52,8 +52,7 @@ class _GroundedCropRotateBarState extends State<GroundedCropRotateBar>
     with ImageEditorConvertedConfigs, SimpleConfigsAccessState {
   late final ScrollController _bottomBarScrollCtrl;
 
-  Color get _foreGroundColor =>
-      imageEditorTheme.textEditor.appBarForegroundColor;
+  Color get _foreGroundColor => cropRotateEditorConfigs.style.appBarColor;
   Color get _foreGroundColorAccent => _foreGroundColor.withValues(alpha: 0.6);
 
   @override
@@ -95,7 +94,7 @@ class _GroundedCropRotateBarState extends State<GroundedCropRotateBar>
   Widget _buildFunctions(BoxConstraints constraints) {
     return BottomAppBar(
       height: GROUNDED_SUB_BAR_HEIGHT,
-      color: imageEditorTheme.bottomBarBackgroundColor,
+      color: cropRotateEditorConfigs.style.bottomBarBackground,
       padding: EdgeInsets.zero,
       child: Align(
         alignment: Alignment.center,
@@ -168,7 +167,7 @@ class _GroundedCropRotateBarState extends State<GroundedCropRotateBar>
           ),
         ),
         icon: Icon(
-          configs.icons.cropRotateEditor.rotate,
+          cropRotateEditorConfigs.icons.rotate,
           color: _foreGroundColor,
         ),
         onPressed: () {
@@ -184,7 +183,7 @@ class _GroundedCropRotateBarState extends State<GroundedCropRotateBar>
           ),
         ),
         icon: Icon(
-          configs.icons.cropRotateEditor.flip,
+          cropRotateEditorConfigs.icons.flip,
           color: _foreGroundColor,
         ),
         onPressed: () {
@@ -201,7 +200,7 @@ class _GroundedCropRotateBarState extends State<GroundedCropRotateBar>
       width: 1,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(2),
-        color: imageEditorTheme.paintingEditor.bottomBarInactiveItemColor,
+        color: paintEditorConfigs.style.bottomBarInactiveItemColor,
       ),
     );
   }

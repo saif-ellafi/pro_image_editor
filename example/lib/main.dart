@@ -1,33 +1,14 @@
-// Flutter imports:
-import 'package:example/pages/crop_to_main_editor.dart';
-import 'package:example/pages/design_examples/design_example.dart';
-import 'package:example/pages/frame_example.dart';
-import 'package:example/pages/zoom_move_editor_example.dart';
+import 'package:example/widgets/not_found_example.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:pro_image_editor/pro_image_editor.dart';
-// Package imports:
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '/pages/firebase_supabase_example.dart';
-import '/pages/import_export_example.dart';
-import '/pages/pick_image_example.dart';
-import '/pages/selectable_layer_example.dart';
-// Project imports:
-import '/utils/example_constants.dart';
-import 'pages/custom_appbar_bottombar_example.dart';
-import 'pages/default_example.dart';
-import 'pages/generation_configs_example.dart';
-import 'pages/google_font_example.dart';
-import 'pages/image_format_convert_example.dart';
-import 'pages/movable_background_image.dart';
-import 'pages/reorder_layer_example.dart';
-import 'pages/round_cropper_example.dart';
-import 'pages/signature_drawing_example.dart';
-import 'pages/standalone_example.dart';
-import 'pages/stickers_example.dart';
+import 'common/example_constants.dart';
+import 'common/examples.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,10 +33,27 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Pro-Image-Editor',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade800),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue.shade800,
+          brightness: Brightness.dark,
+        ),
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
+      onGenerateRoute: (settings) {
+        int index = kImageEditorExamples
+            .indexWhere((example) => example.path == settings.name);
+
+        if (index < 0) {
+          return MaterialPageRoute(
+            builder: (_) => const NotFoundExample(),
+          );
+        }
+
+        return MaterialPageRoute(
+          builder: (_) => kImageEditorExamples[index].page,
+        );
+      },
       home: const MyHomePage(),
     );
   }
@@ -71,29 +69,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
   late final ScrollController _scrollCtrl;
 
-  final List<Widget> _examples = [
-    const DefaultExample(),
-    const DesignExample(),
-    const StandaloneExample(),
-    const CropToMainEditorExample(),
-    const SignatureDrawingExample(),
-    const StickersExample(),
-    const FirebaseSupabaseExample(),
-    const ReorderLayerExample(),
-    const RoundCropperExample(),
-    const SelectableLayerExample(),
-    const GenerationConfigsExample(),
-    const PickImageExample(),
-    const GoogleFontExample(),
-    const CustomAppbarBottombarExample(),
-    const ImportExportExample(),
-    const MovableBackgroundImageExample(),
-    const FrameExample(),
-    const ZoomMoveEditorExample(),
-    const ImageFormatConvertExample(),
-  ];
+  final String _initialRoute = kImageEditorExamples.first.path;
+  int _railIndex = 0;
 
   @override
   void initState() {
@@ -107,40 +87,142 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
+  void _openCodeInGithub() async {
+    String path =
+        'https://github.com/hm21/pro_image_editor/tree/stable/example/lib/pages';
+    Uri url = Uri.parse(path);
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ExampleConstants(
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.dark,
-        child: ExtendedPopScope(
-          child: Scaffold(
-            body: SafeArea(child: _buildCard()),
-          ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: ExtendedPopScope(
+        child: Scaffold(
+          body: Builder(builder: (_) {
+            if (MediaQuery.of(context).size.width >=
+                kImageEditorExampleIsDesktopBreakPoint) {
+              /// Build navigation-rail on large screens
+              return _buildTabletExamples();
+            } else {
+              return _buildMobileExamples();
+            }
+          }),
         ),
       ),
     );
   }
 
-  Widget _buildCard() {
-    return Center(
-      child: LayoutBuilder(builder: (context, constraints) {
-        if (constraints.maxWidth >= 750) {
-          return Container(
-            constraints: const BoxConstraints(maxWidth: 700),
-            child: Card.outlined(
-              margin: const EdgeInsets.all(16),
-              clipBehavior: Clip.hardEdge,
-              child: _buildExamples(),
+  Widget _buildTabletExamples() {
+    return Row(
+      children: [
+        _buildRailBar(),
+        const VerticalDivider(width: 1),
+        Expanded(
+          // Important that hero animations work correctly
+          child: HeroControllerScope(
+            controller: MaterialApp.createMaterialHeroController(),
+            child: Navigator(
+              key: _navigatorKey,
+              initialRoute: _initialRoute,
+              onGenerateRoute: (settings) {
+                int index = kImageEditorExamples
+                    .indexWhere((example) => example.path == settings.name);
+
+                if (index < 0) {
+                  return MaterialPageRoute(
+                    builder: (_) => const NotFoundExample(),
+                  );
+                }
+
+                return PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => kImageEditorExamples[index].page,
+                  transitionsBuilder:
+                      (_, animation, secondaryAnimation, child) {
+                    const begin =
+                        Offset(0.0, 0.1); // Start offscreen to the right
+                    const end = Offset.zero; // End at the center
+                    const curve = Curves.easeInOut;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+                    var offsetAnimation = animation.drive(tween);
+                    return SlideTransition(
+                      position: offsetAnimation,
+                      transformHitTests: false,
+                      child: FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      ),
+                    );
+                  },
+                );
+              },
             ),
-          );
-        } else {
-          return _buildExamples();
-        }
-      }),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildExamples() {
+  Widget _buildRailBar() {
+    return LayoutBuilder(builder: (_, constraints) {
+      return SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: IntrinsicHeight(
+            child: NavigationRail(
+              leading: Column(
+                spacing: 7,
+                children: [
+                  TextButton(
+                    onPressed: _openCodeInGithub,
+                    child: const Text('View code in Github'),
+                  ),
+                  Container(
+                    height: 0.4,
+                    width: 250,
+                    color: Colors.white54,
+                  ),
+                ],
+              ),
+              onDestinationSelected: (index) {
+                if (_railIndex == index) return;
+
+                _navigatorKey.currentState!.pushNamedAndRemoveUntil(
+                  kImageEditorExamples[index].path,
+                  ModalRoute.withName(_initialRoute),
+                );
+                _railIndex = index;
+                setState(() {});
+              },
+              extended: true,
+              destinations: kImageEditorExamples.map((example) {
+                return NavigationRailDestination(
+                  icon: Icon(
+                    example.icon,
+                    color: const Color(0xFFF5F5F5),
+                  ),
+                  label: Text(
+                    example.name,
+                    style: const TextStyle(
+                      color: Color(0xFFF5F5F5),
+                    ),
+                  ),
+                );
+              }).toList(),
+              selectedIndex: _railIndex,
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildMobileExamples() {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -157,26 +239,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               RichText(
-                  text: TextSpan(
-                style: const TextStyle(color: Colors.black87),
-                children: [
-                  const TextSpan(text: 'Check out the example code '),
-                  TextSpan(
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () async {
-                        String path =
-                            'https://github.com/hm21/pro_image_editor/tree/stable/example/lib/pages';
-                        Uri url = Uri.parse(path);
-                        if (!await launchUrl(url)) {
-                          throw Exception('Could not launch $url');
-                        }
-                      },
-                    text: 'here',
-                    style: const TextStyle(color: Colors.blue),
-                  ),
-                  const TextSpan(text: '.'),
-                ],
-              )),
+                text: TextSpan(
+                  style: const TextStyle(color: Colors.white),
+                  children: [
+                    const TextSpan(text: 'Check out the example code '),
+                    TextSpan(
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = _openCodeInGithub,
+                      text: 'here',
+                      style: const TextStyle(color: Colors.blue),
+                    ),
+                    const TextSpan(text: '.'),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -193,7 +269,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: ListTile.divideTiles(
                   context: context,
-                  tiles: _examples,
+                  tiles: kImageEditorExamples.map(
+                    (example) => ListTile(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                          example.path,
+                        );
+                      },
+                      leading: Icon(example.icon),
+                      title: Text(example.name),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                    ),
+                  ),
                 ).toList(),
               ),
             ),

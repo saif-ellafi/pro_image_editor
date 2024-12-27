@@ -1,12 +1,12 @@
 import 'package:pro_image_editor/models/i18n/i18n_tune_editor.dart';
-import 'package:pro_image_editor/models/icons/icons_tune_editor.dart';
+import 'package:pro_image_editor/models/icons/tune_editor_icons.dart';
 
 import '../../../models/tune_editor/tune_adjustment_item.dart';
 import '../../filter_editor/utils/filter_generator/filter_addons.dart';
 
 /// Preset list from tune adjustment
 List<TuneAdjustmentItem> tunePresets({
-  required IconsTuneEditor icons,
+  required TuneEditorIcons icons,
   required I18nTuneEditor i18n,
 }) =>
     [

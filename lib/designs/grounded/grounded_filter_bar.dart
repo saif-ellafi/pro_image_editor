@@ -78,7 +78,7 @@ class _GroundedFilterBarState extends State<GroundedFilterBar>
 
   Widget _buildFunctions(BoxConstraints constraints) {
     return Container(
-      color: imageEditorTheme.bottomBarBackgroundColor,
+      color: mainEditorConfigs.style.bottomBarBackground,
       padding: const EdgeInsets.only(bottom: 8),
       child: Column(
         children: [

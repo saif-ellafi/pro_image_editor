@@ -66,25 +66,21 @@ class Layer {
     /// LayerData subclass.
     switch (map['type']) {
       case 'text':
-
-        /// Returns a TextLayerData instance when type is 'text'.
+        // Returns a TextLayerData instance when type is 'text'.
         return TextLayerData.fromMap(layer, map);
       case 'emoji':
-
-        /// Returns an EmojiLayerData instance when type is 'emoji'.
+        // Returns an EmojiLayerData instance when type is 'emoji'.
         return EmojiLayerData.fromMap(layer, map);
+      case 'paint':
       case 'painting':
-
-        /// Returns a PaintingLayerData instance when type is 'painting'.
-        return PaintingLayerData.fromMap(layer, map);
+        // Returns a PaintLayerData instance when type is 'paint'.
+        return PaintLayerData.fromMap(layer, map);
       case 'sticker':
-
-        /// Returns a StickerLayerData instance when type is 'sticker',
-        /// utilizing the stickers list.
+        // Returns a StickerLayerData instance when type is 'sticker',
+        // utilizing the stickers list.
         return StickerLayerData.fromMap(layer, map, stickers);
       default:
-
-        /// Returns the base Layer instance when type is unrecognized.
+        // Returns the base Layer instance when type is unrecognized.
         return layer;
     }
   }
@@ -372,16 +368,16 @@ class EmojiLayerData extends Layer {
   }
 }
 
-/// A class representing a layer with custom painting content.
+/// A class representing a layer with custom paint content.
 ///
-/// PaintingLayerData is a subclass of [Layer] that allows you to display
+/// PaintLayerData is a subclass of [Layer] that allows you to display
 /// custom-painted content on a canvas. You can specify the painted item and
 /// its raw size, along with optional properties like offset, rotation,
 /// scale, and more.
 ///
 /// Example usage:
 /// ```dart
-/// PaintingLayerData(
+/// PaintLayerData(
 ///   item: CustomPaintedItem(),
 ///   rawSize: Size(200.0, 150.0),
 ///   offset: Offset(50.0, 50.0),
@@ -389,12 +385,12 @@ class EmojiLayerData extends Layer {
 ///   scale: 1.5,
 /// );
 /// ```
-class PaintingLayerData extends Layer {
-  /// Creates an instance of PaintingLayerData.
+class PaintLayerData extends Layer {
+  /// Creates an instance of PaintLayerData.
   ///
   /// The [item] and [rawSize] parameters are required, and other properties
   /// are optional.
-  PaintingLayerData({
+  PaintLayerData({
     required this.item,
     required this.rawSize,
     required this.opacity,
@@ -407,12 +403,12 @@ class PaintingLayerData extends Layer {
     super.enableInteraction,
   });
 
-  /// Factory constructor for creating a PaintingLayerData instance from a
+  /// Factory constructor for creating a PaintLayerData instance from a
   /// Layer and a map.
-  factory PaintingLayerData.fromMap(Layer layer, Map<String, dynamic> map) {
-    /// Constructs and returns a PaintingLayerData instance with properties
+  factory PaintLayerData.fromMap(Layer layer, Map<String, dynamic> map) {
+    /// Constructs and returns a PaintLayerData instance with properties
     /// derived from the layer and map.
-    return PaintingLayerData(
+    return PaintLayerData(
       flipX: layer.flipX,
       flipY: layer.flipY,
       enableInteraction: layer.enableInteraction,
@@ -450,7 +446,7 @@ class PaintingLayerData extends Layer {
         'h': rawSize.height,
       },
       'opacity': opacity,
-      'type': 'painting',
+      'type': 'paint',
     };
   }
 }

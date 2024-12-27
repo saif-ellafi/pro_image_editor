@@ -4,7 +4,7 @@ import 'i18n_crop_rotate_editor.dart';
 import 'i18n_emoji_editor.dart';
 import 'i18n_filter_editor.dart';
 import 'i18n_layer_interaction.dart';
-import 'i18n_painting_editor.dart';
+import 'i18n_paint_editor.dart';
 import 'i18n_sticker_editor.dart';
 import 'i18n_text_editor.dart';
 import 'i18n_tune_editor.dart';
@@ -15,7 +15,7 @@ export 'i18n_crop_rotate_editor.dart';
 export 'i18n_emoji_editor.dart';
 export 'i18n_filter_editor.dart';
 export 'i18n_layer_interaction.dart';
-export 'i18n_painting_editor.dart';
+export 'i18n_paint_editor.dart';
 export 'i18n_sticker_editor.dart';
 export 'i18n_text_editor.dart';
 export 'i18n_tune_editor.dart';
@@ -32,8 +32,8 @@ export 'i18n_various.dart';
 ///   various: I18nVarious(
 ///     // Define various translations...
 ///   ),
-///   paintEditor: I18nPaintingEditor(
-///     // Define painting editor translations...
+///   paintEditor: I18nPaintEditor(
+///     // Define paint editor translations...
 ///   ),
 ///   textEditor: I18nTextEditor(
 ///     // Define text editor translations...
@@ -62,7 +62,7 @@ export 'i18n_various.dart';
 ///
 /// - `various`: Translations and messages for various parts of the editor.
 ///
-/// - `paintEditor`: Translations and messages specific to the painting editor.
+/// - `paintEditor`: Translations and messages specific to the paint editor.
 ///
 /// - `textEditor`: Translations and messages specific to the text editor.
 ///
@@ -94,8 +94,8 @@ export 'i18n_various.dart';
 ///   various: I18nVarious(
 ///     // Define various translations...
 ///   ),
-///   paintEditor: I18nPaintingEditor(
-///     // Define painting editor translations...
+///   paintEditor: I18nPaintEditor(
+///     // Define paint editor translations...
 ///   ),
 ///   // Access other translations and messages...
 /// );
@@ -125,8 +125,8 @@ class I18n {
   ///   various: I18nVarious(
   ///     // Custom translations and settings for various components
   ///   ),
-  ///   paintEditor: I18nPaintingEditor(
-  ///     // Custom translations and settings for the Painting Editor
+  ///   paintEditor: I18nPaintEditor(
+  ///     // Custom translations and settings for the Paint Editor
   ///   ),
   ///   textEditor: I18nTextEditor(
   ///     // Custom translations and settings for the Text Editor
@@ -142,7 +142,7 @@ class I18n {
   /// ```
   const I18n({
     this.layerInteraction = const I18nLayerInteraction(),
-    this.paintEditor = const I18nPaintingEditor(),
+    this.paintEditor = const I18nPaintEditor(),
     this.textEditor = const I18nTextEditor(),
     this.cropRotateEditor = const I18nCropRotateEditor(),
     this.tuneEditor = const I18nTuneEditor(),
@@ -160,8 +160,8 @@ class I18n {
     this.doneLoadingMsg = 'Changes are being applied',
   });
 
-  /// Translations and messages specific to the painting editor.
-  final I18nPaintingEditor paintEditor;
+  /// Translations and messages specific to the paint editor.
+  final I18nPaintEditor paintEditor;
 
   /// Translations and messages for various parts of the editor.
   final I18nVarious various;
@@ -219,7 +219,7 @@ class I18n {
   /// [I18n] with some properties updated while keeping the
   /// others unchanged.
   I18n copyWith({
-    I18nPaintingEditor? paintEditor,
+    I18nPaintEditor? paintEditor,
     I18nVarious? various,
     I18nLayerInteraction? layerInteraction,
     I18nTextEditor? textEditor,

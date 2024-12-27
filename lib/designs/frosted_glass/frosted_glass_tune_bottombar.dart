@@ -95,7 +95,7 @@ class FrostedGlassTuneBottombar extends StatelessWidget {
                               item.icon,
                               size: bottomIconSize,
                               color: tuneEditor.selectedIndex == index
-                                  ? imageEditorPrimaryColor
+                                  ? kImageEditorPrimaryColor
                                   : Colors.white,
                             ),
                             onPressed: () {

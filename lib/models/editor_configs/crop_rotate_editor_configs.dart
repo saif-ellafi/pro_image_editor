@@ -4,9 +4,15 @@ import 'package:flutter/material.dart';
 // Project imports:
 import '../crop_rotate_editor/aspect_ratio_item.dart';
 import '../crop_rotate_editor/rotate_direction.dart';
+import '../custom_widgets/crop_rotate_editor_widgets.dart';
+import '../icons/crop_rotate_editor_icons.dart';
+import '../styles/crop_rotate_editor_style.dart';
 import 'utils/editor_safe_area.dart';
 
 export '../crop_rotate_editor/rotate_direction.dart';
+export '../custom_widgets/crop_rotate_editor_widgets.dart';
+export '../icons/crop_rotate_editor_icons.dart';
+export '../styles/crop_rotate_editor_style.dart';
 
 /// Configuration options for a crop and rotate editor.
 ///
@@ -67,6 +73,9 @@ class CropRotateEditorConfigs {
       AspectRatioItem(text: '9*16', value: 9.0 / 16.0)
     ],
     this.safeArea = const EditorSafeArea(),
+    this.style = const CropRotateEditorStyle(),
+    this.icons = const CropRotateEditorIcons(),
+    this.widgets = const CropRotateEditorWidgets(),
   })  : assert(maxScale >= 1, 'maxScale must be greater than or equal to 1'),
         assert(desktopCornerDragArea > 0,
             'desktopCornerDragArea must be positive'),
@@ -180,6 +189,15 @@ class CropRotateEditorConfigs {
   /// Defines the safe area configuration for the editor.
   final EditorSafeArea safeArea;
 
+  /// Style configuration for the crop and rotate editor.
+  final CropRotateEditorStyle style;
+
+  /// Icons used in the crop and rotate editor.
+  final CropRotateEditorIcons icons;
+
+  /// Widgets associated with the crop and rotate editor.
+  final CropRotateEditorWidgets widgets;
+
   /// Creates a copy of this `CropRotateEditorConfigs` object with the given
   /// fields replaced with new values.
   ///
@@ -215,6 +233,9 @@ class CropRotateEditorConfigs {
     double? desktopCornerDragArea,
     double? mobileCornerDragArea,
     EditorSafeArea? safeArea,
+    CropRotateEditorStyle? style,
+    CropRotateEditorIcons? icons,
+    CropRotateEditorWidgets? widgets,
   }) {
     return CropRotateEditorConfigs(
       safeArea: safeArea ?? this.safeArea,
@@ -253,6 +274,9 @@ class CropRotateEditorConfigs {
       desktopCornerDragArea:
           desktopCornerDragArea ?? this.desktopCornerDragArea,
       mobileCornerDragArea: mobileCornerDragArea ?? this.mobileCornerDragArea,
+      style: style ?? this.style,
+      icons: icons ?? this.icons,
+      widgets: widgets ?? this.widgets,
     );
   }
 }

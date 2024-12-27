@@ -195,7 +195,7 @@ class ExportStateHistory {
     required ImageInfos imageInfos,
   }) async {
     for (var layer in element.layers) {
-      if ((_configs.exportPainting && layer.runtimeType == PaintingLayerData) ||
+      if ((_configs.exportPaint && layer.runtimeType == PaintLayerData) ||
           (_configs.exportText && layer.runtimeType == TextLayerData) ||
           (_configs.exportEmoji && layer.runtimeType == EmojiLayerData)) {
         layers.add(layer.toMap());
@@ -203,9 +203,7 @@ class ExportStateHistory {
           layer.runtimeType == StickerLayerData) {
         layers.add((layer as StickerLayerData).toStickerMap(stickers.length));
 
-        double imageWidth =
-            (editorConfigs.stickerEditorConfigs?.initWidth ?? 100) *
-                layer.scale;
+        double imageWidth = editorConfigs.stickerEditor.initWidth * layer.scale;
         Size targetSize = Size(
             imageWidth,
             MediaQuery.of(context).size.height /

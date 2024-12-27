@@ -255,16 +255,15 @@ class TextEditorState extends State<TextEditor>
     textEditorCallbacks?.handleFontScaleChanged(value);
   }
 
-  /// Displays a range slider for adjusting the line width of the painting tool.
+  /// Displays a range slider for adjusting the line width of the paint tool.
   ///
   /// This method shows a range slider in a modal bottom sheet for adjusting the
-  /// line width of the painting tool.
+  /// line width of the paint tool.
   void openFontScaleBottomSheet() {
     final presetFontScale = _fontScale;
     showModalBottomSheet(
       context: context,
-      backgroundColor:
-          imageEditorTheme.paintingEditor.lineWidthBottomSheetColor,
+      backgroundColor: textEditorConfigs.style.fontScaleBottomSheetBackground,
       builder: (BuildContext context) {
         return Material(
           color: Colors.transparent,
@@ -287,14 +286,14 @@ class TextEditorState extends State<TextEditor>
                       title: '${i18n.textEditor.fontScale} ${_fontScale}x',
                       theme: widget.theme,
                       textStyle:
-                          imageEditorTheme.textEditor.fontSizeBottomSheetTitle,
+                          textEditorConfigs.style.fontSizeBottomSheetTitle,
                       closeButton:
-                          customWidgets.textEditor.fontSizeCloseButton != null
-                              ? (fn) => customWidgets
-                                  .textEditor.fontSizeCloseButton!(this, fn)
+                          textEditorConfigs.widgets.fontSizeCloseButton != null
+                              ? (fn) => textEditorConfigs
+                                  .widgets.fontSizeCloseButton!(this, fn)
                               : null,
                     ),
-                    customWidgets.textEditor.sliderFontSize?.call(
+                    textEditorConfigs.widgets.sliderFontSize?.call(
                           this,
                           _rebuildController.stream,
                           _fontScale,
@@ -324,15 +323,15 @@ class TextEditorState extends State<TextEditor>
                                         onPressed: () {
                                           updateFontScaleScale(presetFontScale);
                                         },
-                                        icon: Icon(
-                                            icons.textEditor.resetFontScale),
+                                        icon: Icon(textEditorConfigs
+                                            .icons.resetFontScale),
                                       )
                                     : IconButton(
                                         key: UniqueKey(),
                                         color: Colors.transparent,
                                         onPressed: null,
-                                        icon: Icon(
-                                            icons.textEditor.resetFontScale),
+                                        icon: Icon(textEditorConfigs
+                                            .icons.resetFontScale),
                                       ),
                               ),
                             ),
@@ -401,7 +400,7 @@ class TextEditorState extends State<TextEditor>
               left: textEditorConfigs.safeArea.left,
               right: textEditorConfigs.safeArea.right,
               child: Scaffold(
-                backgroundColor: imageEditorTheme.textEditor.background,
+                backgroundColor: textEditorConfigs.style.background,
                 appBar: _buildAppBar(constraints),
                 body: _buildBody(),
                 bottomNavigationBar: _buildBottomBar(),
@@ -415,8 +414,8 @@ class TextEditorState extends State<TextEditor>
 
   /// Builds the app bar for the text editor.
   PreferredSizeWidget? _buildAppBar(BoxConstraints constraints) {
-    if (customWidgets.textEditor.appBar != null) {
-      return customWidgets.textEditor.appBar!
+    if (textEditorConfigs.widgets.appBar != null) {
+      return textEditorConfigs.widgets.appBar!
           .call(this, _rebuildController.stream);
     }
 
@@ -428,13 +427,13 @@ class TextEditorState extends State<TextEditor>
 
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: imageEditorTheme.textEditor.appBarBackgroundColor,
-      foregroundColor: imageEditorTheme.textEditor.appBarForegroundColor,
+      backgroundColor: textEditorConfigs.style.appBarBackground,
+      foregroundColor: textEditorConfigs.style.appBarColor,
       actions: [
         IconButton(
           tooltip: i18n.textEditor.back,
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(icons.backButton),
+          icon: Icon(textEditorConfigs.icons.backButton),
           onPressed: close,
         ),
         const Spacer(),
@@ -452,10 +451,10 @@ class TextEditorState extends State<TextEditor>
                 PopupMenuOption(
                   label: i18n.textEditor.textAlign,
                   icon: Icon(align == TextAlign.left
-                      ? icons.textEditor.alignLeft
+                      ? textEditorConfigs.icons.alignLeft
                       : align == TextAlign.right
-                          ? icons.textEditor.alignRight
-                          : icons.textEditor.alignCenter),
+                          ? textEditorConfigs.icons.alignRight
+                          : textEditorConfigs.icons.alignCenter),
                   onTap: () {
                     toggleTextAlign();
                     if (designMode == ImageEditorDesignModeE.cupertino) {
@@ -466,7 +465,7 @@ class TextEditorState extends State<TextEditor>
               if (textEditorConfigs.canChangeFontScale)
                 PopupMenuOption(
                   label: i18n.textEditor.fontScale,
-                  icon: Icon(icons.textEditor.fontScale),
+                  icon: Icon(textEditorConfigs.icons.fontScale),
                   onTap: () {
                     openFontScaleBottomSheet();
                     if (designMode == ImageEditorDesignModeE.cupertino) {
@@ -477,7 +476,7 @@ class TextEditorState extends State<TextEditor>
               if (textEditorConfigs.canToggleBackgroundMode)
                 PopupMenuOption(
                   label: i18n.textEditor.backgroundMode,
-                  icon: Icon(icons.textEditor.backgroundMode),
+                  icon: Icon(textEditorConfigs.icons.backgroundMode),
                   onTap: () {
                     toggleBackgroundMode();
                     if (designMode == ImageEditorDesignModeE.cupertino) {
@@ -492,17 +491,16 @@ class TextEditorState extends State<TextEditor>
     );
   }
 
-  /// Builds the bottom navigation bar of the painting editor.
+  /// Builds the bottom navigation bar of the paint editor.
   /// Returns a [Widget] representing the bottom navigation bar.
   Widget? _buildBottomBar() {
-    if (customWidgets.textEditor.bottomBar != null) {
-      return customWidgets.textEditor.bottomBar!
+    if (textEditorConfigs.widgets.bottomBar != null) {
+      return textEditorConfigs.widgets.bottomBar!
           .call(this, _rebuildController.stream);
     }
 
     if (isDesktop &&
-        widget.configs.textEditorConfigs.customTextStyles?.isNotEmpty ==
-            false) {
+        widget.configs.textEditor.customTextStyles?.isNotEmpty == false) {
       return const SizedBox(height: kBottomNavigationBarHeight);
     }
 
@@ -519,8 +517,8 @@ class TextEditorState extends State<TextEditor>
         onTap: done,
         child: Stack(
           children: [
-            if (customWidgets.textEditor.bodyItems != null)
-              ...customWidgets.textEditor.bodyItems!(
+            if (textEditorConfigs.widgets.bodyItems != null)
+              ...textEditorConfigs.widgets.bodyItems!(
                 this,
                 _rebuildController.stream,
               ),
@@ -551,24 +549,24 @@ class TextEditorState extends State<TextEditor>
             tooltip: i18n.textEditor.textAlign,
             onPressed: toggleTextAlign,
             icon: Icon(align == TextAlign.left
-                ? icons.textEditor.alignLeft
+                ? textEditorConfigs.icons.alignLeft
                 : align == TextAlign.right
-                    ? icons.textEditor.alignRight
-                    : icons.textEditor.alignCenter),
+                    ? textEditorConfigs.icons.alignRight
+                    : textEditorConfigs.icons.alignCenter),
           ),
         if (textEditorConfigs.canChangeFontScale)
           IconButton(
             key: const ValueKey('BackgroundModeFontScaleButton'),
             tooltip: i18n.textEditor.fontScale,
             onPressed: openFontScaleBottomSheet,
-            icon: Icon(icons.textEditor.fontScale),
+            icon: Icon(textEditorConfigs.icons.fontScale),
           ),
         if (textEditorConfigs.canToggleBackgroundMode)
           IconButton(
             key: const ValueKey('BackgroundModeColorIconButton'),
             tooltip: i18n.textEditor.backgroundMode,
             onPressed: toggleBackgroundMode,
-            icon: Icon(icons.textEditor.backgroundMode),
+            icon: Icon(textEditorConfigs.icons.backgroundMode),
           ),
       ];
 
@@ -578,15 +576,15 @@ class TextEditorState extends State<TextEditor>
       key: const ValueKey('TextEditorDoneButton'),
       tooltip: i18n.textEditor.done,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      icon: Icon(icons.applyChanges),
+      icon: Icon(textEditorConfigs.icons.applyChanges),
       iconSize: 28,
       onPressed: done,
     );
   }
 
   Widget _buildColorPicker() {
-    if (customWidgets.textEditor.colorPicker != null) {
-      return customWidgets.textEditor.colorPicker!.call(
+    if (textEditorConfigs.widgets.colorPicker != null) {
+      return textEditorConfigs.widgets.colorPicker!.call(
             this,
             _rebuildController.stream,
             selectedTextStyle.color ?? primaryColor,
@@ -636,7 +634,7 @@ class TextEditorState extends State<TextEditor>
       /// `RoundedBackgroundTextField` code
       child: IntrinsicWidth(
         child: Padding(
-          padding: imageEditorTheme.textEditor.textFieldMargin,
+          padding: textEditorConfigs.style.textFieldMargin,
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -683,14 +681,14 @@ class TextEditorState extends State<TextEditor>
                   textCapitalization: TextCapitalization.sentences,
                   textAlign: textCtrl.text.isEmpty ? TextAlign.center : align,
                   maxLines: null,
-                  cursorColor: imageEditorTheme.textEditor.inputCursorColor,
+                  cursorColor: textEditorConfigs.style.inputCursorColor,
                   cursorHeight: _textFontSize * 1.2,
                   scrollPhysics: const NeverScrollableScrollPhysics(),
                   hint: textCtrl.text.isEmpty
                       ? i18n.textEditor.inputHintText
                       : '',
                   hintStyle: selectedTextStyle.copyWith(
-                    color: imageEditorTheme.textEditor.inputHintColor,
+                    color: textEditorConfigs.style.inputHintColor,
                     fontSize: _textFontSize,
                     height: 1.35,
                     shadows: [],

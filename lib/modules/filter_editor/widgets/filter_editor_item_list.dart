@@ -98,7 +98,7 @@ class _FilterEditorItemListState extends State<FilterEditorItemList> {
   /// A list of `ColorFilterGenerator` objects that define the image filters
   /// available in the editor.
   List<FilterModel> get _filters =>
-      widget.configs.filterEditorConfigs.filterList ?? presetFiltersList;
+      widget.configs.filterEditor.filterList ?? presetFiltersList;
 
   @override
   void initState() {
@@ -133,13 +133,11 @@ class _FilterEditorItemListState extends State<FilterEditorItemList> {
             constraints:
                 BoxConstraints(minWidth: MediaQuery.of(context).size.width),
             child: Padding(
-              padding:
-                  widget.configs.imageEditorTheme.filterEditor.filterListMargin,
+              padding: widget.configs.filterEditor.style.filterListMargin,
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.end,
                 alignment: WrapAlignment.spaceAround,
-                spacing: widget
-                    .configs.imageEditorTheme.filterEditor.filterListSpacing,
+                spacing: widget.configs.filterEditor.style.filterListSpacing,
                 children: <Widget>[
                   for (int i = 0; i < _filters.length; i++)
                     buildFilterButton(
@@ -166,8 +164,8 @@ class _FilterEditorItemListState extends State<FilterEditorItemList> {
         widget.selectedFilter.hashCode == filter.filters.hashCode ||
             (widget.selectedFilter.isEmpty && filter.filters.isEmpty);
 
-    if (widget.configs.customWidgets.filterEditor.filterButton != null) {
-      return widget.configs.customWidgets.filterEditor.filterButton!.call(
+    if (widget.configs.filterEditor.widgets.filterButton != null) {
+      return widget.configs.filterEditor.widgets.filterButton!.call(
         FilterModel(
           name: widget.configs.i18n.filterEditor.filters
               .getFilterI18n(filter.name),
@@ -185,9 +183,8 @@ class _FilterEditorItemListState extends State<FilterEditorItemList> {
     }
 
     return FadeInUp(
-      duration: widget.configs.filterEditorConfigs.fadeInUpDuration,
-      delay: widget.configs.filterEditorConfigs.fadeInUpStaggerDelayDuration *
-          index,
+      duration: widget.configs.filterEditor.fadeInUpDuration,
+      delay: widget.configs.filterEditor.fadeInUpStaggerDelayDuration * index,
       child: GestureDetector(
         key: ValueKey('Filter-${filter.name}-$index'),
         onTap: () {
@@ -220,10 +217,9 @@ class _FilterEditorItemListState extends State<FilterEditorItemList> {
                 style: TextStyle(
                   fontSize: 11,
                   color: isSelected
-                      ? widget.configs.imageEditorTheme.filterEditor
-                          .previewSelectedTextColor
-                      : widget.configs.imageEditorTheme.filterEditor
-                          .previewTextColor,
+                      ? widget
+                          .configs.filterEditor.style.previewSelectedTextColor
+                      : widget.configs.filterEditor.style.previewTextColor,
                 ),
               ),
             ),

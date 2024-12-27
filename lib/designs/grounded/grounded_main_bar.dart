@@ -12,7 +12,7 @@ import 'utils/grounded_configs.dart';
 /// ProImageEditor.
 ///
 /// The [GroundedMainBar] allows users to access various editing features such
-/// as painting, text editing, cropping, rotating, applying filters, blurring,
+/// as paint, text editing, cropping, rotating, applying filters, blurring,
 /// and adding emojis or stickers to an image. It provides an interactive UI
 /// for switching between these editors and includes undo/redo and close actions.
 class GroundedMainBar extends StatefulWidget with SimpleConfigsAccess {
@@ -48,7 +48,7 @@ class GroundedMainBarState extends State<GroundedMainBar>
     with ImageEditorConvertedConfigs, SimpleConfigsAccessState {
   late final ScrollController _bottomBarScrollCtrl;
 
-  Color get _foreGroundColor => imageEditorTheme.appBarForegroundColor;
+  Color get _foreGroundColor => mainEditorConfigs.style.appBarColor;
   Color get _foreGroundColorAccent => _foreGroundColor.withValues(alpha: 0.6);
 
   late final _bottomTextStyle = TextStyle(
@@ -75,7 +75,7 @@ class GroundedMainBarState extends State<GroundedMainBar>
       callbacks: callbacks,
     ));
     if (layer == null || !mounted) return;
-    layer.scale = configs.emojiEditorConfigs.initScale;
+    layer.scale = configs.emojiEditor.initScale;
     widget.editor.addLayer(layer);
   }
 
@@ -115,7 +115,7 @@ class GroundedMainBarState extends State<GroundedMainBar>
   Widget _buildFunctions(BoxConstraints constraints) {
     return BottomAppBar(
       height: GROUNDED_SUB_BAR_HEIGHT,
-      color: imageEditorTheme.bottomBarBackgroundColor,
+      color: mainEditorConfigs.style.bottomBarBackground,
       padding: EdgeInsets.zero,
       clipBehavior: Clip.none,
       child: AnimatedSwitcher(
@@ -167,11 +167,11 @@ class GroundedMainBarState extends State<GroundedMainBar>
                                 i18n.paintEditor.bottomNavigationBarText,
                                 style: _bottomTextStyle),
                             icon: Icon(
-                              icons.paintingEditor.bottomNavBar,
+                              paintEditorConfigs.icons.bottomNavBar,
                               size: _bottomIconSize,
                               color: _foreGroundColor,
                             ),
-                            onPressed: widget.editor.openPaintingEditor,
+                            onPressed: widget.editor.openPaintEditor,
                           ),
                         if (textEditorConfigs.enabled)
                           FlatIconTextButton(
@@ -179,7 +179,7 @@ class GroundedMainBarState extends State<GroundedMainBar>
                             label: Text(i18n.textEditor.bottomNavigationBarText,
                                 style: _bottomTextStyle),
                             icon: Icon(
-                              icons.textEditor.bottomNavBar,
+                              textEditorConfigs.icons.bottomNavBar,
                               size: _bottomIconSize,
                               color: _foreGroundColor,
                             ),
@@ -192,7 +192,7 @@ class GroundedMainBarState extends State<GroundedMainBar>
                                 i18n.cropRotateEditor.bottomNavigationBarText,
                                 style: _bottomTextStyle),
                             icon: Icon(
-                              icons.cropRotateEditor.bottomNavBar,
+                              cropRotateEditorConfigs.icons.bottomNavBar,
                               size: _bottomIconSize,
                               color: _foreGroundColor,
                             ),
@@ -204,7 +204,7 @@ class GroundedMainBarState extends State<GroundedMainBar>
                             label: Text(i18n.tuneEditor.bottomNavigationBarText,
                                 style: _bottomTextStyle),
                             icon: Icon(
-                              icons.tuneEditor.bottomNavBar,
+                              tuneEditorConfigs.icons.bottomNavBar,
                               size: _bottomIconSize,
                               color: _foreGroundColor,
                             ),
@@ -217,7 +217,7 @@ class GroundedMainBarState extends State<GroundedMainBar>
                                 i18n.filterEditor.bottomNavigationBarText,
                                 style: _bottomTextStyle),
                             icon: Icon(
-                              icons.filterEditor.bottomNavBar,
+                              filterEditorConfigs.icons.bottomNavBar,
                               size: _bottomIconSize,
                               color: _foreGroundColor,
                             ),
@@ -229,7 +229,7 @@ class GroundedMainBarState extends State<GroundedMainBar>
                             label: Text(i18n.blurEditor.bottomNavigationBarText,
                                 style: _bottomTextStyle),
                             icon: Icon(
-                              icons.blurEditor.bottomNavBar,
+                              blurEditorConfigs.icons.bottomNavBar,
                               size: _bottomIconSize,
                               color: _foreGroundColor,
                             ),
@@ -242,20 +242,20 @@ class GroundedMainBarState extends State<GroundedMainBar>
                                 i18n.emojiEditor.bottomNavigationBarText,
                                 style: _bottomTextStyle),
                             icon: Icon(
-                              icons.emojiEditor.bottomNavBar,
+                              emojiEditorConfigs.icons.bottomNavBar,
                               size: _bottomIconSize,
                               color: _foreGroundColor,
                             ),
                             onPressed: _openEmojiEditor,
                           ),
-                        if (stickerEditorConfigs?.enabled == true)
+                        if (stickerEditorConfigs.enabled)
                           FlatIconTextButton(
                             spacing: 7,
                             label: Text(
                                 i18n.stickerEditor.bottomNavigationBarText,
                                 style: _bottomTextStyle),
                             icon: Icon(
-                              icons.stickerEditor.bottomNavBar,
+                              stickerEditorConfigs.icons.bottomNavBar,
                               size: _bottomIconSize,
                               color: _foreGroundColor,
                             ),

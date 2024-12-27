@@ -47,8 +47,7 @@ class _GroundedTextBarState extends State<GroundedTextBar>
     with ImageEditorConvertedConfigs, SimpleConfigsAccessState {
   late final ScrollController _bottomBarScrollCtrl;
 
-  Color get _foreGroundColor =>
-      imageEditorTheme.textEditor.appBarForegroundColor;
+  Color get _foreGroundColor => textEditorConfigs.style.appBarColor;
   Color get _foreGroundColorAccent => _foreGroundColor.withValues(alpha: 0.6);
 
   @override
@@ -90,7 +89,7 @@ class _GroundedTextBarState extends State<GroundedTextBar>
   Widget _buildFunctions(BoxConstraints constraints) {
     return BottomAppBar(
       height: GROUNDED_SUB_BAR_HEIGHT,
-      color: imageEditorTheme.bottomBarBackgroundColor,
+      color: textEditorConfigs.style.bottomBarBackground,
       padding: EdgeInsets.zero,
       child: Align(
         alignment: Alignment.center,
@@ -176,9 +175,9 @@ class _GroundedTextBarState extends State<GroundedTextBar>
         ),
         icon: Icon(
           switch (widget.editor.align) {
-            TextAlign.left => configs.icons.textEditor.alignLeft,
-            TextAlign.right => configs.icons.textEditor.alignRight,
-            TextAlign.center || _ => configs.icons.textEditor.alignCenter,
+            TextAlign.left => textEditorConfigs.icons.alignLeft,
+            TextAlign.right => textEditorConfigs.icons.alignRight,
+            TextAlign.center || _ => textEditorConfigs.icons.alignCenter,
           },
           color: _foreGroundColor,
         ),
@@ -195,7 +194,7 @@ class _GroundedTextBarState extends State<GroundedTextBar>
           ),
         ),
         icon: Icon(
-          configs.icons.textEditor.backgroundMode,
+          textEditorConfigs.icons.backgroundMode,
           color: _foreGroundColor,
         ),
         onPressed: () {
@@ -212,7 +211,7 @@ class _GroundedTextBarState extends State<GroundedTextBar>
       width: 1,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(2),
-        color: imageEditorTheme.paintingEditor.bottomBarInactiveItemColor,
+        color: paintEditorConfigs.style.bottomBarInactiveItemColor,
       ),
     );
   }

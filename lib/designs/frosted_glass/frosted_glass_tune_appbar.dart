@@ -43,7 +43,7 @@ class FrostedGlassTuneAppbar extends StatelessWidget {
                     tooltip: tuneEditor.configs.i18n.cancel,
                     onPressed: tuneEditor.close,
                     icon: Icon(
-                      tuneEditor.configs.icons.closeEditor,
+                      tuneEditor.tuneEditorConfigs.icons.backButton,
                       color: Colors.white,
                     ),
                   ),
@@ -59,7 +59,7 @@ class FrostedGlassTuneAppbar extends StatelessWidget {
                         tooltip: tuneEditor.configs.i18n.undo,
                         onPressed: tuneEditor.undo,
                         icon: Icon(
-                          tuneEditor.configs.icons.undoAction,
+                          tuneEditor.tuneEditorConfigs.icons.undoAction,
                           color: tuneEditor.canUndo
                               ? Colors.white
                               : Colors.white.withAlpha(80),
@@ -70,7 +70,7 @@ class FrostedGlassTuneAppbar extends StatelessWidget {
                         tooltip: tuneEditor.configs.i18n.redo,
                         onPressed: tuneEditor.redo,
                         icon: Icon(
-                          tuneEditor.configs.icons.redoAction,
+                          tuneEditor.tuneEditorConfigs.icons.redoAction,
                           color: tuneEditor.canRedo
                               ? Colors.white
                               : Colors.white.withAlpha(80),
@@ -87,7 +87,7 @@ class FrostedGlassTuneAppbar extends StatelessWidget {
                     tooltip: tuneEditor.configs.i18n.done,
                     onPressed: tuneEditor.done,
                     icon: Icon(
-                      tuneEditor.configs.icons.doneIcon,
+                      tuneEditor.tuneEditorConfigs.icons.applyChanges,
                       color: Colors.white,
                     ),
                   ),
