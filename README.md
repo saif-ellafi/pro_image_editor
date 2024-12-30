@@ -968,6 +968,7 @@ The state history from the image editor can be exported and imported. However, i
       exportFilter: true,
       exportEmoji: true,
       exportSticker: true,
+      serializeSticker: true,
       historySpan: ExportHistorySpan.all,
     ),
   ).toJson(); // or => toMap(), toFile()

@@ -16,6 +16,7 @@ class ExportEditorConfigs {
     this.exportTuneAdjustments = true,
     this.exportEmoji = true,
     this.exportSticker = true,
+    this.serializeSticker = true,
   });
 
   /// The span of the export history to include in the export.
@@ -59,4 +60,11 @@ class ExportEditorConfigs {
   ///
   /// Warning: Exporting stickers may result in increased file size.
   final bool exportSticker;
+
+  /// Whether to serialize the stickers.
+  ///
+  /// Defaults to `true`.
+  ///
+  /// Warning: Not serializing stickers may result in loss of stickers.
+  final bool serializeSticker;
 }

@@ -203,21 +203,26 @@ class ExportStateHistory {
           layer.runtimeType == StickerLayerData) {
         layers.add((layer as StickerLayerData).toStickerMap(stickers.length));
 
-        double imageWidth = editorConfigs.stickerEditor.initWidth * layer.scale;
-        Size targetSize = Size(
-            imageWidth,
-            MediaQuery.of(context).size.height /
-                MediaQuery.of(context).size.width *
-                imageWidth);
+        Uint8List? result;
+        if (_configs.serializeSticker) {
+          double imageWidth = editorConfigs.stickerEditor.initWidth * layer.scale;
+          Size targetSize = Size(
+              imageWidth,
+              MediaQuery.of(context).size.height /
+                  MediaQuery.of(context).size.width *
+                  imageWidth);
 
-        Uint8List? result = await contentRecorderCtrl.captureFromWidget(
-          layer.sticker,
-          format: OutputFormat.png,
-          imageInfos: imageInfos,
-          targetSize: targetSize,
-        );
-        if (result == null) return;
-
+          result = await contentRecorderCtrl.captureFromWidget(
+            layer.sticker,
+            format: OutputFormat.png,
+            imageInfos: imageInfos,
+            targetSize: targetSize,
+          );
+          if (result == null) return;
+        } else {
+          result = Uint8List.fromList([]);
+        }
+          
         stickers.add(result);
       }
     }
