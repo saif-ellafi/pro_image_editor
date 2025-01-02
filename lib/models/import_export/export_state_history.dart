@@ -205,7 +205,8 @@ class ExportStateHistory {
 
         Uint8List? result;
         if (_configs.serializeSticker) {
-          double imageWidth = editorConfigs.stickerEditor.initWidth * layer.scale;
+          double imageWidth =
+              editorConfigs.stickerEditor.initWidth * layer.scale;
           Size targetSize = Size(
               imageWidth,
               MediaQuery.of(context).size.height /
@@ -222,7 +223,7 @@ class ExportStateHistory {
         } else {
           result = Uint8List.fromList([]);
         }
-          
+
         stickers.add(result);
       }
     }

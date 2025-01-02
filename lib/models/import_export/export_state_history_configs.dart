@@ -61,10 +61,16 @@ class ExportEditorConfigs {
   /// Warning: Exporting stickers may result in increased file size.
   final bool exportSticker;
 
-  /// Whether to serialize the stickers.
+  /// Controls whether stickers should be serialized.
+  ///
+  /// When enabled, each sticker widget is converted to a `Uint8List` and
+  /// included in the export history.
+  /// **Note:** Enabling this flag with a large number of stickers can
+  /// significantly increase the size of the JSON file.
   ///
   /// Defaults to `true`.
   ///
-  /// Warning: Not serializing stickers may result in loss of stickers.
+  /// **Warning:** Disabling sticker serialization may result in the loss of
+  /// stickers during export.
   final bool serializeSticker;
 }
