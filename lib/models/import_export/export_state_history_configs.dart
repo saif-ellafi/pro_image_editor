@@ -16,6 +16,7 @@ class ExportEditorConfigs {
     this.exportTuneAdjustments = true,
     this.exportEmoji = true,
     this.exportSticker = true,
+    this.serializeSticker = true,
   });
 
   /// The span of the export history to include in the export.
@@ -59,4 +60,17 @@ class ExportEditorConfigs {
   ///
   /// Warning: Exporting stickers may result in increased file size.
   final bool exportSticker;
+
+  /// Controls whether stickers should be serialized.
+  ///
+  /// When enabled, each sticker widget is converted to a `Uint8List` and
+  /// included in the export history.
+  /// **Note:** Enabling this flag with a large number of stickers can
+  /// significantly increase the size of the JSON file.
+  ///
+  /// Defaults to `true`.
+  ///
+  /// **Warning:** Disabling sticker serialization may result in the loss of
+  /// stickers during export.
+  final bool serializeSticker;
 }

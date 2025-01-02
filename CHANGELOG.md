@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.2.0
+- **FEAT**(export-history): Introduce the `serializeSticker` parameter to `ExportEditorConfigs` to enable exporting only `StickerLayerData` without converting the sticker to a `Uint8List`. This change incorporates the updates from pull request [#306](https://github.com/hm21/pro_image_editor/pull/306).
+
 ## 7.1.1
 - **FIX**(android): Resolve crop-drag conflicts with navigation gestures on android. This resolves issue [#303](https://github.com/hm21/pro_image_editor/issues/303)
 
