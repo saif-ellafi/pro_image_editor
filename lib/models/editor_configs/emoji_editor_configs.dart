@@ -1,5 +1,7 @@
 // Project imports:
 
+import 'dart:ui';
+
 import 'emoji_editor_configs.dart';
 
 export 'package:emoji_picker_flutter/emoji_picker_flutter.dart'
@@ -34,7 +36,8 @@ class EmojiEditorConfigs {
     this.minScale = double.negativeInfinity,
     this.maxScale = double.infinity,
     this.checkPlatformCompatibility = true,
-    this.emojiSet = defaultEmojiSet,
+    this.emojiSet,
+    this.locale = const Locale('en'),
     this.style = const EmojiEditorStyle(),
     this.icons = const EmojiEditorIcons(),
   })  : assert(initScale > 0, 'initScale must be positive'),
@@ -50,8 +53,21 @@ class EmojiEditorConfigs {
   /// Verify that emoji glyph is supported by the platform (Android only)
   final bool checkPlatformCompatibility;
 
-  /// Custom emojis; if set, overrides default emojis provided by the library.
-  final List<CategoryEmoji> emojiSet;
+  /// Useful to provide a customized list of Emoji or add/remove the support
+  /// for specific locales
+  /// (create similar method as in default_emoji_set_locale.dart). If not
+  /// provided, the default emoji set will be used based on the locales that
+  /// are available in the package.
+  final List<CategoryEmoji> Function(Locale)? emojiSet;
+
+  /// Locale to choose the fitting language for the emoji set This will affect
+  /// the emoji search results
+  ///
+  /// The package currently supports following languages:
+  /// en, de, es, fr, hi, it, ja, pt, ru, zh.
+  ///
+  /// Default: const Locale('en')
+  final Locale locale;
 
   /// The minimum scale factor from the layer.
   final double minScale;
@@ -75,7 +91,7 @@ class EmojiEditorConfigs {
     bool? enabled,
     double? initScale,
     bool? checkPlatformCompatibility,
-    List<CategoryEmoji>? emojiSet,
+    List<CategoryEmoji> Function(Locale)? emojiSet,
     double? minScale,
     double? maxScale,
     EmojiEditorStyle? style,

@@ -258,9 +258,7 @@ class _DefaultEmojiPickerViewState extends State<ProEmojiPickerView>
   }
 
   List<CategoryEmoji> get _categories {
-    return widget.state.categoryEmoji
-        .where((el) => el.emoji.isNotEmpty)
-        .toList();
+    return widget.state.categoryEmoji.toList();
   }
 
   @override

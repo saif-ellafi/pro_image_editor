@@ -25,10 +25,6 @@ class EmojiEditorBottomBar extends StatelessWidget {
   /// Callback function for closing the skin tone overlay.
   final VoidCallback closeSkinToneOverlay;
 
-  List<CategoryEmoji> get _categories {
-    return categoryEmojis.where((el) => el.emoji.isNotEmpty).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -48,9 +44,9 @@ class EmojiEditorBottomBar extends StatelessWidget {
         onTap: (index) {
           closeSkinToneOverlay();
           EmojiStateManager.of(context)
-              ?.setActiveCategory(_categories[index].category);
+              ?.setActiveCategory(categoryEmojis[index].category);
         },
-        tabs: _categories
+        tabs: categoryEmojis
             .asMap()
             .entries
             .map<Widget>(

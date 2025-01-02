@@ -2,6 +2,7 @@
 import 'dart:math';
 
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:emoji_picker_flutter/locales/default_emoji_set_locale.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:pro_image_editor/modules/emoji_editor/widgets/emoji_editor_category_view.dart';
@@ -94,6 +95,7 @@ class EmojiEditorState extends State<EmojiEditor>
   Config _getEditorConfig(BoxConstraints constraints) {
     return Config(
       height: double.infinity,
+      locale: emojiEditorConfigs.locale,
       emojiSet: emojiEditorConfigs.emojiSet,
       checkPlatformCompatibility: emojiEditorConfigs.checkPlatformCompatibility,
       emojiTextStyle: _textStyle,
@@ -190,7 +192,8 @@ class EmojiEditorState extends State<EmojiEditor>
           key: _emojiSearchPageKey,
           config: _getEditorConfig(constraints),
           state: EmojiViewState(
-            emojiEditorConfigs.emojiSet,
+            (emojiEditorConfigs.emojiSet ??
+                getDefaultEmojiLocale)(emojiEditorConfigs.locale),
             (category, emoji) {
               Navigator.pop(
                 context,

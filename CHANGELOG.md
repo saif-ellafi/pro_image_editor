@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.3.0
+- **FEAT**(dependencies): Update `emoji_picker_flutter` to `4.2.0` and `image` to `4.5.2`. Adds support for custom translations in emoji editor for emoji search.
+
 ## 7.2.0
 - **FEAT**(export-history): Introduce the `serializeSticker` parameter to `ExportEditorConfigs` to enable exporting only `StickerLayerData` without converting the sticker to a `Uint8List`. This change incorporates the updates from pull request [#306](https://github.com/hm21/pro_image_editor/pull/306).
 
