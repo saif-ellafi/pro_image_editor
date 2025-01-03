@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.3.1
+- **FIX**(crop): Corrected an issue where cropping with specific aspect ratios did not work when the editor was embedded.
+
 ## 7.3.0
 - **FEAT**(dependencies): Update `emoji_picker_flutter` to `4.2.0` and `image` to `4.5.2`. Adds support for custom translations in emoji editor for emoji search.
 

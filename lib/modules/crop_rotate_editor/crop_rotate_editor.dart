@@ -182,6 +182,14 @@ class CropRotateEditorState extends State<CropRotateEditor>
         StandaloneEditorState<CropRotateEditor, CropRotateEditorInitConfigs>,
         ExtendedLoop,
         CropAreaHistory {
+  /// A global key used to identify the editor content widget.
+  final _editorContentKey = GlobalKey();
+
+  /// An offset helper to keep track of the editor's screen offset.
+  /// This is required for the case the editor is embedded inside the screen.
+  /// Initialized to `Offset.zero`.
+  Offset _editorScreenOffsetHelper = Offset.zero;
+
   final _mouseCursorsKey = GlobalKey<ExtendedMouseRegionState>();
 
   /// A key used to access the state of the CropRotateGestureDetector widget.
@@ -1224,6 +1232,8 @@ class CropRotateEditorState extends State<CropRotateEditor>
     if (_blockInteraction || details.pointerCount > 2) return;
     _blockInteraction = true;
 
+    _editorScreenOffsetHelper = _calculateEditorScreenOffset();
+
     _startingPinchScale = userScaleFactor;
     _startingTranslate = translate;
     // Calculate the center offset point from the old zoomed view
@@ -1259,6 +1269,24 @@ class CropRotateEditorState extends State<CropRotateEditor>
     _blockInteraction = false;
   }
 
+  /// Calculates the offset of the editor screen.
+  ///
+  /// This method determines the position of the editor content on the screen
+  /// by converting the local coordinates of the render box to global
+  /// coordinates.
+  ///
+  /// Returns an [Offset] representing the position of the editor content.
+  /// If the editor content context is null, it returns [Offset.zero].
+  Offset _calculateEditorScreenOffset() {
+    if (_editorContentKey.currentContext == null) return Offset.zero;
+
+    final RenderBox renderBox =
+        _editorContentKey.currentContext!.findRenderObject() as RenderBox;
+    final Offset position = renderBox.localToGlobal(Offset.zero);
+
+    return position;
+  }
+
   void _onScaleUpdate(ScaleUpdateDetails details) {
     if (_blockInteraction ||
         details.pointerCount > 2 ||
@@ -1285,8 +1313,11 @@ class CropRotateEditorState extends State<CropRotateEditor>
       if (_currentCropAreaPart != CropAreaPart.none &&
           _currentCropAreaPart != CropAreaPart.inside) {
         Offset offset = _getRealHitPoint(
-                zoom: _startingPinchScale, position: details.localFocalPoint) +
+              zoom: _startingPinchScale,
+              position: details.localFocalPoint,
+            ) +
             _startingTranslate * _startingPinchScale;
+
         bool roundCropper = cropRotateEditorConfigs.roundCropper;
 
         double imgW = _renderedImgConstraints.maxWidth;
@@ -1371,12 +1402,16 @@ class CropRotateEditorState extends State<CropRotateEditor>
                 doubleInteractiveArea);
 
         double outsideHitPosY = details.focalPoint.dy -
+            _editorScreenOffsetHelper.dy -
             (_hasToolbar ? kToolbarHeight : 0) -
             MediaQuery.of(context).padding.top;
 
-        bool outsideLeft = details.focalPoint.dx < zoomOutHitAreaX;
+        bool outsideLeft =
+            details.focalPoint.dx - _editorScreenOffsetHelper.dx <
+                zoomOutHitAreaX;
         bool outsideRight =
-            details.focalPoint.dx > editorBodySize.width - zoomOutHitAreaX;
+            details.focalPoint.dx - _editorScreenOffsetHelper.dx >
+                editorBodySize.width - zoomOutHitAreaX;
         bool outsideTop = outsideHitPosY < zoomOutHitAreaY;
         bool outsideBottom =
             outsideHitPosY > editorBodySize.height - zoomOutHitAreaY;
@@ -1929,6 +1964,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      key: _editorContentKey,
       top: cropRotateEditorConfigs.safeArea.top,
       bottom: cropRotateEditorConfigs.safeArea.bottom,
       left: cropRotateEditorConfigs.safeArea.left,
