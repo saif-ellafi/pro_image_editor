@@ -1,38 +1,30 @@
 import 'dart:js_interop';
-import 'dart:typed_data';
 
-/// Returns Dart representation from JS Object.
-dynamic dartify(dynamic object) {
-  // Convert JSObject to Dart equivalents directly
-  // Cannot be done with Dart 3.2 constraints
-  // ignore: invalid_runtime_check_with_js_interop_types
-  if (object is! JSObject) {
-    return object;
-  }
+/// A function that converts a Dart object to a JavaScript object.
+@JS('Object.getOwnPropertyDescriptor')
+external JSObject? jsGetOwnPropertyDescriptor(
+  JSObject obj,
+  JSString propertyName,
+);
 
-  final jsObject = object;
+/// A function that converts a Dart object to a JavaScript object.
+@JS('Reflect.get')
+external JSAny? reflectGet(
+  JSAny? target,
+  JSAny? propertyKey,
+);
 
-  // Convert nested structures
-  final dartObject = jsObject.dartify();
-  return convertNested(dartObject);
-}
+/// A function that converts a Dart object to a JavaScript object.
+JSAny? jsGetProperty(JSObject obj, String propertyName) {
+  // get the descriptor object
+  final descriptor = jsGetOwnPropertyDescriptor(
+    obj,
+    propertyName.toJS,
+  );
+  if (descriptor == null) return null;
 
-/// Convert nested objects
-dynamic convertNested(dynamic object) {
-  if (object is ByteBuffer) {
-    return object;
-  } else if (object is List) {
-    return object.map(convertNested).toList();
-  } else if (object is Map) {
-    var map = <dynamic, dynamic>{};
-    object.forEach((key, value) {
-      map[key] = convertNested(value);
-    });
-    return map;
-  } else {
-    // For non-nested types, attempt to convert directly
-    return dartify(object);
-  }
+  // retrieve descriptor.value using Reflect.get(descriptor, "value")
+  return reflectGet(descriptor, 'value'.toJS);
 }
 
 /// Returns the JS implementation from Dart Object.

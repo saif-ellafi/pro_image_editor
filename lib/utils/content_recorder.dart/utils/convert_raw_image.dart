@@ -38,7 +38,7 @@ Future<ThreadResponse> convertRawImage(ImageConvertThreadRequest res,
       int right = 0;
       int top = image.height;
       int bottom = 0;
-      if (res.generateOnlyImageBounds) {
+      if (res.generateOnlyImageBounds == true) {
         bool found = false;
         // Find top boundary
         for (int y = 0; y < image.height && !found; y++) {
@@ -161,7 +161,7 @@ Future<ThreadResponse> convertRawImage(ImageConvertThreadRequest res,
 
     await healthCheck();
 
-    final croppedImage = res.generateOnlyImageBounds
+    final croppedImage = res.generateOnlyImageBounds == true
         ? await resizeCropRect(
             res.image,
             left: bbox.left,

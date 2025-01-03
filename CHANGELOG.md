@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.3.2
+- **FIX**(web): Resolved performance issues after implementing changes for WASM compatibility. Replaced `dartify` with `toDart`, improving conversion performance from an average of 600ms to 20ms.
+
 ## 7.3.1
 - **FIX**(crop): Corrected an issue where cropping with specific aspect ratios did not work when the editor was embedded.
 

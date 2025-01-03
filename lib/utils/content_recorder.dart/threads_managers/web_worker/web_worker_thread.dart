@@ -46,17 +46,27 @@ class WebWorkerThread extends Thread {
 
       if (worker.isDefinedAndNotNull) {
         worker.onmessage = (web.MessageEvent event) {
-          var data = dartify(event.data);
-          if (data?['id'] != null) {
-            activeTasks--;
-            List<dynamic>? bytes = data['bytes'] as List<dynamic>?;
-            onMessage(ThreadResponse(
-              bytes: bytes != null
-                  ? Uint8List.fromList(List.castFrom<dynamic, int>(bytes))
-                  : null,
-              id: data['id'] as String,
-            ));
-          }
+          final jsObj = event.data as js.JSObject?;
+
+          if (jsObj == null) return;
+
+          /// Grab the "id" property as a JSString and convert to Dart String
+          final jsId = jsGetProperty(jsObj, 'id');
+          final dartId = (jsId as js.JSString).toDart; // String
+
+          /// Grab the "bytes" property as a JSArrayBuffer and convert to
+          /// Dart ByteBuffer
+          final jsBytes = jsGetProperty(jsObj, 'bytes');
+          final dartBytes = (jsBytes as js.JSArray).toDart;
+
+          activeTasks--;
+          List<dynamic>? bytes = dartBytes as List<dynamic>?;
+          onMessage(ThreadResponse(
+            bytes: bytes != null
+                ? Uint8List.fromList(List.castFrom<dynamic, int>(bytes))
+                : null,
+            id: dartId,
+          ));
         }.toJS;
 
         readyState.complete(true);
@@ -74,35 +84,9 @@ class WebWorkerThread extends Thread {
   @override
   void send(ThreadRequest data) {
     activeTasks++;
-    worker.postMessage(jsify({
-      'mode': data is ImageConvertThreadRequest ? 'convert' : 'encode',
-      'id': data.id,
-      'generateOnlyImageBounds': data is ImageConvertThreadRequest
-          ? data.generateOnlyImageBounds
-          : null,
-      'outputFormat': data.outputFormat.name,
-      'jpegChroma': data.jpegChroma.name,
-      'pngFilter': data.pngFilter.name,
-      'jpegQuality': data.jpegQuality,
-      'pngLevel': data.pngLevel,
-      'singleFrame': data.singleFrame,
-      'image': {
-        'buffer': data.image.buffer,
-        'width': data.image.width,
-        'height': data.image.height,
-        'textData': data.image.textData,
-        'frameDuration': data.image.frameDuration,
-        'frameIndex': data.image.frameIndex,
-        'loopCount': data.image.loopCount,
-        'numChannels': data.image.numChannels,
-        'rowStride': data.image.rowStride,
-        'frameType': data.image.frameType.name,
-        'format': data.image.format.name,
-        // 'exif': data.image.exif,
-        // 'palette': data.image.palette,
-        // 'backgroundColor': data.image.backgroundColor,
-      }
-    }));
+    var convertedData = jsify(data.toMap());
+
+    worker.postMessage(convertedData);
   }
 
   @override
