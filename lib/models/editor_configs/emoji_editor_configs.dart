@@ -32,6 +32,7 @@ class EmojiEditorConfigs {
   /// reasonable defaults.
   const EmojiEditorConfigs({
     this.enabled = true,
+    this.enablePreloadWebFont = true,
     this.initScale = 5.0,
     this.minScale = double.negativeInfinity,
     this.maxScale = double.infinity,
@@ -46,6 +47,11 @@ class EmojiEditorConfigs {
 
   /// Indicates whether the emoji editor is enabled.
   final bool enabled;
+
+  /// Indicates whether the web font should be preloaded on web platforms.
+  ///
+  /// Default: true
+  final bool enablePreloadWebFont;
 
   /// The initial scale for displaying emojis.
   final double initScale;

@@ -2149,10 +2149,21 @@ class ProImageEditorState extends State<ProImageEditor>
     });
   }
 
+  Widget _buildFontPreloader() {
+    if (kIsWeb && emojiEditorConfigs.enablePreloadWebFont) {
+      return Offstage(
+        child: Text('😀', style: emojiEditorConfigs.style.textStyle),
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
+  }
+
   Widget _buildInteractiveContent() {
     return Center(
       child: Stack(
         children: [
+          _buildFontPreloader(),
           Padding(
             padding: selectedLayerIndex >= 0 &&
                     configs.layerInteraction.hideToolbarOnInteraction

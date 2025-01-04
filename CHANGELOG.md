@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.4.0
+- **FEAT**(emoji): Preload emoji font on web platforms when the main editor opens. This behavior can be enabled or disabled in the emojiEditor configuration using the `enablePreloadWebFont` flag.
+
 ## 7.3.2
 - **FIX**(web): Resolved performance issues after implementing changes for WASM compatibility. Replaced `dartify` with `toDart`, improving conversion performance from an average of 600ms to 20ms.
 
