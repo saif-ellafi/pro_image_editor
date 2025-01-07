@@ -10,10 +10,10 @@ import 'dart:typed_data';
 
 import 'package:web/web.dart' as web;
 
-import '/utils/content_recorder.dart/threads_managers/web_worker/web_utils.dart';
-import '/utils/content_recorder.dart/utils/convert_raw_image.dart';
-import '/utils/content_recorder.dart/utils/encode_image.dart';
-import '../models/multi_threading/thread_web_request_model.dart';
+import '/core/models/multi_threading/thread_web_request_model.dart';
+import '/shared/services/content_recorder/managers/web_worker/web_utils.dart';
+import '/shared/services/content_recorder/utils/convert_raw_image.dart';
+import '/shared/services/content_recorder/utils/encode_image.dart';
 
 void main() {
   WebWorkerManager();

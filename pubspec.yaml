@@ -63,4 +63,4 @@ flutter:
   fonts:
    - family: ProImageEditorIcons
      fonts:
-      - asset: lib/fonts/ProImageEditorIcons.ttf
+      - asset: assets/fonts/ProImageEditorIcons.ttf

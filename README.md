@@ -498,7 +498,7 @@ return Scaffold(
                   );
                 },
               ),
-              designMode: ImageEditorDesignModeE.material,
+              designMode: ImageEditorDesignMode.material,
               heroTag: 'hero',
               theme: ThemeData(
                   useMaterial3: true,
@@ -1074,7 +1074,7 @@ Creates a `ProImageEditor` widget for editing an image from a network URL.
 |-----------------------------------|----------------------------------------------------------------------------|------------------------------------|
 | `blurEditor`                      | Configuration options for the Blur Editor.                                 | `BlurEditorConfigs()`              |
 | `cropRotateEditor`                | Configuration options for the Crop and Rotate Editor.                      | `CropRotateEditorConfigs()`        |
-| `designMode`                      | The design mode for the Image Editor.                                      | `ImageEditorDesignModeE.material`  |
+| `designMode`                      | The design mode for the Image Editor.                                      | `ImageEditorDesignMode.material`  |
 | `dialogConfigs`                   | Configuration for the loading dialog used in the editor.                   | `DialogConfigs()`                  |
 | `emojiEditor`                     | Configuration options for the Emoji Editor.                                | `EmojiEditorConfigs()`             |
 | `filterEditor`                    | Configuration options for the Filter Editor.                               | `FilterEditorConfigs()`            |
