@@ -199,13 +199,12 @@ class ExportStateHistory {
     required ImageInfos imageInfos,
   }) async {
     for (var layer in element.layers) {
-      if ((_configs.exportPaint && layer.runtimeType == PaintLayerData) ||
-          (_configs.exportText && layer.runtimeType == TextLayerData) ||
-          (_configs.exportEmoji && layer.runtimeType == EmojiLayerData)) {
+      if ((_configs.exportPaint && layer.runtimeType == PaintLayer) ||
+          (_configs.exportText && layer.runtimeType == TextLayer) ||
+          (_configs.exportEmoji && layer.runtimeType == EmojiLayer)) {
         layers.add(layer.toMap());
-      } else if (_configs.exportSticker &&
-          layer.runtimeType == StickerLayerData) {
-        layers.add((layer as StickerLayerData).toStickerMap(stickers.length));
+      } else if (_configs.exportSticker && layer.runtimeType == WidgetLayer) {
+        layers.add((layer as WidgetLayer).toStickerMap(stickers.length));
 
         Uint8List? result;
         if (_configs.serializeSticker) {

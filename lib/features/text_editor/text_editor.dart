@@ -43,7 +43,7 @@ class TextEditor extends StatefulWidget with SimpleConfigsAccess {
   final ThemeData theme;
 
   /// The text layer data to be edited, if any.
-  final TextLayerData? layer;
+  final TextLayer? layer;
 
   @override
   createState() => TextEditorState();
@@ -365,7 +365,7 @@ class TextEditorState extends State<TextEditor>
   void done() {
     if (textCtrl.text.trim().isNotEmpty) {
       Navigator.of(context).pop(
-        TextLayerData(
+        TextLayer(
           text: textCtrl.text.trim(),
           background: _backgroundColor,
           color: _textColor,

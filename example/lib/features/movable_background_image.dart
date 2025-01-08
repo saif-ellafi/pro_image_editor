@@ -78,7 +78,7 @@ class _MovableBackgroundImageExampleState
     }
 
     editorKey.currentState!.addLayer(
-      StickerLayerData(
+      WidgetLayer(
         offset: Offset.zero,
         scale: _initScale * 0.5,
         sticker: Image.memory(
@@ -258,7 +258,7 @@ class _MovableBackgroundImageExampleState
             mainEditorCallbacks: MainEditorCallbacks(
               onAfterViewInit: () {
                 editorKey.currentState!.addLayer(
-                  StickerLayerData(
+                  WidgetLayer(
                     offset: Offset.zero,
                     scale: _initScale,
                     sticker: Image.network(

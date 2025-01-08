@@ -17,13 +17,13 @@ class LayerCopyManager {
   /// If the layer type is not recognized, it returns the original layer
   /// unchanged.
   Layer copyLayer(Layer layer) {
-    if (layer is TextLayerData) {
+    if (layer is TextLayer) {
       return createCopyTextLayer(layer);
-    } else if (layer is EmojiLayerData) {
+    } else if (layer is EmojiLayer) {
       return createCopyEmojiLayer(layer);
-    } else if (layer is PaintLayerData) {
+    } else if (layer is PaintLayer) {
       return createCopyPaintLayer(layer);
-    } else if (layer is StickerLayerData) {
+    } else if (layer is WidgetLayer) {
       return createCopyStickerLayer(layer);
     } else {
       return layer;
@@ -35,9 +35,9 @@ class LayerCopyManager {
     return layers.map(copyLayer).toList();
   }
 
-  /// Create a copy of a TextLayerData instance.
-  TextLayerData createCopyTextLayer(TextLayerData layer) {
-    return TextLayerData(
+  /// Create a copy of a TextLayer instance.
+  TextLayer createCopyTextLayer(TextLayer layer) {
+    return TextLayer(
       id: layer.id,
       text: layer.text,
       align: layer.align,
@@ -67,9 +67,9 @@ class LayerCopyManager {
     );
   }
 
-  /// Create a copy of an EmojiLayerData instance.
-  EmojiLayerData createCopyEmojiLayer(EmojiLayerData layer) {
-    return EmojiLayerData(
+  /// Create a copy of an EmojiLayer instance.
+  EmojiLayer createCopyEmojiLayer(EmojiLayer layer) {
+    return EmojiLayer(
       id: layer.id,
       emoji: layer.emoji,
       offset: Offset(layer.offset.dx, layer.offset.dy),
@@ -81,9 +81,9 @@ class LayerCopyManager {
     );
   }
 
-  /// Create a copy of an EmojiLayerData instance.
-  StickerLayerData createCopyStickerLayer(StickerLayerData layer) {
-    return StickerLayerData(
+  /// Create a copy of an WidgetLayer instance.
+  WidgetLayer createCopyStickerLayer(WidgetLayer layer) {
+    return WidgetLayer(
       id: layer.id,
       sticker: layer.sticker,
       offset: Offset(layer.offset.dx, layer.offset.dy),
@@ -95,9 +95,9 @@ class LayerCopyManager {
     );
   }
 
-  /// Create a copy of a PaintLayerData instance.
-  PaintLayerData createCopyPaintLayer(PaintLayerData layer) {
-    return PaintLayerData(
+  /// Create a copy of a PaintLayer instance.
+  PaintLayer createCopyPaintLayer(PaintLayer layer) {
+    return PaintLayer(
       id: layer.id,
       offset: Offset(layer.offset.dx, layer.offset.dy),
       rotation: layer.rotation,

@@ -197,7 +197,7 @@ class EmojiEditorState extends State<EmojiEditor>
             (category, emoji) {
               Navigator.pop(
                 context,
-                EmojiLayerData(emoji: emoji.emoji),
+                EmojiLayer(emoji: emoji.emoji),
               );
             },
             () {},
@@ -212,7 +212,7 @@ class EmojiEditorState extends State<EmojiEditor>
         child: EmojiPicker(
           key: _emojiPickerKey,
           onEmojiSelected: (category, emoji) => {
-            Navigator.pop(context, EmojiLayerData(emoji: emoji.emoji)),
+            Navigator.pop(context, EmojiLayer(emoji: emoji.emoji)),
           },
           textEditingController: _controller,
           config: _getEditorConfig(constraints),

@@ -181,23 +181,23 @@ class _ReorderLayerSheetState extends State<ReorderLayerSheet> {
         return ListTile(
           key: ValueKey(layer),
           tileColor: Theme.of(context).cardColor,
-          title: layer.runtimeType == TextLayerData
+          title: layer.runtimeType == TextLayer
               ? Text(
-                  (layer as TextLayerData).text,
+                  (layer as TextLayer).text,
                   style: const TextStyle(fontSize: 20),
                 )
-              : layer.runtimeType == EmojiLayerData
+              : layer.runtimeType == EmojiLayer
                   ? Text(
-                      (layer as EmojiLayerData).emoji,
+                      (layer as EmojiLayer).emoji,
                       style: const TextStyle(fontSize: 24),
                     )
-                  : layer.runtimeType == PaintLayerData
+                  : layer.runtimeType == PaintLayer
                       ? SizedBox(
                           height: 40,
                           child: FittedBox(
                             alignment: Alignment.centerLeft,
                             child: CustomPaint(
-                              size: (layer as PaintLayerData).size,
+                              size: (layer as PaintLayer).size,
                               willChange: true,
                               isComplex: layer.item.mode == PaintMode.freeStyle,
                               painter: DrawPaintItem(
@@ -209,12 +209,12 @@ class _ReorderLayerSheetState extends State<ReorderLayerSheet> {
                             ),
                           ),
                         )
-                      : layer.runtimeType == StickerLayerData
+                      : layer.runtimeType == WidgetLayer
                           ? SizedBox(
                               height: 40,
                               child: FittedBox(
                                 alignment: Alignment.centerLeft,
-                                child: (layer as StickerLayerData).sticker,
+                                child: (layer as WidgetLayer).sticker,
                               ),
                             )
                           : Text(

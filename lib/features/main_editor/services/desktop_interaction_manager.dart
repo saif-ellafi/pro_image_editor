@@ -156,9 +156,9 @@ class DesktopInteractionManager {
     required Layer? activeLayer,
   }) {
     if (activeLayer == null) return;
-    double factor = activeLayer is PaintLayerData
+    double factor = activeLayer is PaintLayer
         ? 0.1
-        : activeLayer is TextLayerData
+        : activeLayer is TextLayer
             ? 0.15
             : configs.textEditor.initFontSize / 50;
     if (zoomIn) {
@@ -191,9 +191,9 @@ class DesktopInteractionManager {
           activeLayer.rotation += 0.087266;
         }
       } else {
-        double factor = activeLayer is PaintLayerData
+        double factor = activeLayer is PaintLayer
             ? 0.1
-            : activeLayer is TextLayerData
+            : activeLayer is TextLayer
                 ? 0.15
                 : configs.textEditor.initFontSize / 50;
         if (event.scrollDelta.dy > 0) {

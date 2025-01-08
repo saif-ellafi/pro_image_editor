@@ -7,13 +7,13 @@ import '../../utils/parser/double_parser.dart';
 import '../../utils/unique_id_generator.dart';
 import 'emoji_layer.dart';
 import 'paint_layer.dart';
-import 'sticker_layer.dart';
 import 'text_layer.dart';
+import 'widget_layer.dart';
 
 export 'emoji_layer.dart';
 export 'paint_layer.dart';
-export 'sticker_layer.dart';
 export 'text_layer.dart';
+export 'widget_layer.dart';
 
 /// Represents a layer with common properties for widgets.
 class Layer {
@@ -69,19 +69,19 @@ class Layer {
     /// LayerData subclass.
     switch (map['type']) {
       case 'text':
-        // Returns a TextLayerData instance when type is 'text'.
-        return TextLayerData.fromMap(layer, map);
+        // Returns a TextLayer instance when type is 'text'.
+        return TextLayer.fromMap(layer, map);
       case 'emoji':
-        // Returns an EmojiLayerData instance when type is 'emoji'.
-        return EmojiLayerData.fromMap(layer, map);
+        // Returns an EmojiLayer instance when type is 'emoji'.
+        return EmojiLayer.fromMap(layer, map);
       case 'paint':
       case 'painting':
-        // Returns a PaintLayerData instance when type is 'paint'.
-        return PaintLayerData.fromMap(layer, map);
+        // Returns a PaintLayer instance when type is 'paint'.
+        return PaintLayer.fromMap(layer, map);
       case 'sticker':
-        // Returns a StickerLayerData instance when type is 'sticker',
+        // Returns a WidgetLayer instance when type is 'sticker',
         // utilizing the stickers list.
-        return StickerLayerData.fromMap(layer, map, stickers);
+        return WidgetLayer.fromMap(layer, map, stickers);
       default:
         // Returns the base Layer instance when type is unrecognized.
         return layer;

@@ -11,7 +11,7 @@ import 'package:pro_image_editor/shared/widgets/layer/layer_widget.dart';
 void main() {
   testWidgets('LayerWidget test', (WidgetTester tester) async {
     // Create a mock layer for testing.
-    final layer = TextLayerData(
+    final layer = TextLayer(
       text: 'Test Text',
       color: Colors.white,
       background: Colors.blue,

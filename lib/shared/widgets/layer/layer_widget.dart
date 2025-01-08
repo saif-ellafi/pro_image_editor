@@ -139,16 +139,16 @@ class _LayerWidgetState extends State<LayerWidget>
   @override
   void initState() {
     switch (widget.layerData.runtimeType) {
-      case const (TextLayerData):
+      case const (TextLayer):
         _layerType = _LayerType.text;
         break;
-      case const (EmojiLayerData):
+      case const (EmojiLayer):
         _layerType = _LayerType.emoji;
         break;
-      case const (StickerLayerData):
+      case const (WidgetLayer):
         _layerType = _LayerType.sticker;
         break;
-      case const (PaintLayerData):
+      case const (PaintLayer):
         _layerType = _LayerType.canvas;
         break;
       default:
@@ -216,8 +216,7 @@ class _LayerWidgetState extends State<LayerWidget>
 
   /// Checks if the hit is outside the canvas for certain types of layers.
   bool _checkHitIsOutsideInCanvas() {
-    return _layerType == _LayerType.canvas &&
-        !(_layer as PaintLayerData).item.hit;
+    return _layerType == _LayerType.canvas && !(_layer as PaintLayer).item.hit;
   }
 
   /// Calculates the transformation matrix for the layer's position and
@@ -293,7 +292,7 @@ class _LayerWidgetState extends State<LayerWidget>
               },
               onExit: (event) {
                 if (_layerType == _LayerType.canvas) {
-                  (widget.layerData as PaintLayerData).item.hit = false;
+                  (widget.layerData as PaintLayer).item.hit = false;
                 } else {
                   setState(() {
                     _showMoveCursor = false;
@@ -352,7 +351,7 @@ class _LayerWidgetState extends State<LayerWidget>
   /// Build the text widget
   Widget _buildText() {
     var fontSize = textEditorConfigs.initFontSize * _layer.scale;
-    var layer = _layer as TextLayerData;
+    var layer = _layer as TextLayer;
     var style = TextStyle(
       fontSize: fontSize * layer.fontScale,
       color: layer.color,
@@ -389,7 +388,7 @@ class _LayerWidgetState extends State<LayerWidget>
 
   /// Build the emoji widget
   Widget _buildEmoji() {
-    var layer = _layer as EmojiLayerData;
+    var layer = _layer as EmojiLayer;
     return Material(
       // Prevent hero animation bug
       type: MaterialType.transparency,
@@ -406,7 +405,7 @@ class _LayerWidgetState extends State<LayerWidget>
 
   /// Build the sticker widget
   Widget _buildSticker() {
-    var layer = _layer as StickerLayerData;
+    var layer = _layer as WidgetLayer;
     return SizedBox(
       width: stickerEditorConfigs.initWidth * layer.scale,
       child: FittedBox(
@@ -418,7 +417,7 @@ class _LayerWidgetState extends State<LayerWidget>
 
   /// Build the canvas widget
   Widget _buildCanvas() {
-    var layer = _layer as PaintLayerData;
+    var layer = _layer as PaintLayer;
     return Padding(
       // Better hit detection for mobile devices
       padding: EdgeInsets.all(isDesktop ? 0 : 15),

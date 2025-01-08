@@ -982,8 +982,8 @@ class ProImageEditorState extends State<ProImageEditor>
   /// based on the user's input.
   ///
   /// [layerData] - The text layer data to be edited.
-  void _onTextLayerTap(TextLayerData layerData) async {
-    TextLayerData? layer = await openPage(
+  void _onTextLayerTap(TextLayer layerData) async {
+    TextLayer? layer = await openPage(
       TextEditor(
         key: textEditor,
         layer: layerData,
@@ -1002,7 +1002,7 @@ class ProImageEditorState extends State<ProImageEditor>
     int i = activeLayers.indexWhere((element) => element.id == layerData.id);
     if (i >= 0) {
       _setTempLayer(layerData);
-      (activeLayers[i] as TextLayerData)
+      (activeLayers[i] as TextLayer)
         ..text = layer.text
         ..background = layer.background
         ..color = layer.color
@@ -1191,8 +1191,7 @@ class ProImageEditorState extends State<ProImageEditor>
   /// After closing the paint editor, any changes made are applied to the
   /// image's layers.
   void openPaintEditor() async {
-    List<PaintLayerData>? paintItemLayers =
-        await openPage<List<PaintLayerData>>(
+    List<PaintLayer>? paintItemLayers = await openPage<List<PaintLayer>>(
       PaintEditor.autoSource(
         key: paintEditor,
         file: editorImage.file,
@@ -1238,7 +1237,7 @@ class ProImageEditorState extends State<ProImageEditor>
     /// Small Duration is important for a smooth hero animation
     Duration duration = const Duration(milliseconds: 150),
   }) async {
-    TextLayerData? layer = await openPage(
+    TextLayer? layer = await openPage(
       TextEditor(
         key: textEditor,
         configs: configs,
@@ -1475,7 +1474,7 @@ class ProImageEditorState extends State<ProImageEditor>
     DraggableSheetStyle sheetTheme =
         emojiEditorConfigs.style.themeDraggableSheet;
     bool useDraggableSheet = sheetTheme.maxChildSize != sheetTheme.minChildSize;
-    EmojiLayerData? layer = await showModalBottomSheet(
+    EmojiLayer? layer = await showModalBottomSheet(
         context: context,
         backgroundColor: emojiEditorConfigs.style.backgroundColor,
         constraints: effectiveBoxConstraints,
@@ -1528,7 +1527,7 @@ class ProImageEditorState extends State<ProImageEditor>
         .style.editorBoxConstraintsBuilder
         ?.call(context, configs);
     var sheetTheme = stickerEditorConfigs.style.draggableSheetStyle;
-    StickerLayerData? layer = await showModalBottomSheet(
+    WidgetLayer? layer = await showModalBottomSheet(
         context: context,
         backgroundColor: stickerEditorConfigs.style.bottomSheetBackgroundColor,
         constraints: effectiveBoxConstraints,
@@ -2453,8 +2452,7 @@ class ProImageEditorState extends State<ProImageEditor>
                 onHover: isDesktop
                     ? (event) {
                         bool hasHit = activeLayers.indexWhere((element) =>
-                                element is PaintLayerData &&
-                                element.item.hit) >=
+                                element is PaintLayer && element.item.hit) >=
                             0;
 
                         MouseCursor activeCursor =
@@ -2497,9 +2495,9 @@ class ProImageEditorState extends State<ProImageEditor>
                               highPerformanceMode: layerInteractionManager
                                   .freeStyleHighPerformance,
                               onEditTap: () {
-                                if (layerItem is TextLayerData) {
+                                if (layerItem is TextLayer) {
                                   _onTextLayerTap(layerItem);
-                                } else if (layerItem is StickerLayerData) {
+                                } else if (layerItem is WidgetLayer) {
                                   callbacks
                                       .stickerEditorCallbacks!.onTapEditSticker
                                       ?.call(this, layerItem, i);
@@ -2515,7 +2513,7 @@ class ProImageEditorState extends State<ProImageEditor>
                                           ? ''
                                           : layer.id;
                                   _checkInteractiveViewer();
-                                } else if (layer is TextLayerData) {
+                                } else if (layer is TextLayer) {
                                   _onTextLayerTap(layer);
                                 }
                               },

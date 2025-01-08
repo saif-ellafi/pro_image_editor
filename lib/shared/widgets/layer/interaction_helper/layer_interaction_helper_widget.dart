@@ -184,8 +184,8 @@ class _LayerInteractionHelperWidgetState
               ),
             ),
             _buildRemoveIcon(),
-            if (widget.layerData.runtimeType == TextLayerData ||
-                (widget.layerData.runtimeType == StickerLayerData &&
+            if (widget.layerData.runtimeType == TextLayer ||
+                (widget.layerData.runtimeType == WidgetLayer &&
                     widget.callbacks.stickerEditorCallbacks?.onTapEditSticker !=
                         null))
               _buildEditIcon(),

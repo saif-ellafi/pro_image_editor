@@ -521,22 +521,22 @@ class LayerInteractionManager {
   }
 
   void _setMinMaxScaleFactor(ProImageEditorConfigs configs, Layer layer) {
-    if (layer is PaintLayerData) {
+    if (layer is PaintLayer) {
       layer.scale = layer.scale.clamp(
         configs.paintEditor.minScale,
         configs.paintEditor.maxScale,
       );
-    } else if (layer is TextLayerData) {
+    } else if (layer is TextLayer) {
       layer.scale = layer.scale.clamp(
         configs.textEditor.minScale,
         configs.textEditor.maxScale,
       );
-    } else if (layer is EmojiLayerData) {
+    } else if (layer is EmojiLayer) {
       layer.scale = layer.scale.clamp(
         configs.emojiEditor.minScale,
         configs.emojiEditor.maxScale,
       );
-    } else if (layer is StickerLayerData) {
+    } else if (layer is WidgetLayer) {
       layer.scale = layer.scale.clamp(
         configs.stickerEditor.minScale,
         configs.stickerEditor.maxScale,

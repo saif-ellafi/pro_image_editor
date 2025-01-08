@@ -74,7 +74,7 @@ class _FrameExampleState extends State<FrameExample>
     }
 
     editorKey.currentState!.addLayer(
-      StickerLayerData(
+      WidgetLayer(
         /// Adjust the offset position to place the image at any desired
         /// location. Note that a zero offset places the image at the center
         /// of the editor.
