@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.5.0
+- **FEAT**(export/import): Improve widget-layer import/export to enable setting up a `widgetLoader` inside the `ImportEditorConfigs` that loads widgets using custom logic without converting them to `Uint8List`. See pull request [#315](https://github.com/hm21/pro_image_editor/pull/315) for more details.
+
 ## 7.4.0
 - **FEAT**(emoji): Preload emoji font on web platforms when the main editor opens. This behavior can be enabled or disabled in the emojiEditor configuration using the `enablePreloadWebFont` flag.
 
