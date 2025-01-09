@@ -2,18 +2,19 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Project imports:
+import '/shared/services/import_export/types/widget_loader.dart';
 import '../../utils/parser/double_parser.dart';
 import '../../utils/unique_id_generator.dart';
+import '../editor_image.dart';
 import 'emoji_layer.dart';
 import 'paint_layer.dart';
-import 'sticker_layer.dart';
 import 'text_layer.dart';
+import 'widget_layer.dart';
 
 export 'emoji_layer.dart';
 export 'paint_layer.dart';
-export 'sticker_layer.dart';
 export 'text_layer.dart';
+export 'widget_layer.dart';
 
 /// Represents a layer with common properties for widgets.
 class Layer {
@@ -52,9 +53,11 @@ class Layer {
   /// Factory constructor for creating a Layer instance from a map and a list
   /// of stickers.
   factory Layer.fromMap(
-    Map<String, dynamic> map,
-    List<Uint8List> stickers,
-  ) {
+    Map<String, dynamic> map, {
+    List<Uint8List>? widgetRecords,
+    WidgetLoader? widgetLoader,
+    Function(EditorImage editorImage)? requirePrecache,
+  }) {
     /// Creates a base Layer instance with default or map-provided properties.
     Layer layer = Layer(
       flipX: map['flipX'] ?? false,
@@ -69,19 +72,26 @@ class Layer {
     /// LayerData subclass.
     switch (map['type']) {
       case 'text':
-        // Returns a TextLayerData instance when type is 'text'.
-        return TextLayerData.fromMap(layer, map);
+        // Returns a TextLayer instance when type is 'text'.
+        return TextLayer.fromMap(layer, map);
       case 'emoji':
-        // Returns an EmojiLayerData instance when type is 'emoji'.
-        return EmojiLayerData.fromMap(layer, map);
+        // Returns an EmojiLayer instance when type is 'emoji'.
+        return EmojiLayer.fromMap(layer, map);
       case 'paint':
       case 'painting':
-        // Returns a PaintLayerData instance when type is 'paint'.
-        return PaintLayerData.fromMap(layer, map);
+        // Returns a PaintLayer instance when type is 'paint'.
+        return PaintLayer.fromMap(layer, map);
       case 'sticker':
-        // Returns a StickerLayerData instance when type is 'sticker',
-        // utilizing the stickers list.
-        return StickerLayerData.fromMap(layer, map, stickers);
+      case 'widget':
+        // Returns a WidgetLayer instance when type is 'widget' or 'sticker',
+        // utilizing the widgets layer list.
+        return WidgetLayer.fromMap(
+          layer: layer,
+          map: map,
+          widgetRecords: widgetRecords ?? [],
+          widgetLoader: widgetLoader,
+          requirePrecache: requirePrecache,
+        );
       default:
         // Returns the base Layer instance when type is unrecognized.
         return layer;

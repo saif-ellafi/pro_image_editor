@@ -564,16 +564,16 @@ class PaintEditorState extends State<PaintEditor>
     paintEditorCallbacks?.handleDone();
   }
 
-  /// Exports the painted items as a list of [PaintLayerData].
+  /// Exports the painted items as a list of [PaintLayer].
   ///
   /// This method converts the paint history into a list of
-  /// [PaintLayerData] representing the painted items.
+  /// [PaintLayer] representing the painted items.
   ///
   /// Example:
   /// ```dart
-  /// List<PaintLayerData> layers = exportPaintedItems();
+  /// List<PaintLayer> layers = exportPaintedItems();
   /// ```
-  List<PaintLayerData> _exportPaintedItems(Size editorSize) {
+  List<PaintLayer> _exportPaintedItems(Size editorSize) {
     Rect findRenderedLayerRect(List<Offset?> points) {
       if (points.isEmpty) return Rect.zero;
 
@@ -653,8 +653,8 @@ class PaintEditorState extends State<PaintEditor>
         );
       }
 
-      // Create and return a PaintLayerData instance for the exported layer
-      return PaintLayerData(
+      // Create and return a PaintLayer instance for the exported layer
+      return PaintLayer(
         item: layer.copy(),
         rawSize: Size(
           max(size.width, layer.strokeWidth),

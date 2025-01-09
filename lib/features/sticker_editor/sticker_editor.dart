@@ -9,11 +9,7 @@ import '/shared/widgets/extended/extended_pop_scope.dart';
 import '../../core/models/layers/layer.dart';
 
 /// The `StickerEditor` class is responsible for creating a widget that allows
-/// users to select emojis.
-///
-/// This widget provides an EmojiPicker that allows users to choose emojis,
-/// which are then returned
-/// as `EmojiLayerData` containing the selected emoji text.
+/// users to select stickers
 class StickerEditor extends StatefulWidget with SimpleConfigsAccess {
   /// Creates an `StickerEditor` widget.
   const StickerEditor({
@@ -61,16 +57,24 @@ class StickerEditorState extends State<StickerEditor>
 
     return ExtendedPopScope(
       child: widget.configs.stickerEditor.buildStickers!(
-          setLayer, widget.scrollController),
+        setLayer,
+        widget.scrollController,
+      ),
     );
   }
 
   /// Sets the current layer with a sticker and closes the navigation.
   ///
-  /// [sticker] is the widget to be set as the layer.
-  void setLayer(Widget sticker) {
+  /// [widget] is the widget to be set as the layer.
+  void setLayer(
+    Widget widget, {
+    WidgetLayerExportConfigs? exportConfigs,
+  }) {
     Navigator.of(context).pop(
-      StickerLayerData(sticker: sticker),
+      WidgetLayer(
+        widget: widget,
+        exportConfigs: exportConfigs ?? const WidgetLayerExportConfigs(),
+      ),
     );
   }
 }

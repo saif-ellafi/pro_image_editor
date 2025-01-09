@@ -1,9 +1,9 @@
 // Flutter imports:
 import 'package:flutter/widgets.dart';
 
+import '/core/models/layers/layer.dart';
 import '../icons/sticker_editor_icons.dart';
 import '../styles/sticker_editor_style.dart';
-
 export '../icons/sticker_editor_icons.dart';
 export '../styles/sticker_editor_style.dart';
 
@@ -106,4 +106,9 @@ class StickerEditorConfigs {
 /// editor, allowing customization of how stickers are displayed and
 /// manipulated within the user interface.
 typedef BuildStickers = Widget Function(
-    Function(Widget) setLayer, ScrollController scrollController);
+  Function(
+    Widget widget, {
+    WidgetLayerExportConfigs? exportConfigs,
+  }) setLayer,
+  ScrollController scrollController,
+);

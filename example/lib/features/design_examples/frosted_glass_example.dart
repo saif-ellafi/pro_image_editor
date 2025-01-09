@@ -39,7 +39,7 @@ class _FrostedGlassExampleState extends State<FrostedGlassExample>
 
     if (layer == null || !mounted) return;
 
-    if (layer.runtimeType != StickerLayerData) {
+    if (layer.runtimeType != WidgetLayer) {
       layer.scale = editor.configs.emojiEditor.initScale;
     }
 

@@ -54,7 +54,7 @@ class _WhatsAppExampleState extends State<WhatsAppExample>
   /// is added back. If no layer is returned or the widget is not mounted,
   /// the method returns early.
   ///
-  /// If the returned layer's runtime type is not StickerLayerData, the layer's
+  /// If the returned layer's runtime type is not WidgetLayer, the layer's
   /// scale is set to the initial scale specified in [emojiEditorConfigs] of
   /// the [configs] parameter. Regardless, the layer's offset is set to the
   /// center of the image.
@@ -100,7 +100,7 @@ class _WhatsAppExampleState extends State<WhatsAppExample>
     editor.initKeyEventListener();
     if (layer == null || !mounted) return;
 
-    if (layer.runtimeType != StickerLayerData) {
+    if (layer.runtimeType != WidgetLayer) {
       layer.scale = editor.configs.emojiEditor.initScale;
     }
 

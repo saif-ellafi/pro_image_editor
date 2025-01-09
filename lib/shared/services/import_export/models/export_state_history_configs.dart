@@ -15,7 +15,8 @@ class ExportEditorConfigs {
     this.exportFilter = true,
     this.exportTuneAdjustments = true,
     this.exportEmoji = true,
-    this.exportSticker = true,
+    this.exportSticker,
+    this.exportWidgets = true,
     this.serializeSticker = true,
   });
 
@@ -54,13 +55,25 @@ class ExportEditorConfigs {
   /// Defaults to `true`.
   final bool exportEmoji;
 
+  // TODO: Remove in version 8.0.0
   /// Whether to export the stickers.
   ///
   /// Defaults to `true`.
   ///
   /// Warning: Exporting stickers may result in increased file size.
-  final bool exportSticker;
+  @Deprecated('Use exportWidgets instead')
+  final bool? exportSticker;
 
+  /// Whether to export the widget layers.
+  ///
+  /// Defaults to `true`.
+  ///
+  /// Warning: Exporting widgets may result in a significantly increased file
+  /// size if no `exportConfigs` are added to the `WidgetLayer`.
+  final bool exportWidgets;
+
+  // TODO: Remove in version 8.0.0
+  /// **DEPRECATED:**
   /// Controls whether stickers should be serialized.
   ///
   /// When enabled, each sticker widget is converted to a `Uint8List` and
@@ -72,5 +85,9 @@ class ExportEditorConfigs {
   ///
   /// **Warning:** Disabling sticker serialization may result in the loss of
   /// stickers during export.
+  @Deprecated(
+    'The parameter is no longer used. Instead, add `exportConfigs` to the '
+    '`WidgetLayer`',
+  )
   final bool serializeSticker;
 }

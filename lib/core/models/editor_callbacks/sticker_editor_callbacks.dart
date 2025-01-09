@@ -51,7 +51,7 @@ class StickerEditorCallbacks extends StandaloneEditorCallbacks {
   /// ```
   final Function(
     ProImageEditorState editorState,
-    StickerLayerData sticker,
+    WidgetLayer sticker,
     int index,
   )? onTapEditSticker;
 
