@@ -81,7 +81,7 @@ class _MovableBackgroundImageExampleState
       WidgetLayer(
         offset: Offset.zero,
         scale: _initScale * 0.5,
-        sticker: Image.memory(
+        widget: Image.memory(
           bytes,
           width: decodedImage.width.toDouble(),
           height: decodedImage.height.toDouble(),
@@ -261,7 +261,7 @@ class _MovableBackgroundImageExampleState
                   WidgetLayer(
                     offset: Offset.zero,
                     scale: _initScale,
-                    sticker: Image.network(
+                    widget: Image.network(
                       _imageUrl,
                       width: _editorSize.width,
                       height: _editorSize.height,

@@ -96,8 +96,46 @@ class _ImportExportExampleState extends State<ImportExportExample>
             stateHistory: StateHistoryConfigs(
               initStateHistory: ImportStateHistory.fromMap(
                 kImportHistoryDemoData,
-                configs: const ImportEditorConfigs(
+                configs: ImportEditorConfigs(
                   recalculateSizeAndPosition: true,
+
+                  /// The `widgetLoader` is optional and only required if you
+                  /// add `exportConfigs` with an id to the widget layers.
+                  /// Refer to the [sticker-example] for details on how this
+                  /// works in the sticker editor.
+                  ///
+                  /// If you add widget layers directly to the editor,
+                  /// you can pass the parameters as shown below:
+                  ///
+                  /// ```dart
+                  /// editor.addLayer(
+                  ///   WidgetLayer(
+                  ///     exportConfigs: const WidgetLayerExportConfigs(
+                  ///       id: 'my-special-container',
+                  ///     ),
+                  ///     widget: Container(
+                  ///       width: 100,
+                  ///       height: 100,
+                  ///       color: Colors.amber,
+                  ///     ),
+                  ///   ),
+                  /// );
+                  /// ```
+                  widgetLoader: (id) {
+                    switch (id) {
+                      case 'my-special-container':
+                        return Container(
+                          width: 100,
+                          height: 100,
+                          color: Colors.amber,
+                        );
+
+                      /// ... other widgets
+                    }
+                    throw ArgumentError(
+                      'No widget found for the given id: $id',
+                    );
+                  },
                 ),
               ),
             ),

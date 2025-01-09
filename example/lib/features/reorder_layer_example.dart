@@ -214,7 +214,7 @@ class _ReorderLayerSheetState extends State<ReorderLayerSheet> {
                               height: 40,
                               child: FittedBox(
                                 alignment: Alignment.centerLeft,
-                                child: (layer as WidgetLayer).sticker,
+                                child: (layer as WidgetLayer).widget,
                               ),
                             )
                           : Text(

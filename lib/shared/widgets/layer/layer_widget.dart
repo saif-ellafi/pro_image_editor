@@ -146,7 +146,7 @@ class _LayerWidgetState extends State<LayerWidget>
         _layerType = _LayerType.emoji;
         break;
       case const (WidgetLayer):
-        _layerType = _LayerType.sticker;
+        _layerType = _LayerType.widget;
         break;
       case const (PaintLayer):
         _layerType = _LayerType.canvas;
@@ -329,8 +329,8 @@ class _LayerWidgetState extends State<LayerWidget>
         return _buildEmoji();
       case _LayerType.text:
         return _buildText();
-      case _LayerType.sticker:
-        return _buildSticker();
+      case _LayerType.widget:
+        return _buildWidgetLayer();
       case _LayerType.canvas:
         return _buildCanvas();
       default:
@@ -403,14 +403,14 @@ class _LayerWidgetState extends State<LayerWidget>
     );
   }
 
-  /// Build the sticker widget
-  Widget _buildSticker() {
+  /// Build the layer widget
+  Widget _buildWidgetLayer() {
     var layer = _layer as WidgetLayer;
     return SizedBox(
       width: stickerEditorConfigs.initWidth * layer.scale,
       child: FittedBox(
         fit: BoxFit.contain,
-        child: layer.sticker,
+        child: layer.widget,
       ),
     );
   }
@@ -443,4 +443,4 @@ class _LayerWidgetState extends State<LayerWidget>
 }
 
 // ignore: camel_case_types
-enum _LayerType { emoji, text, sticker, canvas, unknown }
+enum _LayerType { emoji, text, widget, canvas, unknown }

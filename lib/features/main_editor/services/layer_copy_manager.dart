@@ -24,7 +24,7 @@ class LayerCopyManager {
     } else if (layer is PaintLayer) {
       return createCopyPaintLayer(layer);
     } else if (layer is WidgetLayer) {
-      return createCopyStickerLayer(layer);
+      return createCopyWidgetLayer(layer);
     } else {
       return layer;
     }
@@ -82,16 +82,17 @@ class LayerCopyManager {
   }
 
   /// Create a copy of an WidgetLayer instance.
-  WidgetLayer createCopyStickerLayer(WidgetLayer layer) {
+  WidgetLayer createCopyWidgetLayer(WidgetLayer layer) {
     return WidgetLayer(
       id: layer.id,
-      sticker: layer.sticker,
+      widget: layer.widget,
       offset: Offset(layer.offset.dx, layer.offset.dy),
       rotation: layer.rotation,
       scale: layer.scale,
       flipX: layer.flipX,
       flipY: layer.flipY,
       enableInteraction: layer.enableInteraction,
+      exportConfigs: layer.exportConfigs,
     );
   }
 

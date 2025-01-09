@@ -756,7 +756,7 @@ class ProImageEditorState extends State<ProImageEditor>
     }
 
     if (shouldImportStateHistory) {
-      importStateHistory(stateHistoryConfigs.initStateHistory!);
+      await importStateHistory(stateHistoryConfigs.initStateHistory!);
       if (i18n.importStateHistoryMsg.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           LoadingDialog.instance.hide();
@@ -1845,7 +1845,7 @@ class ProImageEditorState extends State<ProImageEditor>
   ///
   /// After importing, it updates the UI by calling [setState()] and the
   /// optional [onUpdateUI] callback.
-  void importStateHistory(ImportStateHistory import) {
+  Future<void> importStateHistory(ImportStateHistory import) async {
     /// Recalculate position and size
     if (import.configs.recalculateSizeAndPosition ||
         import.version == ExportImportVersion.version_1_0_0) {
@@ -1887,6 +1887,17 @@ class ProImageEditorState extends State<ProImageEditor>
         }
       }
     }
+
+    /// Precache all widget layers
+    await Future.wait(
+      /// Call `toSet` to ensure we precache every widget layer just once
+      import.requirePrecacheList.toSet().map(
+            (item) => precacheImage(
+              item.toImageProvider(),
+              context,
+            ),
+          ),
+    );
 
     if (import.configs.mergeMode == ImportEditorMergeMode.replace) {
       stateManager
@@ -1938,7 +1949,7 @@ class ProImageEditorState extends State<ProImageEditor>
     }
 
     setState(() {});
-    decodeImage(stateManager.transformConfigs);
+    unawaited(decodeImage(stateManager.transformConfigs));
     mainEditorCallbacks?.handleUpdateUI();
   }
 

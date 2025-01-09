@@ -1,5 +1,3 @@
-// ignore_for_file: argument_type_not_assignable
-
 // Dart imports:
 import 'dart:convert';
 import 'dart:io';
@@ -7,15 +5,15 @@ import 'dart:io';
 // Flutter imports:
 import 'package:flutter/services.dart';
 
-// Project imports:
 import '/core/models/crop_rotate_editor/transform_factors.dart';
+import '/core/models/editor_image.dart';
 import '/core/models/history/state_history.dart';
+import '/core/models/layers/layer.dart';
 import '/core/models/tune_editor/tune_adjustment_matrix.dart';
 import '/core/utils/parser/double_parser.dart';
 import '/core/utils/parser/int_parser.dart';
 import '/core/utils/parser/size_parser.dart';
 import '/features/filter_editor/utils/filter_generator/filter_addons.dart';
-import '../../../core/models/layers/layer.dart';
 import 'constants/export_import_version.dart';
 import 'models/import_state_history_configs.dart';
 
@@ -38,6 +36,7 @@ class ImportStateHistory {
     required this.stateHistory,
     required this.configs,
     required this.version,
+    required this.requirePrecacheList,
   });
 
   /// Creates an [ImportStateHistory] instance from a map representation.
@@ -49,16 +48,22 @@ class ImportStateHistory {
     final version =
         map['version'] as String? ?? ExportImportVersion.version_1_0_0;
     final stateHistory = <EditorStateHistory>[];
-    final stickers = (map['stickers'] as List<dynamic>? ?? [])
-        .map((sticker) => Uint8List.fromList(List.from(sticker)))
-        .toList();
+    final widgetRecords = _parseWidgetRecords(map, version);
     final lastRenderedImgSize = safeParseSize(map['lastRenderedImgSize']);
+    final List<EditorImage> requirePrecacheList = [];
 
     /// Parse history
     for (final historyItem in (map['history'] as List<dynamic>? ?? [])) {
       /// Layers
       final layers = (historyItem['layers'] as List<dynamic>? ?? [])
-          .map((layer) => Layer.fromMap(layer, stickers))
+          .map(
+            (layer) => Layer.fromMap(
+              layer,
+              widgetRecords: widgetRecords,
+              widgetLoader: configs.widgetLoader,
+              requirePrecache: requirePrecacheList.add,
+            ),
+          )
           .toList();
 
       /// Blur
@@ -94,6 +99,7 @@ class ImportStateHistory {
       stateHistory: stateHistory,
       configs: configs,
       version: version,
+      requirePrecacheList: requirePrecacheList,
     );
   }
 
@@ -125,6 +131,31 @@ class ImportStateHistory {
             .toList();
     }
   }
+
+  static List<Uint8List> _parseWidgetRecords(
+      Map<String, dynamic> map, String version) {
+    List<dynamic> items = [];
+    switch (version) {
+      case ExportImportVersion.version_1_0_0:
+      case ExportImportVersion.version_2_0_0:
+      case ExportImportVersion.version_3_0_0:
+      case ExportImportVersion.version_3_0_1:
+        items = (map['stickers'] as List<dynamic>? ?? []);
+        break;
+      default:
+        items = (map['widgetRecords'] as List<dynamic>? ?? []);
+        break;
+    }
+
+    return items.map((item) => Uint8List.fromList(List.from(item))).toList();
+  }
+
+  /// A list of widget layers that need to be pre-cached.
+  ///
+  /// This list contains images that should be loaded and cached in memory
+  /// before they are used in the editor to ensure smooth performance and
+  /// quick access.
+  final List<EditorImage> requirePrecacheList;
 
   /// The position of the editor.
   final int editorPosition;

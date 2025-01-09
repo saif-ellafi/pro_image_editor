@@ -1,13 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+import '/shared/services/import_export/types/widget_loader.dart';
 import '../../utils/parser/int_parser.dart';
+import '../editor_image.dart';
 import 'layer.dart';
 
-/// A class representing a layer with custom sticker content.
+export '/shared/services/import_export/models/widget_layer_export_configs.dart';
+
+/// A class representing a layer with custom widget content.
 ///
 /// WidgetLayer is a subclass of [Layer] that allows you to display
-/// custom sticker content. You can specify properties like offset, rotation,
+/// custom widget content. You can specify properties like offset, rotation,
 /// scale, and more.
 ///
 /// Example usage:
@@ -21,9 +27,9 @@ import 'layer.dart';
 class WidgetLayer extends Layer {
   /// Creates an instance of WidgetLayer.
   ///
-  /// The [sticker] parameter is required, and other properties are optional.
+  /// The [widget] parameter is required, and other properties are optional.
   WidgetLayer({
-    required this.sticker,
+    required this.widget,
     super.offset,
     super.rotation,
     super.scale,
@@ -31,34 +37,69 @@ class WidgetLayer extends Layer {
     super.flipX,
     super.flipY,
     super.enableInteraction,
+    this.exportConfigs = const WidgetLayerExportConfigs(),
   });
 
   /// Factory constructor for creating a WidgetLayer instance from a
-  /// Layer, a map, and a list of stickers.
-  factory WidgetLayer.fromMap(
-    Layer layer,
-    Map<String, dynamic> map,
-    List<Uint8List> stickers,
-  ) {
-    /// Determines the position of the sticker in the list.
-    int stickerPosition = safeParseInt(map['listPosition'], fallback: -1);
+  /// Layer, a map, and a list of widgets.
+  factory WidgetLayer.fromMap({
+    required Layer layer,
+    required Map<String, dynamic> map,
+    required List<Uint8List> widgetRecords,
+    required WidgetLoader? widgetLoader,
+    required Function(EditorImage editorImage)? requirePrecache,
+  }) {
+    /// Determines the position of the widget in the list.
+    int widgetPosition = safeParseInt(
+        map['recordPosition'] ?? map['listPosition'],
+        fallback: -1);
 
-    /// Widget to display a sticker or a placeholder if not found.
-    Widget sticker = kDebugMode
+    var exportConfigs = WidgetLayerExportConfigs.fromMap(map['exportConfigs']);
+
+    /// Widget to display a widget or a placeholder if not found.
+    Widget widget = kDebugMode
         ? Text(
-            'Sticker $stickerPosition not found',
+            'Widget $widgetPosition not found',
             style: const TextStyle(color: Color(0xFFF44336), fontSize: 24),
           )
         : const SizedBox.shrink();
 
-    /// Updates the sticker widget if the position is valid.
-    if (stickers.isNotEmpty && stickers.length > stickerPosition) {
-      sticker = ConstrainedBox(
-        constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
-        child: Image.memory(
-          stickers[stickerPosition],
-        ),
+    var defaultConstraints = const BoxConstraints(minWidth: 1, minHeight: 1);
+
+    /// Updates the widget widget if the position is valid.
+    if (exportConfigs.id != null) {
+      assert(
+        widgetLoader != null,
+        'The `widgetLoader` must be defined when '
+        'importing the widget layer by id',
       );
+      widget = widgetLoader!(exportConfigs.id!);
+    } else if (exportConfigs.networkUrl != null) {
+      widget = ConstrainedBox(
+        constraints: defaultConstraints,
+        child: Image.network(exportConfigs.networkUrl!),
+      );
+      requirePrecache?.call(EditorImage(networkUrl: exportConfigs.networkUrl));
+    } else if (exportConfigs.assetPath != null) {
+      widget = ConstrainedBox(
+        constraints: defaultConstraints,
+        child: Image.asset(exportConfigs.assetPath!),
+      );
+      requirePrecache?.call(EditorImage(assetPath: exportConfigs.assetPath));
+    } else if (exportConfigs.fileUrl != null) {
+      widget = ConstrainedBox(
+        constraints: defaultConstraints,
+        child: Image.file(File(exportConfigs.fileUrl!)),
+      );
+      requirePrecache?.call(EditorImage(file: File(exportConfigs.fileUrl!)));
+    } else if (widgetRecords.isNotEmpty &&
+        widgetRecords.length > widgetPosition) {
+      var bytes = widgetRecords[widgetPosition];
+      widget = ConstrainedBox(
+        constraints: defaultConstraints,
+        child: Image.memory(bytes),
+      );
+      requirePrecache?.call(EditorImage(byteArray: bytes));
     }
 
     /// Constructs and returns a WidgetLayer instance with properties
@@ -70,24 +111,34 @@ class WidgetLayer extends Layer {
       offset: layer.offset,
       rotation: layer.rotation,
       scale: layer.scale,
-      sticker: sticker,
+      widget: widget,
+      exportConfigs: exportConfigs,
     );
   }
 
-  /// The sticker to display on the layer.
-  Widget sticker;
+  /// The widget to display on the layer.
+  Widget widget;
+
+  /// Configuration settings for exporting a widget layer.
+  ///
+  /// This class holds the necessary configurations required for a custom
+  /// widget import-loader.
+  WidgetLayerExportConfigs exportConfigs;
 
   /// Converts this transform object to a Map suitable for representing a
-  /// sticker.
+  /// widget.
   ///
   /// Returns a Map representing the properties of this transform object,
-  /// augmented with the specified [listPosition] indicating the position of
-  /// the sticker in a list.
-  Map<String, dynamic> toStickerMap(int listPosition) {
+  /// augmented with the specified [recordPosition] indicating the position of
+  /// the widget in a list.
+  Map<String, dynamic> toWidgetMap([int? recordPosition]) {
+    var exportConfigMap = exportConfigs.toMap();
+
     return {
       ...toMap(),
-      'listPosition': listPosition,
-      'type': 'sticker',
+      if (recordPosition != null) 'recordPosition': recordPosition,
+      if (exportConfigMap.isNotEmpty) 'exportConfigs': exportConfigMap,
+      'type': 'widget',
     };
   }
 
@@ -97,7 +148,7 @@ class WidgetLayer extends Layer {
   /// to the corresponding parameter of this method. Unprovided parameters
   /// will default to the current instance's values.
   WidgetLayer copyWith({
-    Widget? sticker,
+    Widget? widget,
     Offset? offset,
     double? rotation,
     double? scale,
@@ -107,7 +158,7 @@ class WidgetLayer extends Layer {
     bool? enableInteraction,
   }) {
     return WidgetLayer(
-      sticker: sticker ?? this.sticker,
+      widget: widget ?? this.widget,
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,
       scale: scale ?? this.scale,
@@ -126,7 +177,7 @@ class WidgetLayer extends Layer {
 class StickerLayerData extends WidgetLayer {
   /// Constructor for StickerLayerData
   StickerLayerData({
-    required super.sticker,
+    required Widget sticker,
     super.offset,
     super.rotation,
     super.scale,
@@ -134,7 +185,7 @@ class StickerLayerData extends WidgetLayer {
     super.flipX,
     super.flipY,
     super.enableInteraction,
-  });
+  }) : super(widget: sticker);
 
   /// Factory constructor for creating a StickerLayerData instance from a
   /// Layer, a map, and a list of stickers.
@@ -144,7 +195,9 @@ class StickerLayerData extends WidgetLayer {
     List<Uint8List> stickers,
   ) {
     /// Determines the position of the sticker in the list.
-    int stickerPosition = safeParseInt(map['listPosition'], fallback: -1);
+    int stickerPosition = safeParseInt(
+        map['recordPosition'] ?? map['listPosition'],
+        fallback: -1);
 
     /// Widget to display a sticker or a placeholder if not found.
     Widget sticker = kDebugMode

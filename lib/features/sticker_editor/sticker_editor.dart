@@ -57,16 +57,24 @@ class StickerEditorState extends State<StickerEditor>
 
     return ExtendedPopScope(
       child: widget.configs.stickerEditor.buildStickers!(
-          setLayer, widget.scrollController),
+        setLayer,
+        widget.scrollController,
+      ),
     );
   }
 
   /// Sets the current layer with a sticker and closes the navigation.
   ///
-  /// [sticker] is the widget to be set as the layer.
-  void setLayer(Widget sticker) {
+  /// [widget] is the widget to be set as the layer.
+  void setLayer(
+    Widget widget, {
+    WidgetLayerExportConfigs? exportConfigs,
+  }) {
     Navigator.of(context).pop(
-      WidgetLayer(sticker: sticker),
+      WidgetLayer(
+        widget: widget,
+        exportConfigs: exportConfigs ?? const WidgetLayerExportConfigs(),
+      ),
     );
   }
 }

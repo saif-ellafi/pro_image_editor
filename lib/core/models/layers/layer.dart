@@ -2,9 +2,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Project imports:
+import '/shared/services/import_export/types/widget_loader.dart';
 import '../../utils/parser/double_parser.dart';
 import '../../utils/unique_id_generator.dart';
+import '../editor_image.dart';
 import 'emoji_layer.dart';
 import 'paint_layer.dart';
 import 'text_layer.dart';
@@ -52,9 +53,11 @@ class Layer {
   /// Factory constructor for creating a Layer instance from a map and a list
   /// of stickers.
   factory Layer.fromMap(
-    Map<String, dynamic> map,
-    List<Uint8List> stickers,
-  ) {
+    Map<String, dynamic> map, {
+    List<Uint8List>? widgetRecords,
+    WidgetLoader? widgetLoader,
+    Function(EditorImage editorImage)? requirePrecache,
+  }) {
     /// Creates a base Layer instance with default or map-provided properties.
     Layer layer = Layer(
       flipX: map['flipX'] ?? false,
@@ -79,9 +82,16 @@ class Layer {
         // Returns a PaintLayer instance when type is 'paint'.
         return PaintLayer.fromMap(layer, map);
       case 'sticker':
-        // Returns a WidgetLayer instance when type is 'sticker',
-        // utilizing the stickers list.
-        return WidgetLayer.fromMap(layer, map, stickers);
+      case 'widget':
+        // Returns a WidgetLayer instance when type is 'widget' or 'sticker',
+        // utilizing the widgets layer list.
+        return WidgetLayer.fromMap(
+          layer: layer,
+          map: map,
+          widgetRecords: widgetRecords ?? [],
+          widgetLoader: widgetLoader,
+          requirePrecache: requirePrecache,
+        );
       default:
         // Returns the base Layer instance when type is unrecognized.
         return layer;

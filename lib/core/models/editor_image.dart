@@ -123,6 +123,29 @@ class EditorImage {
   /// Indicates whether the `assetPath` property is not null.
   bool get hasAssetPath => assetPath != null;
 
+  /// Converts the current `EditorImage` instance to an `ImageProvider`.
+  ///
+  /// The type of `ImageProvider` returned depends on the `EditorImageType`:
+  /// - `EditorImageType.memory`: Returns a `MemoryImage` created from the
+  ///   `byteArray`.
+  /// - `EditorImageType.asset`: Returns an `AssetImage` created from the
+  ///   `assetPath`.
+  /// - `EditorImageType.file`: Returns a `FileImage` created from the `file`.
+  /// - `EditorImageType.network`: Returns a `NetworkImage` created from the
+  ///   `networkUrl`.
+  ImageProvider<Object> toImageProvider() {
+    switch (type) {
+      case EditorImageType.memory:
+        return MemoryImage(byteArray!);
+      case EditorImageType.asset:
+        return AssetImage(assetPath!);
+      case EditorImageType.file:
+        return FileImage(file!);
+      case EditorImageType.network:
+        return NetworkImage(networkUrl!);
+    }
+  }
+
   /// A future that retrieves the image data as a `Uint8List` from the
   /// appropriate source based on the `EditorImageType`.
   Future<Uint8List> safeByteArray(BuildContext context) async {
@@ -166,6 +189,42 @@ class EditorImage {
     } else {
       return EditorImageType.asset;
     }
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+
+    return other is EditorImage &&
+        _areUint8ListsEqual(byteArray, other.byteArray) &&
+        file?.path == other.file?.path &&
+        networkUrl == other.networkUrl &&
+        assetPath == other.assetPath;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      _hashUint8List(byteArray),
+      file?.path,
+      networkUrl,
+      assetPath,
+    );
+  }
+
+  bool _areUint8ListsEqual(Uint8List? a, Uint8List? b) {
+    if (a == null || b == null) return a == b;
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  int _hashUint8List(Uint8List? list) {
+    if (list == null) return 0;
+    return list.fold(0, (hash, byte) => hash * 31 + byte);
   }
 }
 

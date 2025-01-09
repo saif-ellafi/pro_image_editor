@@ -19,7 +19,7 @@ import 'models/export_state_history_configs.dart';
 /// Class responsible for exporting the state history of the editor.
 ///
 /// This class allows you to export the state history of the editor,
-/// including layers, filters, stickers, and other configurations.
+/// including layers, filters, widgets, and other configurations.
 class ExportStateHistory {
   /// Constructs an [ExportStateHistory] object with the given parameters.
   ///
@@ -90,10 +90,10 @@ class ExportStateHistory {
   /// Converts the state history to a Map.
   ///
   /// Returns a Map representing the state history of the editor,
-  /// including layers, filters, stickers, and other configurations.
+  /// including layers, filters and other configurations.
   Future<Map<String, dynamic>> toMap() async {
     List<Map<String, dynamic>> history = [];
-    List<Uint8List> stickers = [];
+    List<Uint8List> widgetRecords = [];
     List<EditorStateHistory> changes = List.from(stateHistory);
 
     if (changes.isNotEmpty) changes.removeAt(0);
@@ -122,7 +122,7 @@ class ExportStateHistory {
       await _convertLayers(
         element: element,
         layers: layers,
-        stickers: stickers,
+        widgetRecords: widgetRecords,
         imageInfos: imageInfos,
       );
 
@@ -141,13 +141,13 @@ class ExportStateHistory {
     }
 
     return {
-      'version': ExportImportVersion.version_3_0_1,
+      'version': ExportImportVersion.version_4_0_0,
       'position': _configs.historySpan == ExportHistorySpan.current ||
               _configs.historySpan == ExportHistorySpan.currentAndForward
           ? 0
           : editorPosition - 1,
       if (history.isNotEmpty) 'history': history,
-      if (stickers.isNotEmpty) 'stickers': stickers,
+      if (widgetRecords.isNotEmpty) 'widgetRecords': widgetRecords,
       'imgSize': {
         'width': imageInfos.rawSize.width,
         'height': imageInfos.rawSize.height,
@@ -195,7 +195,7 @@ class ExportStateHistory {
   Future<void> _convertLayers({
     required EditorStateHistory element,
     required List<Map<String, dynamic>> layers,
-    required List<Uint8List?> stickers,
+    required List<Uint8List?> widgetRecords,
     required ImageInfos imageInfos,
   }) async {
     for (var layer in element.layers) {
@@ -203,31 +203,35 @@ class ExportStateHistory {
           (_configs.exportText && layer.runtimeType == TextLayer) ||
           (_configs.exportEmoji && layer.runtimeType == EmojiLayer)) {
         layers.add(layer.toMap());
-      } else if (_configs.exportSticker && layer.runtimeType == WidgetLayer) {
-        layers.add((layer as WidgetLayer).toStickerMap(stickers.length));
+        // ignore: deprecated_member_use_from_same_package
+      } else if ((_configs.exportSticker ?? _configs.exportWidgets) &&
+          layer.runtimeType == WidgetLayer) {
+        WidgetLayer widgetLayer = layer as WidgetLayer;
 
-        Uint8List? result;
-        if (_configs.serializeSticker) {
+        if (widgetLayer.exportConfigs.hasParameter) {
+          layers.add(widgetLayer.toWidgetMap());
+        } else {
+          /// Convert the widget to Uint8List in the case the user didn't add
+          /// any export config parameter to restore the widget.
+          layers.add(widgetLayer.toWidgetMap(widgetRecords.length));
+
           double imageWidth =
               editorConfigs.stickerEditor.initWidth * layer.scale;
+
           Size targetSize = Size(
               imageWidth,
               MediaQuery.of(context).size.height /
                   MediaQuery.of(context).size.width *
                   imageWidth);
 
-          result = await contentRecorderCtrl.captureFromWidget(
-            layer.sticker,
+          Uint8List? result = await contentRecorderCtrl.captureFromWidget(
+            layer.widget,
             format: OutputFormat.png,
             imageInfos: imageInfos,
             targetSize: targetSize,
           );
-          if (result == null) return;
-        } else {
-          result = Uint8List.fromList([]);
+          widgetRecords.add(result);
         }
-
-        stickers.add(result);
       }
     }
   }

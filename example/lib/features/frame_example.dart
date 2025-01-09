@@ -80,7 +80,7 @@ class _FrameExampleState extends State<FrameExample>
         /// of the editor.
         offset: Offset.zero,
         scale: _initScale,
-        sticker: Image.memory(
+        widget: Image.memory(
           bytes,
           width: 100,
           height: 100 /
