@@ -73,7 +73,7 @@ class WidgetLayer extends Layer {
         'The `widgetLoader` must be defined when '
         'importing the widget layer by id',
       );
-      widget = widgetLoader!(exportConfigs.id!);
+      widget = widgetLoader!(exportConfigs.id!, meta: exportConfigs.meta);
     } else if (exportConfigs.networkUrl != null) {
       widget = ConstrainedBox(
         constraints: defaultConstraints,

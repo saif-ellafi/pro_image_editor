@@ -112,9 +112,10 @@ class _StickersExampleState extends State<StickersExample>
                           id: 'sticker-$index',
 
                           /// Alternatively, you can use one of the parameters
-                          /// below instead of the id. However, keep in mind
-                          /// that for complex widgets, this may slightly alter
-                          /// their size.
+                          /// listed below instead of the id, which does not
+                          /// require setting up the widgetLoader. However,
+                          /// please note that for complex widgets, this
+                          /// approach may slightly alter their size.
                           ///
                           /// networkUrl: '',
                           /// assetPath: '',

@@ -121,7 +121,10 @@ class _ImportExportExampleState extends State<ImportExportExample>
                   ///   ),
                   /// );
                   /// ```
-                  widgetLoader: (id) {
+                  widgetLoader: (
+                    String id, {
+                    Map<String, dynamic>? meta,
+                  }) {
                     switch (id) {
                       case 'my-special-container':
                         return Container(

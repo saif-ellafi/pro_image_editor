@@ -1,3 +1,5 @@
+// ignore_for_file: unintended_html_in_doc_comment
+
 import 'package:flutter/widgets.dart';
 
 /// {@template widgetLoader}
@@ -7,6 +9,7 @@ import 'package:flutter/widgets.dart';
 ///
 /// Parameters:
 /// - `id` (String): The export ID of the widget to be loaded.
+/// - `meta` (Map<String, dynamic>?): Additional information about the widget.
 ///
 /// Returns:
 /// - `Widget`: The widget corresponding to the given export ID.
@@ -35,7 +38,10 @@ import 'package:flutter/widgets.dart';
 ///   ImportStateHistory.fromJson(
 ///     savedHistory,
 ///     configs: ImportEditorConfigs(
-///       widgetLoader: (id) {
+///         widgetLoader: (
+///           String id, {
+///           Map<String, dynamic>? meta,
+///         }) {
 ///         switch (id) {
 ///           case 'my-special-container':
 ///             return Container(
@@ -56,4 +62,7 @@ import 'package:flutter/widgets.dart';
 /// ```
 ///
 /// {@endtemplate}
-typedef WidgetLoader = Widget Function(String id);
+typedef WidgetLoader = Widget Function(
+  String id, {
+  Map<String, dynamic>? meta,
+});
