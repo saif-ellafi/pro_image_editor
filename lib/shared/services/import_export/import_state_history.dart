@@ -16,18 +16,10 @@ import '/core/utils/parser/size_parser.dart';
 import '/features/filter_editor/utils/filter_generator/filter_addons.dart';
 import 'constants/export_import_version.dart';
 import 'models/import_state_history_configs.dart';
+import 'utils/key_minifier.dart';
 
 /// This class represents the state history of an imported editor session.
 class ImportStateHistory {
-  /// Creates an [ImportStateHistory] instance from a JSON file.
-  factory ImportStateHistory.fromJsonFile(
-    File file, {
-    ImportEditorConfigs configs = const ImportEditorConfigs(),
-  }) {
-    String json = file.readAsStringSync();
-    return ImportStateHistory.fromJson(json, configs: configs);
-  }
-
   /// Constructs an [ImportStateHistory] instance.
   ImportStateHistory._({
     required this.editorPosition,
@@ -39,48 +31,114 @@ class ImportStateHistory {
     required this.requirePrecacheList,
   });
 
+  /// Creates an [ImportStateHistory] instance from a JSON file.
+  factory ImportStateHistory.fromJsonFile(
+    File file, {
+    ImportEditorConfigs configs = const ImportEditorConfigs(),
+  }) {
+    String json = file.readAsStringSync();
+    return ImportStateHistory.fromJson(json, configs: configs);
+  }
+
+  /// Creates an [ImportStateHistory] instance from a JSON string.
+  factory ImportStateHistory.fromJson(
+    String json, {
+    ImportEditorConfigs configs = const ImportEditorConfigs(),
+  }) {
+    return ImportStateHistory.fromMap(jsonDecode(json), configs: configs);
+  }
+
   /// Creates an [ImportStateHistory] instance from a map representation.
   factory ImportStateHistory.fromMap(
     Map<String, dynamic> map, {
     ImportEditorConfigs configs = const ImportEditorConfigs(),
   }) {
+    bool isMinified = map['m'] == true;
+
+    EditorKeyMinifier minifier = EditorKeyMinifier(enableMinify: isMinified);
+
+    final blurKey = minifier.convertHistoryKey('blur');
+    final tuneKey = minifier.convertHistoryKey('tune');
+    final filtersKey = minifier.convertHistoryKey('filters');
+    final transformKey = minifier.convertHistoryKey('transform');
+
     /// Initialize default values
-    final version =
-        map['version'] as String? ?? ExportImportVersion.version_1_0_0;
+    final version = map[minifier.convertMainKey('version')] as String? ??
+        ExportImportVersion.version_1_0_0;
     final stateHistory = <EditorStateHistory>[];
     final widgetRecords = _parseWidgetRecords(map, version);
-    final lastRenderedImgSize = safeParseSize(map['lastRenderedImgSize']);
+    final lastRenderedImgSize =
+        safeParseSize(map[minifier.convertMainKey('lastRenderedImgSize')]);
     final List<EditorImage> requirePrecacheList = [];
 
+    Map<String, Map<String, dynamic>> lastLayerStateHelper = {
+      ...map[minifier.convertMainKey('references')] ?? {}
+    };
+
+    var historyList =
+        (map[minifier.convertMainKey('history')] as List<dynamic>? ?? []);
+
     /// Parse history
-    for (final historyItem in (map['history'] as List<dynamic>? ?? [])) {
+    for (final historyItem in historyList) {
       /// Layers
-      final layers = (historyItem['layers'] as List<dynamic>? ?? [])
-          .map(
-            (layer) => Layer.fromMap(
-              layer,
+      List<Layer> layers = [];
+      switch (version) {
+        case ExportImportVersion.version_1_0_0:
+        case ExportImportVersion.version_2_0_0:
+        case ExportImportVersion.version_3_0_1:
+        case ExportImportVersion.version_3_0_0:
+        case ExportImportVersion.version_4_0_0:
+          layers = (historyItem['layers'] as List<dynamic>? ?? [])
+              .map(
+                (layer) => Layer.fromMap(
+                  layer,
+                  widgetRecords: widgetRecords,
+                  widgetLoader: configs.widgetLoader,
+                  requirePrecache: requirePrecacheList.add,
+                ),
+              )
+              .toList();
+          break;
+        default:
+          for (var rawLayer in List.from(
+              historyItem[minifier.convertHistoryKey('layers')] ?? [])) {
+            String id = rawLayer['id'];
+            Map<String, dynamic> convertedLayerMap = {
+              ...lastLayerStateHelper[id] ?? {},
+              ...rawLayer,
+            };
+
+            layers.add(Layer.fromMap(
+              convertedLayerMap,
               widgetRecords: widgetRecords,
               widgetLoader: configs.widgetLoader,
               requirePrecache: requirePrecacheList.add,
-            ),
-          )
-          .toList();
+              minifier: minifier,
+              id: id,
+            ));
+
+            lastLayerStateHelper[id] =
+                Map<String, Object>.from(convertedLayerMap);
+          }
+      }
 
       /// Blur
-      final blur = safeParseDouble(historyItem['blur']);
+      final blur = historyItem[blurKey] != null
+          ? safeParseDouble(historyItem[blurKey])
+          : null;
 
       /// Filters
-      final filters = _parseFilters(historyItem['filters'], version);
+      final filters = _parseFilters(historyItem[filtersKey], version);
 
       /// Tune Adjustments
-      final tuneAdjustments = (historyItem['tune'] as List<dynamic>? ?? [])
+      final tuneAdjustments = (historyItem[tuneKey] as List<dynamic>? ?? [])
           .map((tune) => TuneAdjustmentMatrix.fromMap(tune))
           .toList();
 
       /// Transformations
-      final transformConfigs = historyItem['transform'] != null &&
-              Map.from(historyItem['transform']).isNotEmpty
-          ? TransformConfigs.fromMap(historyItem['transform'])
+      final transformConfigs = historyItem[transformKey] != null &&
+              Map.from(historyItem[transformKey]).isNotEmpty
+          ? TransformConfigs.fromMap(historyItem[transformKey])
           : TransformConfigs.empty();
 
       stateHistory.add(EditorStateHistory(
@@ -93,22 +151,14 @@ class ImportStateHistory {
     }
 
     return ImportStateHistory._(
-      editorPosition: safeParseInt(map['position']),
-      imgSize: safeParseSize(map['imgSize']),
+      editorPosition: safeParseInt(map[minifier.convertMainKey('position')]),
+      imgSize: safeParseSize(map[minifier.convertMainKey('imgSize')]),
       lastRenderedImgSize: lastRenderedImgSize,
       stateHistory: stateHistory,
       configs: configs,
       version: version,
       requirePrecacheList: requirePrecacheList,
     );
-  }
-
-  /// Creates an [ImportStateHistory] instance from a JSON string.
-  factory ImportStateHistory.fromJson(
-    String json, {
-    ImportEditorConfigs configs = const ImportEditorConfigs(),
-  }) {
-    return ImportStateHistory.fromMap(jsonDecode(json), configs: configs);
   }
 
   /// Helper to parse filters

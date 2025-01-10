@@ -13,15 +13,15 @@ class EditorStateHistory {
   ///
   /// All parameters are required.
   EditorStateHistory({
-    required this.blur,
-    required this.layers,
-    required this.filters,
-    required this.tuneAdjustments,
-    required this.transformConfigs,
+    this.blur,
+    this.layers = const [],
+    this.filters = const [],
+    this.tuneAdjustments = const [],
+    this.transformConfigs,
   });
 
   /// The blur factor.
-  final double blur;
+  final double? blur;
 
   /// The list of layers.
   final List<Layer> layers;
@@ -33,5 +33,5 @@ class EditorStateHistory {
   final List<TuneAdjustmentMatrix> tuneAdjustments;
 
   /// The transformation from the crop/ rotate editor.
-  TransformConfigs transformConfigs;
+  TransformConfigs? transformConfigs;
 }

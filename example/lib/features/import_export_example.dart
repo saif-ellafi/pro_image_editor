@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 
-import '/core/constants/import_history_demo_data.dart';
+import '/core/constants/history_demo/import_history_5_0_0_minified.dart';
 import '/core/mixin/example_helper.dart';
 
 /// The import export example
@@ -66,6 +66,8 @@ class _ImportExportExampleState extends State<ImportExportExample>
                                 onPressed: () async {
                                   var history = await editor.exportStateHistory(
                                     configs: const ExportEditorConfigs(
+                                        historySpan:
+                                            ExportHistorySpan.currentAndBackward
                                         // configs...
                                         ),
                                   );
@@ -101,8 +103,8 @@ class _ImportExportExampleState extends State<ImportExportExample>
 
                   /// The `widgetLoader` is optional and only required if you
                   /// add `exportConfigs` with an id to the widget layers.
-                  /// Refer to the [sticker-example] for details on how this
-                  /// works in the sticker editor.
+                  /// Refer to the [sticker-example](https://github.com/hm21/pro_image_editor/blob/stable/example/lib/features/stickers_example.dart)
+                  /// for details on how this works in the sticker editor.
                   ///
                   /// If you add widget layers directly to the editor,
                   /// you can pass the parameters as shown below:

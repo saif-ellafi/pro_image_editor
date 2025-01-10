@@ -48,19 +48,23 @@ class WidgetLayer extends Layer {
     required List<Uint8List> widgetRecords,
     required WidgetLoader? widgetLoader,
     required Function(EditorImage editorImage)? requirePrecache,
+    Function(String key)? keyConverter,
   }) {
+    keyConverter ??= (String key) => key;
+
     /// Determines the position of the widget in the list.
     int widgetPosition = safeParseInt(
-        map['recordPosition'] ?? map['listPosition'],
+        map[keyConverter('recordPosition')] ?? map['listPosition'],
         fallback: -1);
 
-    var exportConfigs = WidgetLayerExportConfigs.fromMap(map['exportConfigs']);
+    var exportConfigs =
+        WidgetLayerExportConfigs.fromMap(map[keyConverter('exportConfigs')]);
 
     /// Widget to display a widget or a placeholder if not found.
     Widget widget = kDebugMode
         ? Text(
             'Widget $widgetPosition not found',
-            style: const TextStyle(color: Color(0xFFF44336), fontSize: 24),
+            style: const TextStyle(color: Color(0xFFF44336), fontSize: 48),
           )
         : const SizedBox.shrink();
 
@@ -105,6 +109,7 @@ class WidgetLayer extends Layer {
     /// Constructs and returns a WidgetLayer instance with properties
     /// derived from the layer and map.
     return WidgetLayer(
+      id: layer.id,
       flipX: layer.flipX,
       flipY: layer.flipY,
       enableInteraction: layer.enableInteraction,
@@ -131,14 +136,22 @@ class WidgetLayer extends Layer {
   /// Returns a Map representing the properties of this transform object,
   /// augmented with the specified [recordPosition] indicating the position of
   /// the widget in a list.
-  Map<String, dynamic> toWidgetMap([int? recordPosition]) {
+  @override
+  Map<String, dynamic> toMap([int? recordPosition]) {
     var exportConfigMap = exportConfigs.toMap();
 
     return {
-      ...toMap(),
+      ...super.toMap(),
       if (recordPosition != null) 'recordPosition': recordPosition,
       if (exportConfigMap.isNotEmpty) 'exportConfigs': exportConfigMap,
       'type': 'widget',
+    };
+  }
+
+  @override
+  Map<String, dynamic> toMapFromReference(Layer layer) {
+    return {
+      ...super.toMapFromReference(layer),
     };
   }
 
@@ -220,6 +233,7 @@ class StickerLayerData extends WidgetLayer {
     /// Constructs and returns a StickerLayerData instance with properties
     /// derived from the layer and map.
     return StickerLayerData(
+      id: layer.id,
       flipX: layer.flipX,
       flipY: layer.flipY,
       enableInteraction: layer.enableInteraction,

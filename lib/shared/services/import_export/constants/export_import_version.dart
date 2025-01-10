@@ -17,6 +17,10 @@ class ExportImportVersion {
   static const version_3_0_1 = '3.0.1';
 
   /// The version string representing version `4.0.0` which is used in the
-  /// editor version >= `7.5.0`.
+  /// editor version >= `7.5.0` && < `7.6.0`.
   static const version_4_0_0 = '4.0.0';
+
+  /// The version string representing version `5.0.0` which is used in the
+  /// editor version >= `7.6.0`.
+  static const version_5_0_0 = '5.0.0';
 }

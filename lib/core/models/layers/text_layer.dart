@@ -44,7 +44,13 @@ class TextLayer extends Layer {
 
   /// Factory constructor for creating a TextLayer instance from a Layer
   /// instance and a map.
-  factory TextLayer.fromMap(Layer layer, Map<String, dynamic> map) {
+  factory TextLayer.fromMap(
+    Layer layer,
+    Map<String, dynamic> map, {
+    Function(String key)? keyConverter,
+  }) {
+    keyConverter ??= (String key) => key;
+
     /// Helper function to determine the text decoration style from a string.
     TextDecoration getDecoration(String decoration) {
       if (decoration.contains('combine')) {
@@ -90,26 +96,27 @@ class TextLayer extends Layer {
     }
 
     /// Optional properties for text styling from the map.
-    String? fontFamily = map['fontFamily'] as String?;
-    double? wordSpacing = tryParseDouble(map['wordSpacing']);
-    double? height = tryParseDouble(map['height']);
-    double? letterSpacing = tryParseDouble(map['letterSpacing']);
-    int? fontWeight = tryParseInt(map['fontWeight']);
-    String? fontStyle = map['fontStyle'] as String?;
-    String? decoration = map['decoration'] as String?;
+    String? fontFamily = map[keyConverter('fontFamily')] as String?;
+    double? wordSpacing = tryParseDouble(map[keyConverter('wordSpacing')]);
+    double? height = tryParseDouble(map[keyConverter('height')]);
+    double? letterSpacing = tryParseDouble(map[keyConverter('letterSpacing')]);
+    int? fontWeight = tryParseInt(map[keyConverter('fontWeight')]);
+    String? fontStyle = map[keyConverter('fontStyle')] as String?;
+    String? decoration = map[keyConverter('decoration')] as String?;
 
     /// Constructs and returns a TextLayer instance with properties derived
     /// from the map.
     return TextLayer(
+      id: layer.id,
       flipX: layer.flipX,
       flipY: layer.flipY,
       enableInteraction: layer.enableInteraction,
       offset: layer.offset,
       rotation: layer.rotation,
       scale: layer.scale,
-      text: map['text'] ?? '-',
-      fontScale: map['fontScale'] ?? 1.0,
-      textStyle: map['fontFamily'] != null
+      text: map[keyConverter('text')] ?? '-',
+      fontScale: map[keyConverter('fontScale')] ?? 1.0,
+      textStyle: map[keyConverter('fontFamily')] != null
           ? TextStyle(
               fontFamily: fontFamily,
               height: height,
@@ -126,14 +133,14 @@ class TextLayer extends Layer {
                   : null,
             )
           : null,
-      colorMode: LayerBackgroundMode.values
-          .firstWhere((element) => element.name == map['colorMode']),
-      color: Color(map['color']),
-      background: Color(map['background']),
-      colorPickerPosition: map['colorPickerPosition'] ?? 0,
+      colorMode: LayerBackgroundMode.values.firstWhere(
+          (element) => element.name == map[keyConverter!('colorMode')]),
+      color: Color(map[keyConverter('color')]),
+      background: Color(map[keyConverter('background')]),
+      colorPickerPosition: map[keyConverter('colorPickerPosition')] ?? 0,
       align: TextAlign.values
-          .firstWhere((element) => element.name == map['align']),
-      customSecondaryColor: map['customSecondaryColor'] ?? false,
+          .firstWhere((element) => element.name == map[keyConverter!('align')]),
+      customSecondaryColor: map[keyConverter('customSecondaryColor')] ?? false,
     );
   }
 
@@ -187,6 +194,38 @@ class TextLayer extends Layer {
       if (textStyle?.height != null) 'height': textStyle?.height,
       if (textStyle?.wordSpacing != null) 'wordSpacing': textStyle?.wordSpacing,
       if (textStyle?.decoration != null)
+        'decoration': textStyle?.decoration.toString(),
+    };
+  }
+
+  @override
+  Map<String, dynamic> toMapFromReference(Layer layer) {
+    var paintLayer = layer as TextLayer;
+    return {
+      ...super.toMapFromReference(layer),
+      if (paintLayer.text != text) 'text': text,
+      if (paintLayer.fontScale != fontScale) 'fontScale': fontScale,
+      if (paintLayer.color != color) 'color': color.toHex(),
+      if (paintLayer.background != background) 'background': background.toHex(),
+      if (paintLayer.colorPickerPosition != colorPickerPosition)
+        'colorPickerPosition': colorPickerPosition ?? 0,
+      if (paintLayer.colorMode?.name != colorMode?.name)
+        'colorMode': LayerBackgroundMode.values[colorMode?.index ?? 0].name,
+      if (paintLayer.customSecondaryColor != customSecondaryColor)
+        'customSecondaryColor': customSecondaryColor,
+      if (paintLayer.textStyle?.fontFamily != textStyle?.fontFamily)
+        'fontFamily': textStyle?.fontFamily,
+      if (paintLayer.textStyle?.fontStyle != textStyle?.fontStyle)
+        'fontStyle': textStyle?.fontStyle!.name,
+      if (paintLayer.textStyle?.fontWeight != textStyle?.fontWeight)
+        'fontWeight': textStyle?.fontWeight!.value,
+      if (paintLayer.textStyle?.letterSpacing != textStyle?.letterSpacing)
+        'letterSpacing': textStyle?.letterSpacing,
+      if (paintLayer.textStyle?.height != textStyle?.height)
+        'height': textStyle?.height,
+      if (paintLayer.textStyle?.wordSpacing != textStyle?.wordSpacing)
+        'wordSpacing': textStyle?.wordSpacing,
+      if (paintLayer.textStyle?.decoration != textStyle?.decoration)
         'decoration': textStyle?.decoration.toString(),
     };
   }
@@ -275,6 +314,7 @@ class TextLayerData extends TextLayer {
     /// Constructs and returns a TextLayerData instance with properties derived
     /// from the map.
     return TextLayerData(
+      id: layer.id,
       flipX: layer.flipX,
       flipY: layer.flipY,
       enableInteraction: layer.enableInteraction,

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../../../shared/services/import_export/utils/key_minifier.dart';
 import '../../utils/parser/double_parser.dart';
 import '../paint_editor/painted_model.dart';
 import 'layer.dart';
@@ -41,22 +42,32 @@ class PaintLayer extends Layer {
 
   /// Factory constructor for creating a PaintLayer instance from a
   /// Layer and a map.
-  factory PaintLayer.fromMap(Layer layer, Map<String, dynamic> map) {
+  factory PaintLayer.fromMap(
+    Layer layer,
+    Map<String, dynamic> map, {
+    EditorKeyMinifier? minifier,
+  }) {
+    var keyConverter = minifier?.convertLayerKey ?? (String key) => key;
+
     /// Constructs and returns a PaintLayer instance with properties
     /// derived from the layer and map.
     return PaintLayer(
+      id: layer.id,
       flipX: layer.flipX,
       flipY: layer.flipY,
       enableInteraction: layer.enableInteraction,
       offset: layer.offset,
       rotation: layer.rotation,
       scale: layer.scale,
-      opacity: safeParseDouble(map['opacity'], fallback: 1.0),
+      opacity: safeParseDouble(map[keyConverter('opacity')], fallback: 1.0),
       rawSize: Size(
-        safeParseDouble(map['rawSize']?['w'], fallback: 0),
-        safeParseDouble(map['rawSize']?['h'], fallback: 0),
+        safeParseDouble(map[keyConverter('rawSize')]?['w'], fallback: 0),
+        safeParseDouble(map[keyConverter('rawSize')]?['h'], fallback: 0),
       ),
-      item: PaintedModel.fromMap(map['item'] ?? {}),
+      item: PaintedModel.fromMap(
+        map[keyConverter('item')] ?? {},
+        keyConverter: minifier?.convertPaintKey,
+      ),
     );
   }
 
@@ -85,6 +96,21 @@ class PaintLayer extends Layer {
       'type': 'paint',
     };
   }
+
+  @override
+  Map<String, dynamic> toMapFromReference(Layer layer) {
+    var paintLayer = layer as PaintLayer;
+    return {
+      ...super.toMapFromReference(layer),
+      if (paintLayer.item != item) 'item': item.toMap(),
+      if (paintLayer.rawSize != rawSize)
+        'rawSize': {
+          'w': rawSize.width,
+          'h': rawSize.height,
+        },
+      if (paintLayer.opacity != opacity) 'opacity': opacity,
+    };
+  }
 }
 
 // TODO: Remove in version 8.0.0
@@ -109,6 +135,7 @@ class PaintLayerData extends PaintLayer {
   /// Layer and a map.
   factory PaintLayerData.fromMap(Layer layer, Map<String, dynamic> map) {
     return PaintLayerData(
+      id: layer.id,
       flipX: layer.flipX,
       flipY: layer.flipY,
       enableInteraction: layer.enableInteraction,

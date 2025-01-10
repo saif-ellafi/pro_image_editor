@@ -4,7 +4,6 @@ import 'dart:math';
 // Flutter imports:
 import 'package:flutter/material.dart';
 
-// Project imports:
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
 import '/core/models/history/state_history.dart';
 import '/shared/widgets/screen_resize_detector.dart';
@@ -131,11 +130,11 @@ class SizesManager {
 
     for (var el in history) {
       Size oldSize = getCropImageSize(
-        transformConfigs: el.transformConfigs,
+        transformConfigs: el.transformConfigs ?? TransformConfigs.empty(),
         drawSize: resizeEvent.oldContentSize,
       );
       Size newSize = getCropImageSize(
-        transformConfigs: el.transformConfigs,
+        transformConfigs: el.transformConfigs ?? TransformConfigs.empty(),
         drawSize: resizeEvent.newContentSize,
       );
       double scaleFactor = min(

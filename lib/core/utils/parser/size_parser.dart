@@ -29,7 +29,7 @@ Size safeParseSize(Map<String, dynamic>? map, {Size fallback = Size.zero}) {
   if (map == null) return fallback;
 
   return Size(
-    safeParseDouble(map['width'], fallback: fallback.width),
-    safeParseDouble(map['height'], fallback: fallback.height),
+    safeParseDouble(map['width'] ?? map['w'], fallback: fallback.width),
+    safeParseDouble(map['height'] ?? map['h'], fallback: fallback.height),
   );
 }

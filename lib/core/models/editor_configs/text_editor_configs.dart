@@ -48,6 +48,7 @@ class TextEditorConfigs {
     this.minScale = double.negativeInfinity,
     this.maxScale = double.infinity,
     this.customTextStyles,
+    this.defaultTextStyle = const TextStyle(),
     this.initialBackgroundColorMode = LayerBackgroundMode.backgroundAndColor,
     this.safeArea = const EditorSafeArea(),
     this.style = const TextEditorStyle(),
@@ -93,6 +94,11 @@ class TextEditorConfigs {
 
   /// Allow users to select a different font style
   final List<TextStyle>? customTextStyles;
+
+  /// The default text style to be used in the text editor.
+  ///
+  /// This style will be applied to the text if no other style is specified.
+  final TextStyle defaultTextStyle;
 
   /// The minimum scale factor from the layer.
   final double minScale;
@@ -145,6 +151,7 @@ class TextEditorConfigs {
     double? minFontScale,
     LayerBackgroundMode? initialBackgroundColorMode,
     List<TextStyle>? customTextStyles,
+    TextStyle? defaultTextStyle,
     double? minScale,
     double? maxScale,
     bool? enableSuggestions,
@@ -171,6 +178,7 @@ class TextEditorConfigs {
       initialBackgroundColorMode:
           initialBackgroundColorMode ?? this.initialBackgroundColorMode,
       customTextStyles: customTextStyles ?? this.customTextStyles,
+      defaultTextStyle: defaultTextStyle ?? this.defaultTextStyle,
       minScale: minScale ?? this.minScale,
       maxScale: maxScale ?? this.maxScale,
       enableSuggestions: enableSuggestions ?? this.enableSuggestions,

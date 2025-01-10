@@ -15,6 +15,7 @@ import '../content_recorder/controllers/content_recorder_controller.dart';
 import 'constants/export_import_version.dart';
 import 'enums/export_import_enum.dart';
 import 'models/export_state_history_configs.dart';
+import 'utils/key_minifier.dart';
 
 /// Class responsible for exporting the state history of the editor.
 ///
@@ -87,78 +88,6 @@ class ExportStateHistory {
   /// data within the editor, providing a connection to the widget tree.
   final BuildContext context;
 
-  /// Converts the state history to a Map.
-  ///
-  /// Returns a Map representing the state history of the editor,
-  /// including layers, filters and other configurations.
-  Future<Map<String, dynamic>> toMap() async {
-    List<Map<String, dynamic>> history = [];
-    List<Uint8List> widgetRecords = [];
-    List<EditorStateHistory> changes = List.from(stateHistory);
-
-    if (changes.isNotEmpty) changes.removeAt(0);
-
-    /// Choose history span
-    switch (_configs.historySpan) {
-      case ExportHistorySpan.current:
-        if (editorPosition > 0) {
-          changes = [changes[editorPosition - 1]];
-        }
-        break;
-      case ExportHistorySpan.currentAndBackward:
-        changes.removeRange(editorPosition, changes.length);
-        break;
-      case ExportHistorySpan.currentAndForward:
-        changes.removeRange(0, editorPosition - 1);
-        break;
-      case ExportHistorySpan.all:
-        break;
-    }
-
-    /// Build Layers and filters
-    for (EditorStateHistory element in changes) {
-      List<Map<String, dynamic>> layers = [];
-
-      await _convertLayers(
-        element: element,
-        layers: layers,
-        widgetRecords: widgetRecords,
-        imageInfos: imageInfos,
-      );
-
-      Map<String, dynamic> transformConfigsMap =
-          element.transformConfigs.toMap();
-      history.add({
-        if (layers.isNotEmpty) 'layers': layers,
-        if (_configs.exportFilter && element.filters.isNotEmpty)
-          'filters': element.filters,
-        if (_configs.exportTuneAdjustments &&
-            element.tuneAdjustments.isNotEmpty)
-          'tune': element.tuneAdjustments.map((item) => item.toMap()).toList(),
-        'blur': element.blur,
-        if (transformConfigsMap.isNotEmpty) 'transform': transformConfigsMap,
-      });
-    }
-
-    return {
-      'version': ExportImportVersion.version_4_0_0,
-      'position': _configs.historySpan == ExportHistorySpan.current ||
-              _configs.historySpan == ExportHistorySpan.currentAndForward
-          ? 0
-          : editorPosition - 1,
-      if (history.isNotEmpty) 'history': history,
-      if (widgetRecords.isNotEmpty) 'widgetRecords': widgetRecords,
-      'imgSize': {
-        'width': imageInfos.rawSize.width,
-        'height': imageInfos.rawSize.height,
-      },
-      'lastRenderedImgSize': {
-        'width': imageInfos.renderedSize.width,
-        'height': imageInfos.renderedSize.height,
-      },
-    };
-  }
-
   /// Converts the state history to a JSON string.
   ///
   /// Returns a JSON string representing the state history of the editor.
@@ -192,28 +121,143 @@ class ExportStateHistory {
     return tempFile;
   }
 
-  Future<void> _convertLayers({
+  /// Converts the state history to a Map.
+  ///
+  /// Returns a Map representing the state history of the editor,
+  /// including layers, filters and other configurations.
+  Future<Map<String, dynamic>> toMap() async {
+    EditorKeyMinifier minifier = EditorKeyMinifier(
+      enableMinify: _configs.enableMinify,
+    );
+
+    List<Map<String, dynamic>> history = [];
+    List<Uint8List> widgetRecords = [];
+    List<EditorStateHistory> changes = List.from(stateHistory);
+
+    if (changes.isNotEmpty) changes.removeAt(0);
+
+    /// Choose history span
+    switch (_configs.historySpan) {
+      case ExportHistorySpan.current:
+        if (editorPosition > 0) {
+          changes = [changes[editorPosition - 1]];
+        }
+        break;
+      case ExportHistorySpan.currentAndBackward:
+        changes.removeRange(editorPosition, changes.length);
+        break;
+      case ExportHistorySpan.currentAndForward:
+        changes.removeRange(0, editorPosition - 1);
+        break;
+      case ExportHistorySpan.all:
+        break;
+    }
+
+    Map<String, dynamic> references = {};
+    Map<String, dynamic> lastLayerStateHelper = {};
+
+    /// Build Layers and filters
+    for (EditorStateHistory element in changes) {
+      List<Map<String, dynamic>> layers = await _convertLayers(
+        element: element,
+        widgetRecords: widgetRecords,
+        imageInfos: imageInfos,
+        layerReferences: references,
+        lastLayerStateHelper: lastLayerStateHelper,
+      );
+
+      layers = minifier.convertListOfLayerKeys(layers);
+
+      Map<String, dynamic> transformConfigsMap =
+          element.transformConfigs?.toMap() ?? {};
+
+      bool enableTuneExport =
+          _configs.exportTuneAdjustments && element.tuneAdjustments.isNotEmpty;
+      bool enableBlurExport = _configs.exportBlur && element.blur != null;
+      bool enableFilterExport =
+          _configs.exportFilter && element.filters.isNotEmpty;
+      bool enableCropRotateExport =
+          _configs.exportCropRotate && transformConfigsMap.isNotEmpty;
+
+      history.add({
+        if (layers.isNotEmpty) minifier.convertHistoryKey('layers'): layers,
+        if (enableFilterExport)
+          minifier.convertHistoryKey('filters'): element.filters,
+        if (enableTuneExport)
+          minifier.convertHistoryKey('tune'):
+              element.tuneAdjustments.map((item) => item.toMap()).toList(),
+        if (enableBlurExport) minifier.convertHistoryKey('blur'): element.blur,
+        if (enableCropRotateExport)
+          minifier.convertHistoryKey('transform'): transformConfigsMap,
+      });
+    }
+    references = minifier.convertReferenceKeys(references);
+
+    var convertedLayer = minifier.convertLayerId(history, references);
+    references = convertedLayer.references;
+    history = convertedLayer.history;
+
+    return {
+      minifier.convertMainKey('version'): ExportImportVersion.version_5_0_0,
+      if (_configs.enableMinify) minifier.convertMainKey('minify'): true,
+      minifier.convertMainKey('position'):
+          _configs.historySpan == ExportHistorySpan.current ||
+                  _configs.historySpan == ExportHistorySpan.currentAndForward
+              ? 0
+              : editorPosition - 1,
+      if (history.isNotEmpty) minifier.convertMainKey('history'): history,
+      if (widgetRecords.isNotEmpty)
+        minifier.convertMainKey('widgetRecords'): widgetRecords,
+      if (references.isNotEmpty)
+        minifier.convertMainKey('references'): references,
+      minifier.convertMainKey('imgSize'): {
+        minifier.convertSizeKey('width'): imageInfos.rawSize.width,
+        minifier.convertSizeKey('height'): imageInfos.rawSize.height,
+      },
+      minifier.convertMainKey('lastRenderedImgSize'): {
+        minifier.convertSizeKey('width'): imageInfos.renderedSize.width,
+        minifier.convertSizeKey('height'): imageInfos.renderedSize.height,
+      },
+    };
+  }
+
+  Future<List<Map<String, dynamic>>> _convertLayers({
     required EditorStateHistory element,
-    required List<Map<String, dynamic>> layers,
     required List<Uint8List?> widgetRecords,
     required ImageInfos imageInfos,
+    required Map<String, dynamic> layerReferences,
+    required Map<String, dynamic> lastLayerStateHelper,
   }) async {
+    List<Map<String, dynamic>> convertedLayers = [];
+    void updateReference(Layer layer, {int? recordPosition}) {
+      if (recordPosition == null) {
+        layerReferences[layer.id] ??= layer.toMap();
+      } else {
+        layerReferences[layer.id] ??=
+            (layer as WidgetLayer).toMap(recordPosition);
+      }
+      convertedLayers.add(
+        layer.toMapFromReference(lastLayerStateHelper[layer.id] ?? layer),
+      );
+    }
+
     for (var layer in element.layers) {
       if ((_configs.exportPaint && layer.runtimeType == PaintLayer) ||
           (_configs.exportText && layer.runtimeType == TextLayer) ||
           (_configs.exportEmoji && layer.runtimeType == EmojiLayer)) {
-        layers.add(layer.toMap());
+        updateReference(layer);
+
         // ignore: deprecated_member_use_from_same_package
       } else if ((_configs.exportSticker ?? _configs.exportWidgets) &&
           layer.runtimeType == WidgetLayer) {
         WidgetLayer widgetLayer = layer as WidgetLayer;
 
         if (widgetLayer.exportConfigs.hasParameter) {
-          layers.add(widgetLayer.toWidgetMap());
+          updateReference(widgetLayer);
         } else {
           /// Convert the widget to Uint8List in the case the user didn't add
           /// any export config parameter to restore the widget.
-          layers.add(widgetLayer.toWidgetMap(widgetRecords.length));
+          updateReference(widgetLayer, recordPosition: widgetRecords.length);
 
           double imageWidth =
               editorConfigs.stickerEditor.initWidth * layer.scale;
@@ -233,6 +277,10 @@ class ExportStateHistory {
           widgetRecords.add(result);
         }
       }
+
+      lastLayerStateHelper[layer.id] = layer;
     }
+
+    return convertedLayers;
   }
 }
