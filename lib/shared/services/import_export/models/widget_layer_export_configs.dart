@@ -70,9 +70,14 @@ class WidgetLayerExportConfigs {
   /// - [networkUrl]
   /// - [assetPath]
   /// - [fileUrl]
+  /// - [fileUrl]
   /// Otherwise, returns `false`.
   bool get hasParameter =>
-      id != null || networkUrl != null || assetPath != null || fileUrl != null;
+      id != null ||
+      networkUrl != null ||
+      assetPath != null ||
+      fileUrl != null ||
+      (meta != null && meta!.isNotEmpty);
 
   /// Converts the [WidgetLayerExportConfigs] instance into a [Map].
   ///

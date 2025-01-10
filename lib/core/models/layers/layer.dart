@@ -1,6 +1,7 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pro_image_editor/shared/services/import_export/utils/key_minifier.dart';
 
 import '/shared/services/import_export/types/widget_loader.dart';
 import '../../utils/parser/double_parser.dart';
@@ -38,6 +39,7 @@ class Layer {
     bool? flipX,
     bool? flipY,
     bool? enableInteraction,
+    bool? isDeleted,
   }) {
     key = GlobalKey();
     // Initialize properties with provided values or defaults.
@@ -48,6 +50,7 @@ class Layer {
     this.flipX = flipX ?? false;
     this.flipY = flipY ?? false;
     this.enableInteraction = enableInteraction ?? true;
+    this.isDeleted = isDeleted ?? false;
   }
 
   /// Factory constructor for creating a Layer instance from a map and a list
@@ -56,31 +59,36 @@ class Layer {
     Map<String, dynamic> map, {
     List<Uint8List>? widgetRecords,
     WidgetLoader? widgetLoader,
+    String? id,
     Function(EditorImage editorImage)? requirePrecache,
+    EditorKeyMinifier? minifier,
   }) {
+    var keyConverter = minifier?.convertLayerKey ?? (String key) => key;
+
     /// Creates a base Layer instance with default or map-provided properties.
     Layer layer = Layer(
-      flipX: map['flipX'] ?? false,
-      flipY: map['flipY'] ?? false,
-      enableInteraction: map['enableInteraction'] ?? true,
+      id: id,
+      flipX: map[keyConverter('flipX')] ?? false,
+      flipY: map[keyConverter('flipY')] ?? false,
+      enableInteraction: map[keyConverter('enableInteraction')] ?? true,
       offset: Offset(safeParseDouble(map['x']), safeParseDouble(map['y'])),
-      rotation: safeParseDouble(map['rotation']),
-      scale: safeParseDouble(map['scale'], fallback: 1),
+      rotation: safeParseDouble(map[keyConverter('rotation')]),
+      scale: safeParseDouble(map[keyConverter('scale')], fallback: 1),
     );
 
     /// Determines the layer type from the map and returns the appropriate
     /// LayerData subclass.
-    switch (map['type']) {
+    switch (map[keyConverter('type')]) {
       case 'text':
         // Returns a TextLayer instance when type is 'text'.
-        return TextLayer.fromMap(layer, map);
+        return TextLayer.fromMap(layer, map, keyConverter: keyConverter);
       case 'emoji':
         // Returns an EmojiLayer instance when type is 'emoji'.
-        return EmojiLayer.fromMap(layer, map);
+        return EmojiLayer.fromMap(layer, map, keyConverter: keyConverter);
       case 'paint':
       case 'painting':
         // Returns a PaintLayer instance when type is 'paint'.
-        return PaintLayer.fromMap(layer, map);
+        return PaintLayer.fromMap(layer, map, minifier: minifier);
       case 'sticker':
       case 'widget':
         // Returns a WidgetLayer instance when type is 'widget' or 'sticker',
@@ -91,6 +99,7 @@ class Layer {
           widgetRecords: widgetRecords ?? [],
           widgetLoader: widgetLoader,
           requirePrecache: requirePrecache,
+          keyConverter: keyConverter,
         );
       default:
         // Returns the base Layer instance when type is unrecognized.
@@ -114,6 +123,9 @@ class Layer {
   /// Flag to enable or disable the user interaction with the layer.
   late bool enableInteraction;
 
+  /// Flag which indicates to the history that the layer is removed.
+  late bool isDeleted;
+
   /// A unique identifier for the layer.
   late String id;
 
@@ -130,8 +142,56 @@ class Layer {
       'scale': scale,
       'flipX': flipX,
       'flipY': flipY,
+      if (isDeleted) 'isDeleted': isDeleted,
       'enableInteraction': enableInteraction,
       'type': 'default',
     };
+  }
+
+  /// Converts the current layer to a map representation, comparing it with a
+  /// reference layer.
+  ///
+  /// The resulting map will contain only the properties that differ from the
+  /// reference layer.
+  Map<String, dynamic> toMapFromReference(Layer layer) {
+    return {
+      'id': layer.id,
+      if (layer.offset.dx != offset.dx) 'x': offset.dx,
+      if (layer.offset.dy != offset.dy) 'y': offset.dy,
+      if (layer.rotation != rotation) 'rotation': rotation,
+      if (layer.scale != scale) 'scale': scale,
+      if (layer.flipX != flipX) 'flipX': flipX,
+      if (layer.flipY != flipY) 'flipY': flipY,
+      if (isDeleted) 'isDeleted': isDeleted,
+      if (layer.enableInteraction != enableInteraction)
+        'enableInteraction': enableInteraction,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Layer &&
+        other.id == id &&
+        other.offset == offset &&
+        other.rotation == rotation &&
+        other.scale == scale &&
+        other.flipX == flipX &&
+        other.flipY == flipY &&
+        other.enableInteraction == enableInteraction &&
+        other.isDeleted == isDeleted;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        offset.hashCode ^
+        rotation.hashCode ^
+        scale.hashCode ^
+        flipX.hashCode ^
+        flipY.hashCode ^
+        enableInteraction.hashCode ^
+        isDeleted.hashCode;
   }
 }

@@ -15,9 +15,11 @@ class ExportEditorConfigs {
     this.exportFilter = true,
     this.exportTuneAdjustments = true,
     this.exportEmoji = true,
+    this.exportBlur = true,
     this.exportSticker,
     this.exportWidgets = true,
     this.serializeSticker = true,
+    this.enableMinify = true,
   });
 
   /// The span of the export history to include in the export.
@@ -31,6 +33,10 @@ class ExportEditorConfigs {
   final bool exportPaint;
 
   /// Whether to export the text content.
+  ///
+  /// **Note:** If you do not set a `defaultTextStyle` within
+  /// `textEditorConfigs`, the text size may change when you import the state
+  /// history on other platforms, as their default text styles may vary.
   ///
   /// Defaults to `true`.
   final bool exportText;
@@ -55,14 +61,23 @@ class ExportEditorConfigs {
   /// Defaults to `true`.
   final bool exportEmoji;
 
-  // TODO: Remove in version 8.0.0
-  /// Whether to export the stickers.
+  /// Whether to export the blur state.
   ///
   /// Defaults to `true`.
+  final bool exportBlur;
+
+  /// The `enableMinify` flag controls whether the keys in the
+  /// exported/imported data should be shortened (minified) to save space or
+  /// remain in their original, more descriptive form.
   ///
-  /// Warning: Exporting stickers may result in increased file size.
-  @Deprecated('Use exportWidgets instead')
-  final bool? exportSticker;
+  /// When `enableMinify` is `true`, the keys are converted to shorter
+  /// representations.
+  /// When `enableMinify` is `false`, the original keys are retained.
+  ///
+  /// This flag is typically used to toggle between optimized exports
+  /// (smaller payloads) and more readable exports for debugging or development
+  /// purposes.
+  final bool enableMinify;
 
   /// Whether to export the widget layers.
   ///
@@ -71,6 +86,15 @@ class ExportEditorConfigs {
   /// Warning: Exporting widgets may result in a significantly increased file
   /// size if no `exportConfigs` are added to the `WidgetLayer`.
   final bool exportWidgets;
+
+  // TODO: Remove in version 8.0.0
+  /// Whether to export the stickers.
+  ///
+  /// Defaults to `true`.
+  ///
+  /// Warning: Exporting stickers may result in increased file size.
+  @Deprecated('Use exportWidgets instead')
+  final bool? exportSticker;
 
   // TODO: Remove in version 8.0.0
   /// **DEPRECATED:**

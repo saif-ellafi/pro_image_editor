@@ -31,6 +31,7 @@ import '../../shared/services/import_export/constants/export_import_version.dart
 import '../../shared/services/import_export/export_state_history.dart';
 import '../crop_rotate_editor/widgets/crop_layer_painter.dart';
 import '../filter_editor/types/filter_matrix.dart';
+import '../filter_editor/widgets/filter_generator.dart';
 import '../filter_editor/widgets/filtered_image.dart';
 import 'controllers/main_editor_controllers.dart';
 import 'services/desktop_interaction_manager.dart';
@@ -267,6 +268,7 @@ class ProImageEditorState extends State<ProImageEditor>
   final _mouseCursorsKey = GlobalKey<ExtendedMouseRegionState>();
   final _bottomBarKey = GlobalKey();
   final _removeAreaKey = GlobalKey();
+  final _backgroundImageColorFilterKey = GlobalKey<ColorFilterGeneratorState>();
   final _interactiveViewer = GlobalKey<ExtendedInteractiveViewerState>();
   late final StreamController<void> _rebuildController;
 
@@ -340,18 +342,16 @@ class ProImageEditorState extends State<ProImageEditor>
           : null;
 
   /// Get the list of layers from the current image editor changes.
-  List<Layer> get activeLayers =>
-      stateManager.stateHistory[stateManager.position].layers;
+  List<Layer> get activeLayers => stateManager.activeLayers;
 
   /// List to store the history of image editor changes.
   List<EditorStateHistory> get stateHistory => stateManager.stateHistory;
 
   /// Determines whether undo actions can be performed on the current state.
-  bool get canUndo => stateManager.position > 0;
+  bool get canUndo => stateManager.canUndo;
 
   /// Determines whether redo actions can be performed on the current state.
-  bool get canRedo =>
-      stateManager.position < stateManager.stateHistory.length - 1;
+  bool get canRedo => stateManager.canRedo;
 
   /// Get the current background image.
   late EditorImage editorImage;
@@ -397,13 +397,15 @@ class ProImageEditorState extends State<ProImageEditor>
     if (mainEditorConfigs.transformSetup != null) {
       _initializeWithTransformations();
     } else {
-      stateManager.stateHistory.add(EditorStateHistory(
-        transformConfigs: TransformConfigs.empty(),
-        blur: 0,
-        layers: [],
-        filters: [],
-        tuneAdjustments: [],
-      ));
+      stateManager.addHistory(
+        EditorStateHistory(
+          transformConfigs: TransformConfigs.empty(),
+          blur: 0,
+          layers: [],
+          filters: [],
+          tuneAdjustments: [],
+        ),
+      );
     }
 
     if (helperLines.hitVibration) {
@@ -532,21 +534,20 @@ class ProImageEditorState extends State<ProImageEditor>
     bool heroScreenshotRequired = false,
     bool blockCaptureScreenshot = false,
   }) {
-    stateManager.cleanForwardChanges();
-
     List<Layer> activeLayerList = _layerCopyManager.copyLayerList(activeLayers);
 
-    stateHistory.add(
+    stateManager.addHistory(
       EditorStateHistory(
-        transformConfigs: transformConfigs ?? stateManager.transformConfigs,
-        blur: blur ?? stateManager.activeBlur,
+        transformConfigs: transformConfigs,
+        blur: blur,
         layers: layers ??
             (newLayer != null
                 ? [...activeLayerList, newLayer]
                 : activeLayerList),
-        filters: filters ?? stateManager.activeFilters,
-        tuneAdjustments: tuneAdjustments ?? stateManager.activeTuneAdjustments,
+        filters: filters ?? [],
+        tuneAdjustments: tuneAdjustments ?? [],
       ),
+      historyLimit: configs.stateHistory.stateHistoryLimit,
     );
     if (!blockCaptureScreenshot) {
       if (!heroScreenshotRequired) {
@@ -558,9 +559,6 @@ class ProImageEditorState extends State<ProImageEditor>
       _controllers.screenshot
           .addEmptyScreenshot(screenshots: stateManager.screenshots);
     }
-    stateManager.position++;
-
-    stateManager.setHistoryLimit(configs.stateHistory.stateHistoryLimit);
   }
 
   /// Replaces a layer at the specified index with a new layer.
@@ -635,21 +633,21 @@ class ProImageEditorState extends State<ProImageEditor>
   /// Remove a layer from the editor.
   ///
   /// This method removes a layer from the editor and updates the editing state.
-  void removeLayer(int layerPos, {Layer? layer}) {
-    int oldIndex = activeLayers
+  void removeLayer(Layer? layer) {
+    int layerPos = activeLayers
         .indexWhere((element) => element.id == (layer?.id ?? _tempLayer!.id));
-    if (oldIndex >= 0) {
-      stateHistory[stateManager.position].layers[oldIndex] =
+    if (layerPos >= 0) {
+      stateManager.activeLayers[layerPos] =
           _layerCopyManager.copyLayer(_tempLayer ?? layer!);
 
-      mainEditorCallbacks?.handleRemoveLayer(
-          stateHistory[stateManager.position].layers[oldIndex]);
-    }
+      mainEditorCallbacks
+          ?.handleRemoveLayer(stateManager.activeLayers[layerPos]);
 
-    var layers = _layerCopyManager.copyLayerList(activeLayers)
-      ..removeAt(layerPos);
-    addHistory(layers: layers);
-    setState(() {});
+      var layers = _layerCopyManager.copyLayerList(activeLayers)
+        ..removeAt(layerPos);
+      addHistory(layers: layers);
+      setState(() {});
+    }
   }
 
   /// Remove all layers from the editor.
@@ -685,7 +683,8 @@ class ProImageEditorState extends State<ProImageEditor>
       });
     } */
 
-    List<Layer> oldLayers = stateHistory[stateManager.position - 1].layers;
+    List<Layer> oldLayers =
+        stateHistory[stateManager.historyPointer - 1].layers;
     int oldIndex =
         oldLayers.indexWhere((element) => element.id == _tempLayer!.id);
     if (oldIndex >= 0) {
@@ -698,7 +697,7 @@ class ProImageEditorState extends State<ProImageEditor>
     var transformSetup = mainEditorConfigs.transformSetup!;
 
     /// Add the initial history
-    stateManager.stateHistory.add(
+    stateManager.addHistory(
       EditorStateHistory(
         transformConfigs: transformSetup.transformConfigs,
         blur: 0,
@@ -807,7 +806,7 @@ class ProImageEditorState extends State<ProImageEditor>
     }
 
     /// Force to rebuild everything
-    int pos = stateManager.position;
+    int pos = stateManager.historyPointer;
     EditorStateHistory oldHistory = stateManager.stateHistory[pos];
 
     stateManager.stateHistory[pos] = EditorStateHistory(
@@ -817,6 +816,11 @@ class ProImageEditorState extends State<ProImageEditor>
       filters: [...oldHistory.filters],
       tuneAdjustments: [...oldHistory.tuneAdjustments],
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _backgroundImageColorFilterKey.currentState?.refresh();
+      }
+    });
   }
 
   /// Handle the start of a scaling operation.
@@ -1275,8 +1279,7 @@ class ProImageEditorState extends State<ProImageEditor>
           callbacks: callbacks,
           theme: _theme,
           layers: stateManager.activeLayers,
-          transformConfigs:
-              stateManager.stateHistory[stateManager.position].transformConfigs,
+          transformConfigs: stateManager.transformConfigs,
           mainImageSize: sizesManager.decodedImageSize,
           mainBodySize: sizesManager.bodySize,
           enableFakeHero: true,
@@ -1588,11 +1591,11 @@ class ProImageEditorState extends State<ProImageEditor>
   /// It decreases the edit position, and the image is decoded to reflect
   /// the previous state.
   void undoAction() {
-    if (stateManager.position > 0) {
+    if (stateManager.canUndo) {
       setState(() {
         layerInteractionManager.selectedLayerId = '';
         _checkInteractiveViewer();
-        stateManager.position--;
+        stateManager.undo();
         decodeImage();
       });
       mainEditorCallbacks?.handleUndo();
@@ -1607,11 +1610,11 @@ class ProImageEditorState extends State<ProImageEditor>
   /// decoded to reflect
   /// the next state.
   void redoAction() {
-    if (stateManager.position < stateHistory.length - 1) {
+    if (stateManager.canRedo) {
       setState(() {
         layerInteractionManager.selectedLayerId = '';
         _checkInteractiveViewer();
-        stateManager.position++;
+        stateManager.redo();
         decodeImage();
       });
       mainEditorCallbacks?.handleRedo();
@@ -1634,7 +1637,7 @@ class ProImageEditorState extends State<ProImageEditor>
     // Capture the screenshot in a post-frame callback to ensure the UI is fully
     // rendered
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (_imageInfos == null) await decodeImage();
+      if (_imageInfos == null && mounted) await decodeImage();
 
       if (!mounted) return;
 
@@ -1657,7 +1660,7 @@ class ProImageEditorState extends State<ProImageEditor>
   /// indicate that the operation is in progress.
   void doneEditing() async {
     if (_processFinalImage) return;
-    if (stateManager.position <= 0 && activeLayers.isEmpty) {
+    if (!stateManager.canUndo && activeLayers.isEmpty) {
       if (!imageGenerationConfigs.allowEmptyEditCompletion) {
         return closeEditor();
       }
@@ -1677,8 +1680,7 @@ class ProImageEditorState extends State<ProImageEditor>
 
     /// For the case the user add initial transformConfigs but there are no
     /// changes we need to ensure the editor will generate the image.
-    if (mainEditorConfigs.transformSetup != null &&
-        stateManager.position == 0) {
+    if (mainEditorConfigs.transformSetup != null && !stateManager.canUndo) {
       addHistory();
     }
 
@@ -1738,7 +1740,7 @@ class ProImageEditorState extends State<ProImageEditor>
 
     if (!mounted) return Uint8List.fromList([]);
 
-    bool hasChanges = stateManager.position > 0;
+    bool hasChanges = stateManager.canUndo;
     bool useOriginalImage =
         !hasChanges && imageGenerationConfigs.enableUseOriginalBytes;
     if (!hasChanges && !imageGenerationConfigs.enableUseOriginalBytes) {
@@ -1762,7 +1764,7 @@ class ProImageEditorState extends State<ProImageEditor>
   /// any changes or edits.
   /// It navigates back to the previous screen or closes the modal editor.
   void closeEditor() {
-    if (stateManager.position <= 0) {
+    if (!stateManager.canUndo) {
       if (onCloseEditor == null) {
         Navigator.pop(context);
       } else {
@@ -1808,7 +1810,6 @@ class ProImageEditorState extends State<ProImageEditor>
                 designMode: designMode,
                 onPressed: () {
                   close = true;
-                  stateManager.position = 0;
                   Navigator.pop(context, 'OK');
                 },
                 child: Text(i18n.various.closeEditorWarningConfirmBtn),
@@ -1902,8 +1903,6 @@ class ProImageEditorState extends State<ProImageEditor>
     if (import.configs.mergeMode == ImportEditorMergeMode.replace) {
       stateManager
         ..screenshots = []
-        ..position =
-            import.editorPosition + (import.stateHistory.isEmpty ? 0 : 1)
         ..stateHistory = [
           EditorStateHistory(
             transformConfigs: TransformConfigs.empty(),
@@ -1913,7 +1912,9 @@ class ProImageEditorState extends State<ProImageEditor>
             tuneAdjustments: [],
           ),
           ...import.stateHistory
-        ];
+        ]
+        ..historyPointer =
+            import.editorPosition + (import.stateHistory.isEmpty ? 0 : 1);
       for (var i = 0; i < import.stateHistory.length; i++) {
         if (i < import.stateHistory.length - 1) {
           _controllers.screenshot
@@ -1945,8 +1946,10 @@ class ProImageEditorState extends State<ProImageEditor>
           _takeScreenshot();
         }
       }
-      stateManager.position = stateHistory.length - 1;
+      stateManager.historyPointer = stateHistory.length - 1;
     }
+
+    stateManager.updateActiveItems();
 
     setState(() {});
     unawaited(decodeImage(stateManager.transformConfigs));
@@ -1970,7 +1973,7 @@ class ProImageEditorState extends State<ProImageEditor>
       stateHistory: stateManager.stateHistory,
       imageInfos: _imageInfos!,
       imgSize: sizesManager.decodedImageSize,
-      editorPosition: stateManager.position,
+      editorPosition: stateManager.historyPointer,
       configs: configs,
       contentRecorderCtrl: _controllers.screenshot,
       // ignore: use_build_context_synchronously
@@ -1992,12 +1995,11 @@ class ProImageEditorState extends State<ProImageEditor>
     return RecordInvisibleWidget(
       controller: _controllers.screenshot,
       child: ExtendedPopScope(
-        canPop:
-            disablePopScope || stateManager.position <= 0 || _processFinalImage,
+        canPop: disablePopScope || !stateManager.canUndo || _processFinalImage,
         onPopInvokedWithResult: (didPop, result) {
           if (!didPop &&
               !disablePopScope &&
-              stateManager.position > 0 &&
+              stateManager.canUndo &&
               !_processFinalImage) {
             closeWarning();
           }
@@ -2074,7 +2076,7 @@ class ProImageEditorState extends State<ProImageEditor>
                 tooltip: i18n.undo,
                 icon: Icon(
                   mainEditorConfigs.icons.undoAction,
-                  color: stateManager.position > 0
+                  color: stateManager.canUndo
                       ? foregroundColor
                       : foregroundColor.withAlpha(80),
                 ),
@@ -2085,7 +2087,7 @@ class ProImageEditorState extends State<ProImageEditor>
                 tooltip: i18n.redo,
                 icon: Icon(
                   mainEditorConfigs.icons.redoAction,
-                  color: stateManager.position < stateHistory.length - 1
+                  color: stateManager.canRedo
                       ? foregroundColor
                       : foregroundColor.withAlpha(80),
                 ),
@@ -2530,11 +2532,7 @@ class ProImageEditorState extends State<ProImageEditor>
                               },
                               onTapUp: () {
                                 if (layerInteractionManager.hoverRemoveBtn) {
-                                  removeLayer(
-                                    activeLayers.indexWhere((element) =>
-                                        element.id == layerItem.id),
-                                    layer: layerItem,
-                                  );
+                                  removeLayer(layerItem);
                                 }
                                 _controllers.uiLayerCtrl.add(null);
                                 mainEditorCallbacks?.handleUpdateUI();
@@ -2571,11 +2569,7 @@ class ProImageEditorState extends State<ProImageEditor>
                               },
                               onRemoveTap: () {
                                 setState(() {
-                                  removeLayer(
-                                    activeLayers.indexWhere((element) =>
-                                        element.id == layerItem.id),
-                                    layer: layerItem,
-                                  );
+                                  removeLayer(layerItem);
                                 });
                                 mainEditorCallbacks?.handleUpdateUI();
                               },
@@ -2717,6 +2711,7 @@ class ProImageEditorState extends State<ProImageEditor>
               transformConfigs: stateManager.transformConfigs,
               configs: configs,
               child: FilteredImage(
+                filterKey: _backgroundImageColorFilterKey,
                 width: sizesManager.decodedImageSize.width,
                 height: sizesManager.decodedImageSize.height,
                 configs: configs,

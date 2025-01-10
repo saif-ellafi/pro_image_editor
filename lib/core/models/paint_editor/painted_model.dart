@@ -1,6 +1,3 @@
-// ignore_for_file: argument_type_not_assignable
-
-// Dart imports:
 import 'dart:ui';
 
 import '/core/utils/parser/double_parser.dart';
@@ -11,12 +8,17 @@ import '../../../features/paint_editor/enums/paint_editor_enum.dart';
 /// Represents a unit of shape or drawing information used in paint.
 class PaintedModel {
   /// Factory constructor for creating a PaintedModel instance from a map.
-  factory PaintedModel.fromMap(Map<String, dynamic> map) {
+  factory PaintedModel.fromMap(
+    Map<String, dynamic> map, {
+    Function(String key)? keyConverter,
+  }) {
+    keyConverter ??= (String key) => key;
+
     /// List to hold offset points for the paint.
     List<Offset> offsets = [];
 
     /// Iterate over the offsets in the map and add them to the list.
-    for (var el in List.from(map['offsets'])) {
+    for (var el in List.from(map[keyConverter('offsets')])) {
       offsets.add(
         Offset(
           safeParseDouble(el['x']),
@@ -28,13 +30,14 @@ class PaintedModel {
     /// Constructs and returns a PaintedModel instance with properties
     /// derived from the map.
     return PaintedModel(
-      mode:
-          PaintMode.values.firstWhere((element) => element.name == map['mode']),
+      mode: PaintMode.values
+          .firstWhere((element) => element.name == map[keyConverter!('mode')]),
       offsets: offsets,
-      color: Color(map['color']),
-      strokeWidth: safeParseDouble(map['strokeWidth'], fallback: 1),
-      fill: map['fill'] ?? false,
-      opacity: safeParseDouble(map['opacity'], fallback: 1),
+      color: Color(map[keyConverter('color')]),
+      strokeWidth:
+          safeParseDouble(map[keyConverter('strokeWidth')], fallback: 1),
+      fill: map[keyConverter('fill')] ?? false,
+      opacity: safeParseDouble(map[keyConverter('opacity')], fallback: 1),
     );
   }
 
@@ -136,5 +139,42 @@ class PaintedModel {
       'opacity': opacity,
       'fill': fill,
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        mode,
+        color,
+        strokeWidth,
+        opacity,
+        fill,
+        offsets,
+        hit,
+        id,
+      );
+
+  @override
+  bool operator ==(Object other) {
+    bool areOffsetsEqual(List<Offset?> list1, List<Offset?> list2) {
+      if (list1.length != list2.length) return false;
+
+      for (int i = 0; i < list1.length; i++) {
+        if (list1[i] != list2[i]) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    if (identical(this, other)) return true;
+
+    return other is PaintedModel &&
+        other.mode == mode &&
+        other.color == color &&
+        other.strokeWidth == strokeWidth &&
+        other.opacity == opacity &&
+        other.fill == fill &&
+        areOffsetsEqual(other.offsets, offsets);
   }
 }

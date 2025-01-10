@@ -115,7 +115,7 @@ class TextEditorState extends State<TextEditor>
 
     selectedTextStyle = widget.layer?.textStyle ??
         textEditorConfigs.customTextStyles?.first ??
-        const TextStyle();
+        textEditorConfigs.defaultTextStyle;
     _initializeFromLayer();
     _setupTextControllerListener();
 

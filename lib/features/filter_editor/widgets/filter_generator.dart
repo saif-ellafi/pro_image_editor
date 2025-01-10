@@ -25,10 +25,18 @@ class ColorFilterGenerator extends StatefulWidget {
 
   /// Creates the state for the ColorFilterGenerator widget.
   @override
-  State<ColorFilterGenerator> createState() => _ColorFilterGeneratorState();
+  State<ColorFilterGenerator> createState() => ColorFilterGeneratorState();
 }
 
-class _ColorFilterGeneratorState extends State<ColorFilterGenerator> {
+/// The state class for the `ColorFilterGenerator` widget.
+///
+/// This class is responsible for managing the state of the
+/// `ColorFilterGenerator` widget, which includes handling the generation and
+/// application of color filters.
+///
+/// It extends the `State` class, which means it holds mutable state for the
+/// `ColorFilterGenerator` widget.
+class ColorFilterGeneratorState extends State<ColorFilterGenerator> {
   late Widget _filteredWidget;
 
   late FilterMatrix _tempFilters;
@@ -40,6 +48,26 @@ class _ColorFilterGeneratorState extends State<ColorFilterGenerator> {
     super.initState();
   }
 
+  /// Generates a filtered widget by applying a series of color filters and
+  /// tune adjustments to the child widget.
+  ///
+  /// This method combines the filters and tune adjustments provided in the
+  /// widget's properties and applies them sequentially to the child widget.
+  /// The resulting widget with all the applied filters is stored in the
+  /// `_filteredWidget` variable.
+  ///
+  /// The filters and tune adjustments are expected to be in the form of color
+  /// matrices, which are
+  /// applied using the `ColorFiltered` widget.
+  ///
+  /// The method performs the following steps:
+  /// 1. Initializes the `tree` variable with the child widget.
+  /// 2. Stores the filters and tune adjustments in temporary variables.
+  /// 3. Combines the filters and tune adjustments into a single list of color
+  /// matrices.
+  /// 4. Iterates through the list of color matrices and applies each one to
+  /// the `tree` widget.
+  /// 5. Stores the final filtered widget in the `_filteredWidget` variable.
   void _generateFilteredWidget() {
     Widget tree = widget.child;
     _tempFilters = widget.filters;
@@ -57,6 +85,13 @@ class _ColorFilterGeneratorState extends State<ColorFilterGenerator> {
       );
     }
     _filteredWidget = tree;
+  }
+
+  /// Refreshes the filter editor by generating the filtered widget and
+  /// updating the state.
+  void refresh() {
+    _generateFilteredWidget();
+    setState(() {});
   }
 
   @override

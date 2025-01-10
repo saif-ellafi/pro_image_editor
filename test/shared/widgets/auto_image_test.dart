@@ -9,7 +9,7 @@ import 'package:network_image_mock/network_image_mock.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 import 'package:pro_image_editor/shared/widgets/auto_image.dart';
 
-import '../fake/fake_image.dart';
+import '../../fake/fake_image.dart';
 import 'auto_image_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<EditorImage>()])

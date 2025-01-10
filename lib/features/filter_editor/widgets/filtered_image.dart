@@ -24,8 +24,16 @@ class FilteredImage extends StatelessWidget {
     required this.tuneAdjustments,
     required this.image,
     required this.blurFactor,
+    this.filterKey,
     this.fit = BoxFit.contain,
   });
+
+  /// A key that uniquely identifies the [ColorFilterGeneratorState] widget and
+  /// allows access to its state. This can be used to manipulate the state of
+  /// the color filter generator from outside the widget tree.
+  ///
+  /// This key is optional and can be null.
+  final GlobalKey<ColorFilterGeneratorState>? filterKey;
 
   /// The width of the image.
   final double width;
@@ -63,6 +71,7 @@ class FilteredImage extends StatelessWidget {
         children: [
           _buildImage(),
           ColorFilterGenerator(
+            key: filterKey,
             filters: filters,
             tuneAdjustments: tuneAdjustments,
             child: _buildImage(),
