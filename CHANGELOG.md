@@ -1,5 +1,14 @@
 # Changelog
 
+## 7.6.0
+- **FEAT**(state-history): Improve internal state history to consume less RAM during in-app usage, enhancing performance in memory-constrained environments.
+- **FEAT**(export/import): Introduce reference-based export mechanism to reduce redundancy and significantly minimize export file size.
+- **FEAT**(export/import): Add `enableMinify` option to `ExportEditorConfigs` (enabled by default), which further reduces the output file size by minifying key structures. Even with minification disabled, export sizes are notably smaller due to optimizations.
+- **REFACTOR**(tests): Reorganize tests by moving module-specific tests to `features` and `shared` directories for better maintainability.
+- **TEST**(export/import): Add unit tests for `key_minifier` to ensure reliability of the minification process.
+
+See pull request [#322](https://github.com/hm21/pro_image_editor/pull/322) for more details.
+
 ## 7.5.0
 - **FEAT**(export/import): Improve widget-layer import/export to enable setting up a `widgetLoader` inside the `ImportEditorConfigs` that loads widgets using custom logic without converting them to `Uint8List`. See pull request [#315](https://github.com/hm21/pro_image_editor/pull/315) for more details.
 
