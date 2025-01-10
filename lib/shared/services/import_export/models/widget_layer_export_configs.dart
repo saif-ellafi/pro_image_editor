@@ -37,6 +37,7 @@ class WidgetLayerExportConfigs {
       networkUrl: map['networkUrl'],
       assetPath: map['assetPath'],
       fileUrl: map['fileUrl'],
+      meta: map['meta'],
     );
   }
 
