@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.6.1
+- **FIX**(paint-editor): Resolved an issue where the freestyle painter didn't update the painting in real-time until the user finished painting.
+
 ## 7.6.0
 - **FEAT**(state-history): Improve internal state history to consume less RAM during in-app usage, enhancing performance in memory-constrained environments.
 - **FEAT**(export/import): Introduce reference-based export mechanism to reduce redundancy and significantly minimize export file size.
