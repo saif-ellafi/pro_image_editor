@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.6.3
+- **FIX**(grounded-design): Fixed an issue where aspect ratios were incorrectly selected regardless of the `canChangeAspectRatio` flag.
+
 ## 7.6.2
 - **DOCS**(readme): update readme to reflect latest changes
 
@@ -454,7 +457,7 @@ configs: ProImageEditorConfigs(
 - **DOCS**(preview-videos): update preview videos to version 3.0.0
 
 
-## 3.0.0 New Crop-Rotate-Editor
+## 3.0.0
 
 > Replace the existing crop-rotate editor, which depended on the `extended_image` and `image_editor` package, with a new solution that doesn't depend on this packages.
 
