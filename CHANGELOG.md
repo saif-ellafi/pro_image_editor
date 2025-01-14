@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.6.2
+- **DOCS**(readme): update readme to reflect latest changes
+
 ## 7.6.1
 - **FIX**(paint-editor): Resolved an issue where the freestyle painter didn't update the painting in real-time until the user finished painting.
 
