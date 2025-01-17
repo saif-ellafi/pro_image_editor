@@ -410,13 +410,13 @@ class ProImageEditorState extends State<ProImageEditor>
 
     if (helperLines.hitVibration) {
       Vibration.hasVibrator().then((hasVibrator) {
-        layerInteractionManager.deviceCanVibrate = hasVibrator ?? false;
+        layerInteractionManager.deviceCanVibrate = hasVibrator;
 
         if (layerInteractionManager.deviceCanVibrate) {
           Vibration.hasCustomVibrationsSupport()
               .then((hasCustomVibrationsSupport) {
             layerInteractionManager.deviceCanCustomVibrate =
-                hasCustomVibrationsSupport ?? false;
+                hasCustomVibrationsSupport;
           });
         }
       });

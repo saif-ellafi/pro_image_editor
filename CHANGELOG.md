@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.6.4
+- **CHORE**(vibration): Updated the `vibration` package to version `2.1.0`.
+- **FIX**(vibration): Resolved lint issues introduced by the package update.
+
 ## 7.6.3
 - **FIX**(grounded-design): Fixed an issue where aspect ratios were incorrectly selected regardless of the `canChangeAspectRatio` flag.
 
