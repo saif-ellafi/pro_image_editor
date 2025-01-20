@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 import '/shared/extensions/color_extension.dart';
-import '../../../shared/utils/parser/double_parser.dart';
-import '../../../shared/utils/parser/int_parser.dart';
+import '/shared/utils/parser/double_parser.dart';
+import '/shared/utils/parser/int_parser.dart';
 import 'enums/layer_background_mode.dart';
 import 'layer.dart';
 

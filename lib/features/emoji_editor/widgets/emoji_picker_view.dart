@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '/core/models/i18n/i18n_emoji_editor.dart';
 import '/core/models/styles/emoji_editor_style.dart';
 import '/features/emoji_editor/services/emoji_state_manager.dart';
-import '../../../shared/utils/platform_info.dart';
+import '/shared/utils/platform_info.dart';
 import 'emoji_cell_extended.dart';
 
 /// A widget that provides an enhanced emoji picker view.

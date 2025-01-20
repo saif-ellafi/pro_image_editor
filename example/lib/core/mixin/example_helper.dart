@@ -2,16 +2,12 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-// Flutter imports:
 import 'package:flutter/material.dart';
-// Package imports:
 import 'package:pro_image_editor/pro_image_editor.dart';
 
-import '../../features/preview_img.dart';
-// Project imports:
+import '/features/preview_img.dart';
 import '../constants/example_constants.dart';
-
-export '../../shared/widgets/prepare_image_widget.dart';
+export '/shared/widgets/prepare_image_widget.dart';
 
 /// A mixin that provides helper methods and state management for image editing
 /// using the [ProImageEditor]. It is intended to be used in a [StatefulWidget].

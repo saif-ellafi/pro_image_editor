@@ -1,6 +1,6 @@
 import '/core/models/i18n/i18n_tune_editor.dart';
 import '/core/models/icons/tune_editor_icons.dart';
-import '../../filter_editor/utils/filter_generator/filter_addons.dart';
+import '/features/filter_editor/utils/filter_generator/filter_addons.dart';
 import '../models/tune_adjustment_item.dart';
 
 /// Preset list from tune adjustment

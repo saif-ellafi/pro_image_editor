@@ -4,7 +4,7 @@ import 'dart:math';
 // Flutter imports:
 import 'package:flutter/material.dart';
 
-import '../../../shared/utils/platform_info.dart';
+import '/shared/utils/platform_info.dart';
 import '../enums/paint_editor_enum.dart';
 import '../models/painted_model.dart';
 import '../utils/paint_element.dart';

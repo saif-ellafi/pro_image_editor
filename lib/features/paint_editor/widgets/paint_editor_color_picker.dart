@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/models/editor_configs/pro_image_editor_configs.dart';
-import '../../../shared/widgets/color_picker/bar_color_picker.dart';
+import '/core/models/editor_configs/pro_image_editor_configs.dart';
+import '/shared/widgets/color_picker/bar_color_picker.dart';
 import '../paint_editor.dart';
 
 class PaintEditorColorPicker extends StatelessWidget {

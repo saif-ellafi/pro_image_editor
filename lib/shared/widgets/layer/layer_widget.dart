@@ -9,10 +9,10 @@ import '/core/mixins/converted_configs.dart';
 import '/core/mixins/editor_configs_mixin.dart';
 import '/core/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
+import '/core/models/layers/layer.dart';
 import '/features/paint_editor/enums/paint_editor_enum.dart';
 import '/features/paint_editor/widgets/draw_paint_item.dart';
 import '/plugins/rounded_background_text/src/rounded_background_text.dart';
-import '../../../core/models/layers/layer.dart';
 import '../../styles/platform_text_styles.dart';
 import 'interaction_helper/layer_interaction_helper_widget.dart';
 

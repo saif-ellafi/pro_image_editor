@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '/core/mixins/converted_configs.dart';
 import '/core/mixins/editor_configs_mixin.dart';
 import '/designs/grounded/grounded_design.dart';
+import '/features/crop_rotate_editor/widgets/crop_aspect_ratio_button.dart';
 import '/pro_image_editor.dart';
-import '../../../../features/crop_rotate_editor/widgets/crop_aspect_ratio_button.dart';
 
 /// A widget that provides controls for cropping and rotating an image in the
 /// ProImageEditor.

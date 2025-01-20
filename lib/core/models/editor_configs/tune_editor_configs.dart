@@ -1,4 +1,4 @@
-import '../../../features/tune_editor/models/tune_adjustment_item.dart';
+import '/features/tune_editor/models/tune_adjustment_item.dart';
 import '../custom_widgets/tune_editor_widgets.dart';
 import '../icons/tune_editor_icons.dart';
 import '../styles/tune_editor_style.dart';
