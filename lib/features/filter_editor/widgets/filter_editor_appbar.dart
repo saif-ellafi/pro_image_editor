@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../core/models/editor_configs/filter_editor_configs.dart';
-import '../../../core/models/i18n/i18n_filter_editor.dart';
+
+import '/core/models/editor_configs/filter_editor_configs.dart';
+import '/core/models/i18n/i18n_filter_editor.dart';
 
 class FilterEditorAppBar extends StatelessWidget
     implements PreferredSizeWidget {
-
   const FilterEditorAppBar({
     super.key,
     required this.filterEditorConfigs,

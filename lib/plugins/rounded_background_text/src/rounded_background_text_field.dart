@@ -77,10 +77,7 @@ class RoundedBackgroundTextField extends StatefulWidget {
     this.onAppPrivateCommand,
     this.onSelectionHandleTapped,
     this.onTapOutside,
-    this.heroTag,
   });
-
-  final String? heroTag;
 
   final TextEditingController? controller;
 
