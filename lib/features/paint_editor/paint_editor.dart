@@ -21,10 +21,8 @@ import '/pro_image_editor.dart';
 import '/shared/services/content_recorder/widgets/content_recorder.dart';
 import '/shared/styles/platform_text_styles.dart';
 import '/shared/widgets/auto_image.dart';
-import '/shared/widgets/bottom_sheets_header_row.dart';
 import '/shared/widgets/extended/extended_interactive_viewer.dart';
 import '/shared/widgets/layer/layer_stack.dart';
-import '/shared/widgets/platform/platform_popup_menu.dart';
 import '/shared/widgets/transform/transformed_content_generator.dart';
 import '../filter_editor/widgets/filtered_image.dart';
 import 'controllers/paint_controller.dart';
@@ -693,114 +691,114 @@ class PaintEditorState extends State<PaintEditor>
               alignment: Alignment.center,
               fit: StackFit.expand,
               children: _fakeHeroBytes != null
-                  ? [
-                      Hero(
-                        tag: configs.heroTag,
-                        child: AutoImage(
-                          EditorImage(byteArray: _fakeHeroBytes),
-                          configs: configs,
-                        ),
-                      ),
-                    ]
-                  : [
-                      ExtendedInteractiveViewer(
-                        key: _interactiveViewer,
-                        enableZoom: _enableZoom,
-                        boundaryMargin: paintEditorConfigs.boundaryMargin,
-                        minScale: paintEditorConfigs.editorMinScale,
-                        maxScale: paintEditorConfigs.editorMaxScale,
-                        enableInteraction: paintMode == PaintMode.moveAndZoom,
-                        onInteractionStart: (details) {
-                          _freeStyleHighPerformance = (paintEditorConfigs
-                                      .freeStyleHighPerformanceMoving ??
-                                  !isDesktop) ||
-                              (paintEditorConfigs
-                                      .freeStyleHighPerformanceScaling ??
-                                  !isDesktop);
-
-                          callbacks.paintEditorCallbacks?.onEditorZoomScaleStart
-                              ?.call(details);
-                          setState(() {});
-                        },
-                        onInteractionUpdate: callbacks
-                            .paintEditorCallbacks?.onEditorZoomScaleUpdate,
-                        onInteractionEnd: (details) {
-                          _freeStyleHighPerformance = false;
-                          callbacks.paintEditorCallbacks?.onEditorZoomScaleEnd
-                              ?.call(details);
-                          setState(() {});
-                        },
-                        child: ContentRecorder(
-                          autoDestroyController: false,
-                          controller: screenshotCtrl,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            fit: StackFit.expand,
-                            children: [
-                              if (!widget.paintOnly)
-                                TransformedContentGenerator(
-                                  configs: configs,
-                                  transformConfigs: initialTransformConfigs ??
-                                      TransformConfigs.empty(),
-                                  child: FilteredImage(
-                                    width: getMinimumSize(
-                                            mainImageSize, editorBodySize)
-                                        .width,
-                                    height: getMinimumSize(
-                                            mainImageSize, editorBodySize)
-                                        .height,
-                                    configs: configs,
-                                    image: editorImage,
-                                    filters: appliedFilters,
-                                    tuneAdjustments: appliedTuneAdjustments,
-                                    blurFactor: appliedBlurFactor,
-                                  ),
-                                )
-                              else
-                                SizedBox(
-                                  width: configs
-                                      .imageGeneration.maxOutputSize.width,
-                                  height: configs
-                                      .imageGeneration.maxOutputSize.height,
-                                ),
-                              if (layers != null)
-                                LayerStack(
-                                  configs: configs,
-                                  layers: layers!,
-                                  transformHelper: TransformHelper(
-                                    mainBodySize: getMinimumSize(
-                                        mainBodySize, editorBodySize),
-                                    mainImageSize: getMinimumSize(
-                                        mainImageSize, editorBodySize),
-                                    editorBodySize: editorBodySize,
-                                    transformConfigs: initialTransformConfigs,
-                                  ),
-                                ),
-                              _buildPainter(),
-                              if (paintEditorConfigs
-                                      .widgets.bodyItemsRecorded !=
-                                  null)
-                                ...paintEditorConfigs
-                                        .widgets.bodyItemsRecorded!(
-                                    this, rebuildController.stream),
-                            ],
-                          ),
-                        ),
-                      ),
-                      PaintEditorColorPicker(
-                        state: this,
-                        configs: configs,
-                        rebuildController: rebuildController,
-                      ),
-                      if (paintEditorConfigs.widgets.bodyItems != null)
-                        ...paintEditorConfigs.widgets.bodyItems!(
-                            this, rebuildController.stream),
-                    ],
+                  ? _buildFakeHero()
+                  : _buildInteractiveContent(),
             ),
           ),
         );
       }),
     );
+  }
+
+  List<Widget> _buildFakeHero() {
+    return [
+      Hero(
+        tag: configs.heroTag,
+        child: AutoImage(
+          EditorImage(byteArray: _fakeHeroBytes),
+          configs: configs,
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> _buildInteractiveContent() {
+    return [
+      ExtendedInteractiveViewer(
+        key: _interactiveViewer,
+        enableZoom: _enableZoom,
+        boundaryMargin: paintEditorConfigs.boundaryMargin,
+        minScale: paintEditorConfigs.editorMinScale,
+        maxScale: paintEditorConfigs.editorMaxScale,
+        enableInteraction: paintMode == PaintMode.moveAndZoom,
+        onInteractionStart: (details) {
+          _freeStyleHighPerformance =
+              (paintEditorConfigs.freeStyleHighPerformanceMoving ??
+                      !isDesktop) ||
+                  (paintEditorConfigs.freeStyleHighPerformanceScaling ??
+                      !isDesktop);
+
+          callbacks.paintEditorCallbacks?.onEditorZoomScaleStart?.call(details);
+          setState(() {});
+        },
+        onInteractionUpdate:
+            callbacks.paintEditorCallbacks?.onEditorZoomScaleUpdate,
+        onInteractionEnd: (details) {
+          _freeStyleHighPerformance = false;
+          callbacks.paintEditorCallbacks?.onEditorZoomScaleEnd?.call(details);
+          setState(() {});
+        },
+        child: ContentRecorder(
+          autoDestroyController: false,
+          controller: screenshotCtrl,
+          child: Stack(
+            alignment: Alignment.center,
+            fit: StackFit.expand,
+            children: [
+              if (!widget.paintOnly)
+                TransformedContentGenerator(
+                  configs: configs,
+                  transformConfigs:
+                      initialTransformConfigs ?? TransformConfigs.empty(),
+                  child: FilteredImage(
+                    width: getMinimumSize(mainImageSize, editorBodySize).width,
+                    height:
+                        getMinimumSize(mainImageSize, editorBodySize).height,
+                    configs: configs,
+                    image: editorImage,
+                    filters: appliedFilters,
+                    tuneAdjustments: appliedTuneAdjustments,
+                    blurFactor: appliedBlurFactor,
+                  ),
+                )
+              else
+                SizedBox(
+                  width: configs.imageGeneration.maxOutputSize.width,
+                  height: configs.imageGeneration.maxOutputSize.height,
+                ),
+
+              /// Build layers
+              if (layers != null)
+                LayerStack(
+                  configs: configs,
+                  layers: layers!,
+                  transformHelper: TransformHelper(
+                    mainBodySize: getMinimumSize(mainBodySize, editorBodySize),
+                    mainImageSize:
+                        getMinimumSize(mainImageSize, editorBodySize),
+                    editorBodySize: editorBodySize,
+                    transformConfigs: initialTransformConfigs,
+                  ),
+                ),
+              _buildPainter(),
+              if (paintEditorConfigs.widgets.bodyItemsRecorded != null)
+                ...paintEditorConfigs.widgets.bodyItemsRecorded!(
+                    this, rebuildController.stream),
+            ],
+          ),
+        ),
+      ),
+
+      /// Build Color picker
+      PaintEditorColorPicker(
+        state: this,
+        configs: configs,
+        rebuildController: rebuildController,
+      ),
+      if (paintEditorConfigs.widgets.bodyItems != null)
+        ...paintEditorConfigs.widgets.bodyItems!(
+            this, rebuildController.stream),
+    ];
   }
 
   /// Builds the bottom navigation bar of the paint editor.
