@@ -34,10 +34,11 @@ The ProImageEditor is a Flutter widget designed for image editing within your ap
   - [Open the editor in a new page](#open-the-editor-in-a-new-page)
   - [Show the editor inside of a widget](#show-the-editor-inside-of-a-widget)
   - [Own stickers or widgets](#own-stickers-or-widgets)
+  - [Grounded-Design](#grounded-design)
   - [Frosted-Glass-Design](#frosted-glass-design)
   - [WhatsApp-Design](#whatsapp-design)
   - [Highly configurable](#highly-configurable)
-  - [Custom AppBar](#custom-appbar)
+  - [Custom Widgets](#custom-widgets)
   - [Upload to Firebase or Supabase](#upload-to-firebase-or-supabase)
   - [Import-Export state history](#import-export-state-history)
 - **[📚 Documentation](#documentation)**
@@ -161,6 +162,7 @@ The ProImageEditor is a Flutter widget designed for image editing within your ap
     - ✅ Reset
     - ✅ Double-Tap
     - ✅ Round cropper
+  - ✅ Tune-Adjustments-Editor
   - ✅ Filter-Editor
   - ✅ Blur-Editor
   - ✅ Emoji-Picker
@@ -168,19 +170,19 @@ The ProImageEditor is a Flutter widget designed for image editing within your ap
 - ✅ Multi-Threading
   - ✅ Use isolates for background tasks on Dart native devices
   - ✅ Use web-workers for background tasks on Dart web devices
-  - ✅ Automatically set the number of active background processors based on the device
-  - ✅ Manually set the number of active background processors
+  - ✅ Automatically or manually set the number of active background processors based on the device
 - ✅ Undo and redo function
 - ✅ Use your image directly from memory, asset, file or network
-- ✅ Each icon can be changed
+- ✅ Each icon, style or widget can be changed
 - ✅ Any text can be translated "i18n"
 - ✅ Many custom configurations for each subeditor
-- ✅ Custom theme for each editor
 - ✅ Selectable design mode between Material and Cupertino
 - ✅ Reorder layer level
 - ✅ Movable background image
-- ✅ WhatsApp Theme
-- ✅ Frosted-Glass Theme
+- ✅ Multiple prebuilt themes
+  - ✅ Grounded-Theme
+  - ✅ WhatsApp Theme
+  - ✅ Frosted-Glass Theme
 - ✅ Interactive layers
 - ✅ Helper lines for better positioning
 - ✅ Hit detection for painted layers
@@ -194,8 +196,6 @@ The ProImageEditor is a Flutter widget designed for image editing within your ap
   - Freestyle-Painter with improved performance and hitbox
 - ✨ Text-Editor
   - Text-layer with an improved hit-box and ensure it's vertically centered on all devices
-- ✨ Emoji-Editor
-  - Preload emojis in web platforms
 - ✨ AI Futures => Perhaps integrating Adobe Firefly
 
 
@@ -348,13 +348,18 @@ Widget build(BuildContext context) {
 
 #### Own stickers or widgets
 
-To display stickers or widgets in the ProImageEditor, you have the flexibility to customize and load your own content. The `buildStickers` method allows you to define your own logic for loading stickers, whether from a backend, assets, or local storage, and then push them into the editor. The example [here](https://github.com/hm21/pro_image_editor/blob/stable/example/lib/pages/stickers_example.dart) demonstrates how to load images that can serve as stickers and then add them to the editor.
+To display stickers or widgets in the ProImageEditor, you have the flexibility to customize and load your own content. The `buildStickers` method allows you to define your own logic for loading stickers, whether from a backend, assets, or local storage, and then push them into the editor. The example [here](https://github.com/hm21/pro_image_editor/blob/stable/example/lib/features/stickers_example.dart) demonstrates how to load images that can serve as stickers and then add them to the editor.
 
+
+
+#### Grounded design
+
+To use the "Grounded-Design" you can follow the example [here](https://github.com/hm21/pro_image_editor/blob/stable/example/lib/features/design_examples/grounded_example.dart)
 
 
 #### Frosted-Glass design
 
-To use the "Frosted-Glass-Design" you can follow the example [here](https://github.com/hm21/pro_image_editor/blob/stable/example/lib/pages/design_examples/frosted_glass_example.dart)
+To use the "Frosted-Glass-Design" you can follow the example [here](https://github.com/hm21/pro_image_editor/blob/stable/example/lib/features/design_examples/frosted_glass_example.dart)
 
 
 
@@ -363,7 +368,7 @@ To use the "Frosted-Glass-Design" you can follow the example [here](https://gith
 The image editor offers a WhatsApp-themed option that mirrors the popular messaging app's design.
 The editor also follows the small changes that exist in the Material (Android) and Cupertino (iOS) version.
 
-You can see the complete example [here](https://github.com/hm21/pro_image_editor/blob/stable/example/lib/pages/design_examples/whatsapp_example.dart)
+You can see the complete example [here](https://github.com/hm21/pro_image_editor/blob/stable/example/lib/features/design_examples/whatsapp_example.dart)
 
 
 
@@ -376,520 +381,114 @@ Customize the image editor to suit your preferences. Of course, each class like 
 
 ```dart
 return Scaffold(
-    appBar: AppBar(
-      title: const Text('Pro-Image-Editor')
+  appBar: AppBar(title: const Text('Pro-Image-Editor')),
+  body: ProImageEditor.network(
+    'https://picsum.photos/id/237/2000',
+    key: _editor,
+    callbacks: ProImageEditorCallbacks(
+      onImageEditingComplete: (Uint8List bytes) async {
+        /*
+              Your code to handle the edited image. Upload it to your server as an example.
+              You can choose to use await, so that the loading-dialog remains visible until your code is ready, or no async, so that the loading-dialog closes immediately.
+              By default, the bytes are in `jpg` format.
+            */
+        Navigator.pop(context);
+      },
     ),
-    body: ProImageEditor.network(
-        'https://picsum.photos/id/237/2000',
-            key: _editor,
-            callbacks: ProImageEditorCallbacks(
-              onImageEditingComplete: (Uint8List bytes) async {
-                /*
-                  Your code to handle the edited image. Upload it to your server as an example.
-                  You can choose to use await, so that the loading-dialog remains visible until your code is ready, or no async, so that the loading-dialog closes immediately.
-                  By default, the bytes are in `jpg` format.
-                */
-                Navigator.pop(context);
-              },
-            ),
-            configs: ProImageEditorConfigs(
-              activePreferredOrientations: [
-                  DeviceOrientation.portraitUp,
-                  DeviceOrientation.portraitDown,
-                  DeviceOrientation.landscapeLeft,
-                  DeviceOrientation.landscapeRight,
-              ],
-              i18n: const I18n(
-                  various: I18nVarious(),
-                  paintEditor: I18nPaintEditor(),
-                  textEditor: I18nTextEditor(),
-                  cropRotateEditor: I18nCropRotateEditor(),
-                  filterEditor: I18nFilterEditor(filters: I18nFilters()),
-                  emojiEditor: I18nEmojiEditor(),
-                  stickerEditor: I18nStickerEditor(),
-                  // More translations...
-              ),
-              helperLines: const HelperLines(
-                  showVerticalLine: true,
-                  showHorizontalLine: true,
-                  showRotateLine: true,
-                  hitVibration: true,
-              ),
-              customWidgets: const ProImageEditorCustomWidgets(),
-              imageEditorTheme: const ImageEditorTheme(
-                  layerHoverCursor: SystemMouseCursors.move,
-                  helperLine: HelperLineTheme(
-                      horizontalColor: Color(0xFF1565C0),
-                      verticalColor: Color(0xFF1565C0),
-                      rotateColor: Color(0xFFE91E63),
-                  ),
-                  paintEditor: PaintEditorTheme(),
-                  textEditor: TextEditorTheme(),
-                  cropRotateEditor: CropRotateEditorTheme(),
-                  filterEditor: FilterEditorTheme(),
-                  emojiEditor: EmojiEditorTheme(),
-                  stickerEditor: StickerEditorTheme(),
-                  background: Color.fromARGB(255, 22, 22, 22),
-                  loadingDialogTextColor: Color(0xFFE1E1E1),
-                  uiOverlayStyle: SystemUiOverlayStyle(
-                  statusBarColor: Color(0x42000000),
-                  statusBarIconBrightness: Brightness.light,
-                  systemNavigationBarIconBrightness: Brightness.light,
-                  statusBarBrightness: Brightness.dark,
-                  systemNavigationBarColor: Color(0xFF000000),
-                  ),
-              ),
-              icons: const ImageEditorIcons(
-                  paintEditor: IconsPaintEditor(),
-                  textEditor: IconsTextEditor(),
-                  cropRotateEditor: IconsCropRotateEditor(),
-                  filterEditor: IconsFilterEditor(),
-                  emojiEditor: IconsEmojiEditor(),
-                  stickerEditor: IconsStickerEditor(),
-                  closeEditor: Icons.clear,
-                  doneIcon: Icons.done,
-                  applyChanges: Icons.done,
-                  backButton: Icons.arrow_back,
-                  undoAction: Icons.undo,
-                  redoAction: Icons.redo,
-                  removeElementZone: Icons.delete_outline_rounded,
-              ),
-              paintEditorConfigs: const PaintEditorConfigs(),
-              textEditorConfigs: const TextEditorConfigs(),
-              cropRotateEditorConfigs: const CropRotateEditorConfigs(),
-              filterEditorConfigs: FilterEditorConfigs(),
-              emojiEditorConfigs: const EmojiEditorConfigs(),
-              stickerEditorConfigs: StickerEditorConfigs(
-                enabled: true,
-                buildStickers: (setLayer) {
-                  return ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                    child: Container(
-                      color: const Color.fromARGB(255, 224, 239, 251),
-                      child: GridView.builder(
-                        padding: const EdgeInsets.all(16),
-                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 150,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                        ),
-                        itemCount: 21,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          Widget widget = ClipRRect(
-                            borderRadius: BorderRadius.circular(7),
-                            child: Image.network(
-                              'https://picsum.photos/id/${(index + 3) * 3}/2000',
-                              width: 120,
-                              height: 120,
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                          return GestureDetector(
-                            onTap: () => setLayer(widget),
-                            child: MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: widget,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
-              designMode: ImageEditorDesignMode.material,
-              heroTag: 'hero',
-              theme: ThemeData(
-                  useMaterial3: true,
-                  colorScheme: ColorScheme.fromSeed(
-                  seedColor: Colors.blue.shade800,
-                  brightness: Brightness.dark,
-                  ),
-              ),
+    configs: ProImageEditorConfigs(
+      i18n: const I18n(
+        various: I18nVarious(),
+        paintEditor: I18nPaintEditor(),
+        textEditor: I18nTextEditor(),
+        cropRotateEditor: I18nCropRotateEditor(),
+        filterEditor: I18nFilterEditor(filters: I18nFilters()),
+        emojiEditor: I18nEmojiEditor(),
+        stickerEditor: I18nStickerEditor(),
+        // More translations...
+      ),
+      helperLines: const HelperLineConfigs(
+        showVerticalLine: true,
+        showHorizontalLine: true,
+        showRotateLine: true,
+        hitVibration: true,
+      ),
+      mainEditor: const MainEditorConfigs(
+        widgets: MainEditorWidgets(),
+        icons: MainEditorIcons(),
+        style: MainEditorStyle(),
+        enableCloseButton: true,
+        // more...
+      ),
+      paintEditor: const PaintEditorConfigs(
+        widgets: PaintEditorWidgets(),
+        icons: PaintEditorIcons(),
+        style: PaintEditorStyle(),
+        canChangeOpacity: true,
+        // more...
+      ),
+      textEditor: const TextEditorConfigs(
+          widgets: TextEditorWidgets(),
+          icons: TextEditorIcons(),
+          style: TextEditorStyle(),
+          autocorrect: true
+          // more...
+          ),
+      cropRotateEditor: const CropRotateEditorConfigs(
+        widgets: CropRotateEditorWidgets(),
+        icons: CropRotateEditorIcons(),
+        style: CropRotateEditorStyle(),
+        canFlip: true,
+        // more...
+      ),
+      filterEditor: const FilterEditorConfigs(
+        widgets: FilterEditorWidgets(),
+        icons: FilterEditorIcons(),
+        style: FilterEditorStyle(),
+        showLayers: true,
+        // more...
+      ),
+      blurEditor: const BlurEditorConfigs(
+        widgets: BlurEditorWidgets(),
+        icons: BlurEditorIcons(),
+        style: BlurEditorStyle(),
+        showLayers: true,
+        // more...
+      ),
+      tuneEditor: const TuneEditorConfigs(
+        widgets: TuneEditorWidgets(),
+        icons: TuneEditorIcons(),
+        style: TuneEditorStyle(),
+        showLayers: true,
+        // more...
+      ),
+      emojiEditor: const EmojiEditorConfigs(
+        icons: EmojiEditorIcons(),
+        style: EmojiEditorStyle(),
+        // more...
+      ),
+      imageGeneration: const ImageGenerationConfigs(
+        processorConfigs: ProcessorConfigs(),
+        // more
+      ),
+      designMode: ImageEditorDesignMode.material,
+      heroTag: 'hero',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue.shade800,
+          brightness: Brightness.dark,
         ),
-    )
+      ),
+    ),
+  ),
 );
 ```
 </details>
 
-#### Custom AppBar
+#### Custom Widgets
 
-Customize the AppBar with your own widgets. The same is also possible with the BottomBar.
+Customize the editor with your own widgets. For a complete example, refer to the [custom widgets example](https://github.com/hm21/pro_image_editor/blob/stable/example/lib/features/custom_widgets_example.dart).
 
-<details>
-  <summary>Show code example</summary>
-
-```dart
-import 'dart:async';
-
-import 'package:flutter/material.dart';
-import 'package:pro_image_editor/pro_image_editor.dart';
-
-class Demo extends StatefulWidget {
-  const Demo({super.key});
-
-  @override
-  State<Demo> createState() => DemoState();
-}
-
-class DemoState extends State<Demo> {
-  final _editorKey = GlobalKey<ProImageEditorState>();
-  late StreamController _updateAppBarStream;
-
-  @override
-  void initState() {
-    _updateAppBarStream = StreamController.broadcast();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _updateAppBarStream.close();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ProImageEditor.network(
-      'https://picsum.photos/id/237/2000',
-      key: _editorKey,
-      callbacks: ProImageEditorCallbacks(
-        onImageEditingComplete: (Uint8List bytes) async {
-          /*
-            Your code to handle the edited image. Upload it to your server as an example.
-            You can choose to use await, so that the loading-dialog remains visible until your code is ready, or no async, so that the loading-dialog closes immediately.
-            By default, the bytes are in `jpg` format.
-          */
-          Navigator.pop(context);
-        },
-        onUpdateUI: () {
-          _updateAppBarStream.add(null);
-        },
-      ),
-      configs: ProImageEditorConfigs(
-        customWidgets: ImageEditorCustomWidgets(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.black,
-            actions: [
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      tooltip: 'Cancel',
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: const Icon(Icons.close),
-                      onPressed: _editorKey.currentState?.closeEditor,
-                    );
-                  }),
-              const Spacer(),
-              IconButton(
-                tooltip: 'Custom Icon',
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                icon: const Icon(
-                  Icons.bug_report,
-                  color: Colors.white,
-                ),
-                onPressed: () {},
-              ),
-              StreamBuilder(
-                stream: _updateAppBarStream.stream,
-                builder: (_, __) {
-                  return IconButton(
-                    tooltip: 'Undo',
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    icon: Icon(
-                      Icons.undo,
-                      color: _editorKey.currentState?.canUndo == true ? Colors.white : Colors.white.withAlpha(80),
-                    ),
-                    onPressed: _editorKey.currentState?.undoAction,
-                  );
-                },
-              ),
-              StreamBuilder(
-                stream: _updateAppBarStream.stream,
-                builder: (_, __) {
-                  return IconButton(
-                    tooltip: 'Redo',
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    icon: Icon(
-                      Icons.redo,
-                      color: _editorKey.currentState?.canRedo == true ? Colors.white : Colors.white.withAlpha(80),
-                    ),
-                    onPressed: _editorKey.currentState?.redoAction,
-                  );
-                },
-              ),
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      tooltip: 'Done',
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: const Icon(Icons.done),
-                      iconSize: 28,
-                      onPressed: _editorKey.currentState?.doneEditing,
-                    );
-                  }),
-            ],
-          ),
-          appBarPaintEditor: AppBar(
-            automaticallyImplyLeading: false,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.black,
-            actions: [
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: _editorKey.currentState?.paintEditor.currentState?.close,
-                    );
-                  }),
-              const SizedBox(width: 80),
-              const Spacer(),
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: const Icon(
-                        Icons.line_weight_rounded,
-                        color: Colors.white,
-                      ),
-                      onPressed: _editorKey.currentState?.paintEditor.currentState?.openLineWeightBottomSheet,
-                    );
-                  }),
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        icon: Icon(
-                          _editorKey.currentState?.paintEditor.currentState?.fillBackground == true
-                              ? Icons.format_color_reset
-                              : Icons.format_color_fill,
-                          color: Colors.white,
-                        ),
-                        onPressed: _editorKey.currentState?.paintEditor.currentState?.toggleFill);
-                  }),
-              const Spacer(),
-              IconButton(
-                tooltip: 'Custom Icon',
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                icon: const Icon(
-                  Icons.bug_report,
-                  color: Colors.white,
-                ),
-                onPressed: () {},
-              ),
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      tooltip: 'Undo',
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: Icon(
-                        Icons.undo,
-                        color: _editorKey.currentState?.paintEditor.currentState?.canUndo == true ? Colors.white : Colors.white.withAlpha(80),
-                      ),
-                      onPressed: _editorKey.currentState?.paintEditor.currentState?.undoAction,
-                    );
-                  }),
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      tooltip: 'Redo',
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: Icon(
-                        Icons.redo,
-                        color: _editorKey.currentState?.paintEditor.currentState?.canRedo == true ? Colors.white : Colors.white.withAlpha(80),
-                      ),
-                      onPressed: _editorKey.currentState?.paintEditor.currentState?.redoAction,
-                    );
-                  }),
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      tooltip: 'Done',
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: const Icon(Icons.done),
-                      iconSize: 28,
-                      onPressed: _editorKey.currentState?.paintEditor.currentState?.done,
-                    );
-                  }),
-            ],
-          ),
-          appBarTextEditor: AppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-            actions: [
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: _editorKey.currentState?.textEditor.currentState?.close,
-                    );
-                  }),
-              const Spacer(),
-              IconButton(
-                tooltip: 'Custom Icon',
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                icon: const Icon(
-                  Icons.bug_report,
-                  color: Colors.white,
-                ),
-                onPressed: () {},
-              ),
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      onPressed: _editorKey.currentState?.textEditor.currentState?.toggleTextAlign,
-                      icon: Icon(
-                        _editorKey.currentState?.textEditor.currentState?.align == TextAlign.left
-                            ? Icons.align_horizontal_left_rounded
-                            : _editorKey.currentState?.textEditor.currentState?.align == TextAlign.right
-                                ? Icons.align_horizontal_right_rounded
-                                : Icons.align_horizontal_center_rounded,
-                      ),
-                    );
-                  }),
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      onPressed: _editorKey.currentState?.textEditor.currentState?.toggleBackgroundMode,
-                      icon: const Icon(Icons.layers_rounded),
-                    );
-                  }),
-              const Spacer(),
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: const Icon(Icons.done),
-                      iconSize: 28,
-                      onPressed: _editorKey.currentState?.textEditor.currentState?.done,
-                    );
-                  }),
-            ],
-          ),
-          appBarCropRotateEditor: AppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-            actions: [
-                StreamBuilder(
-                stream: _updateUIStream.stream,
-                builder: (_, __) {
-                  return IconButton(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: editorKey.currentState?.cropRotateEditor.currentState?.close,
-                  );
-                }),
-                const Spacer(),
-                IconButton(
-                  tooltip: 'My Button',
-                  color: Colors.amber,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  icon: const Icon(
-                    Icons.bug_report,
-                    color: Colors.amber,
-                  ),
-                  onPressed: () {},
-                ),
-                StreamBuilder(
-                    stream: _updateUIStream.stream,
-                    builder: (_, __) {
-                      return IconButton(
-                        tooltip: 'Undo',
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        icon: Icon(
-                          Icons.undo,
-                          color: editorKey.currentState!.cropRotateEditor.currentState!.canUndo ? Colors.white : Colors.white.withAlpha(80),
-                        ),
-                        onPressed: editorKey.currentState!.cropRotateEditor.currentState!.undoAction,
-                      );
-                    }),
-                StreamBuilder(
-                    stream: _updateUIStream.stream,
-                    builder: (_, __) {
-                      return IconButton(
-                        tooltip: 'Redo',
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        icon: Icon(
-                          Icons.redo,
-                          color: editorKey.currentState!.cropRotateEditor.currentState!.canRedo ? Colors.white : Colors.white.withAlpha(80),
-                        ),
-                        onPressed: editorKey.currentState!.cropRotateEditor.currentState!.redoAction,
-                      );
-                    }),
-                StreamBuilder(
-                    stream: _updateUIStream.stream,
-                    builder: (_, __) {
-                      return IconButton(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        icon: const Icon(Icons.done),
-                        iconSize: 28,
-                        onPressed: editorKey.currentState!.cropRotateEditor.currentState!.done,
-                      );
-                    }),
-            ],
-          ),
-          appBarFilterEditor: AppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-            actions: [
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: _editorKey.currentState?.filterEditor.currentState?.close,
-                    );
-                  }),
-              const Spacer(),
-              IconButton(
-                tooltip: 'Custom Icon',
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                icon: const Icon(
-                  Icons.bug_report,
-                  color: Colors.white,
-                ),
-                onPressed: () {},
-              ),
-              StreamBuilder(
-                  stream: _updateAppBarStream.stream,
-                  builder: (_, __) {
-                    return IconButton(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: const Icon(Icons.done),
-                      iconSize: 28,
-                      onPressed: _editorKey.currentState?.filterEditor.currentState?.done,
-                    );
-                  }),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-```
-</details>
 
 #### Upload to Firebase or Supabase
 
@@ -962,14 +561,16 @@ The state history from the image editor can be exported and imported. However, i
  await _editor.currentState?.exportStateHistory(
     // All configurations are optional
     configs: const ExportEditorConfigs(
-      exportPaint: true,
-      exportText: true,
-      exportCropRotate: false,
-      exportFilter: true,
-      exportEmoji: true,
-      exportSticker: true,
-      serializeSticker: true,
-      historySpan: ExportHistorySpan.all,
+        historySpan: ExportHistorySpan.all,
+        exportPaint: true,
+        exportText: true,
+        exportCropRotate: true,
+        exportFilter: true,
+        exportTuneAdjustments: true,
+        exportEmoji: true,
+        exportBlur: true,
+        exportWidgets: true,
+        enableMinify: true,
     ),
   ).toJson(); // or => toMap(), toFile()
 ```
@@ -1016,7 +617,7 @@ ProImageEditor.memory(
     },
   ),
   configs: ProImageEditorConfigs(
-    stateHistoryConfigs: StateHistoryConfigs(
+    stateHistory: StateHistoryConfigs(
       initStateHistory: ImportStateHistory.fromJson( 
         /* Json-String from your exported state history */,
         configs: const ImportEditorConfigs(

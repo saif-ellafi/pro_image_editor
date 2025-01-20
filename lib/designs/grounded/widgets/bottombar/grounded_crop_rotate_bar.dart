@@ -108,7 +108,8 @@ class _GroundedCropRotateBarState extends State<GroundedCropRotateBar>
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 ..._buildConfigs(),
-                if (textEditorConfigs.customTextStyles != null) ...[
+                if (cropRotateEditorConfigs.aspectRatios.isNotEmpty &&
+                    cropRotateEditorConfigs.canChangeAspectRatio) ...[
                   const SizedBox(width: 5),
                   _buildDivider(),
                   ...List.generate(
