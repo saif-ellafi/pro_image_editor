@@ -392,7 +392,7 @@ class _CustomWidgetsExampleState extends State<CustomWidgetsExample>
             Icons.line_weight_rounded,
             color: Colors.white,
           ),
-          onPressed: paintEditor.openLineWeightBottomSheet,
+          onPressed: paintEditor.openLinWidthBottomSheet,
         ),
         IconButton(
             padding: const EdgeInsets.symmetric(horizontal: 8),

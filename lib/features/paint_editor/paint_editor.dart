@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:pro_image_editor/features/paint_editor/widgets/paint_editor_appbar.dart';
 import 'package:pro_image_editor/features/paint_editor/widgets/paint_editor_bottombar.dart';
 import 'package:pro_image_editor/features/paint_editor/widgets/paint_editor_color_picker.dart';
+import 'package:pro_image_editor/shared/widgets/slider_bottom_sheet.dart';
 
 import '/core/constants/image_constants.dart';
 import '/core/mixins/converted_callbacks.dart';
@@ -361,66 +362,28 @@ class PaintEditorState extends State<PaintEditor>
   }
 
   /// Opens a bottom sheet to adjust the line weight when drawing.
-  void openLineWeightBottomSheet() {
+  void openLinWidthBottomSheet() {
     showModalBottomSheet(
       context: context,
       backgroundColor: paintEditorConfigs.style.lineWidthBottomSheetBackground,
       builder: (BuildContext context) {
-        return StatefulBuilder(builder: (context, setState) {
-          return Material(
-            color: Colors.transparent,
-            textStyle: platformTextStyle(context, designMode),
-            child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    BottomSheetHeaderRow(
-                      title: i18n.paintEditor.lineWidth,
-                      theme: initConfigs.theme,
-                      textStyle:
-                          paintEditorConfigs.style.lineWidthBottomSheetTitle,
-                      closeButton:
-                          paintEditorConfigs.widgets.lineWidthCloseButton !=
-                                  null
-                              ? (fn) => paintEditorConfigs
-                                  .widgets.lineWidthCloseButton!(this, fn)
-                              : null,
-                    ),
-                    StatefulBuilder(builder: (context, setState) {
-                      if (paintEditorConfigs.widgets.sliderLineWidth != null) {
-                        return paintEditorConfigs.widgets.sliderLineWidth!(
-                          this,
-                          rebuildController.stream,
-                          paintCtrl.strokeWidth,
-                          (value) {
-                            setStrokeWidth(value);
-                            setState(() {});
-                          },
-                          (onChangedEnd) {},
-                        );
-                      }
-
-                      return Slider.adaptive(
-                        max: 40,
-                        min: 2,
-                        divisions: 19,
-                        value: paintCtrl.strokeWidth,
-                        onChanged: (value) {
-                          setStrokeWidth(value);
-                          setState(() {});
-                        },
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ),
-          );
-        });
+        return SliderBottomSheet<PaintEditorState>(
+          title: i18n.paintEditor.lineWidth,
+          headerTextStyle: paintEditorConfigs.style.lineWidthBottomSheetTitle,
+          min: 2,
+          max: 40,
+          divisions: 19,
+          closeButton: paintEditorConfigs.widgets.lineWidthCloseButton,
+          customSlider: paintEditorConfigs.widgets.sliderLineWidth,
+          state: this,
+          value: paintCtrl.strokeWidth,
+          designMode: designMode,
+          theme: theme,
+          rebuildController: rebuildController,
+          onValueChanged: (value) {
+            setStrokeWidth(value);
+          },
+        );
       },
     );
   }
@@ -431,62 +394,23 @@ class PaintEditorState extends State<PaintEditor>
       context: context,
       backgroundColor: paintEditorConfigs.style.opacityBottomSheetBackground,
       builder: (BuildContext context) {
-        return StatefulBuilder(builder: (context, setState) {
-          return Material(
-            color: Colors.transparent,
-            textStyle: platformTextStyle(context, designMode),
-            child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    BottomSheetHeaderRow(
-                      title: i18n.paintEditor.changeOpacity,
-                      theme: initConfigs.theme,
-                      textStyle:
-                          paintEditorConfigs.style.opacityBottomSheetTitle,
-                      closeButton:
-                          paintEditorConfigs.widgets.changeOpacityCloseButton !=
-                                  null
-                              ? (fn) => paintEditorConfigs
-                                  .widgets.changeOpacityCloseButton!(this, fn)
-                              : null,
-                    ),
-                    StatefulBuilder(builder: (context, setState) {
-                      if (paintEditorConfigs.widgets.sliderChangeOpacity !=
-                          null) {
-                        return paintEditorConfigs.widgets.sliderChangeOpacity!(
-                          this,
-                          rebuildController.stream,
-                          paintCtrl.opacity,
-                          (value) {
-                            setOpacity(value);
-                            setState(() {});
-                          },
-                          (onChangedEnd) {},
-                        );
-                      }
-
-                      return Slider.adaptive(
-                        max: 1,
-                        min: 0,
-                        divisions: 100,
-                        value: paintCtrl.opacity,
-                        onChanged: (value) {
-                          setOpacity(value);
-                          setState(() {});
-                        },
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ),
-          );
-        });
+        return SliderBottomSheet<PaintEditorState>(
+          title: i18n.paintEditor.changeOpacity,
+          headerTextStyle: paintEditorConfigs.style.opacityBottomSheetTitle,
+          max: 1,
+          min: 0,
+          divisions: 100,
+          closeButton: paintEditorConfigs.widgets.changeOpacityCloseButton,
+          customSlider: paintEditorConfigs.widgets.sliderChangeOpacity,
+          state: this,
+          value: paintCtrl.opacity,
+          designMode: designMode,
+          theme: theme,
+          rebuildController: rebuildController,
+          onValueChanged: (value) {
+            setOpacity(value);
+          },
+        );
       },
     );
   }
@@ -746,7 +670,7 @@ class PaintEditorState extends State<PaintEditor>
         canUndo: canUndo,
         isFillMode: _isFillMode,
         onOpenOpacityBottomSheet: openOpacityBottomSheet,
-        onOpenLineWeightBottomSheet: openLineWeightBottomSheet,
+        onOpenLineWeightBottomSheet: openLinWidthBottomSheet,
         designMode: designMode,
       ),
     );

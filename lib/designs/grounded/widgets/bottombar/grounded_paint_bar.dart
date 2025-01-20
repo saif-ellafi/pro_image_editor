@@ -204,7 +204,7 @@ class _GroundedPaintBarState extends State<GroundedPaintBar>
           color: _foreGroundColor,
         ),
         onPressed: () {
-          widget.editor.openLineWeightBottomSheet();
+          widget.editor.openLinWidthBottomSheet();
         },
       ),
       FlatIconTextButton(

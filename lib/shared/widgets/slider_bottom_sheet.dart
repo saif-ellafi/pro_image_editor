@@ -3,48 +3,68 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '/core/enums/design_mode.dart';
-import '/core/models/editor_configs/text_editor_configs.dart';
-import '/core/models/i18n/i18n_text_editor.dart';
-import '/features/text_editor/text_editor.dart';
 import '/shared/styles/platform_text_styles.dart';
 import '/shared/widgets/bottom_sheets_header_row.dart';
+import 'custom_widgets/reactive_custom_widget.dart';
 
-class FontScaleBottomSheet extends StatefulWidget {
-  const FontScaleBottomSheet({
+class SliderBottomSheet<T> extends StatefulWidget {
+  const SliderBottomSheet({
     super.key,
-    required this.configs,
-    required this.i18n,
+    required this.title,
+    required this.headerTextStyle,
+    required this.min,
+    required this.max,
+    required this.divisions,
+    required this.closeButton,
+    required this.customSlider,
     required this.state,
-    required this.fontScale,
+    required this.value,
     required this.designMode,
     required this.theme,
     required this.rebuildController,
-    required this.onFontScaleChanged,
+    required this.onValueChanged,
+    this.resetIcon,
+    this.showFactorInTitle = false,
   });
+
+  final String title;
+  final TextStyle? headerTextStyle;
+  final IconData? resetIcon;
+  final Widget Function(T, dynamic Function())? closeButton;
+  final ReactiveWidget<Widget> Function(
+    T,
+    Stream<void>,
+    double,
+    dynamic Function(double),
+    dynamic Function(double),
+  )? customSlider;
+
+  final bool showFactorInTitle;
+  final double min;
+  final double max;
+  final int? divisions;
 
   final StreamController<void> rebuildController;
 
-  final TextEditorConfigs configs;
-  final I18nTextEditor i18n;
-  final TextEditorState state;
+  final T state;
 
   final ImageEditorDesignMode designMode;
   final ThemeData theme;
-  final double fontScale;
+  final double value;
 
-  final Function(double value) onFontScaleChanged;
+  final Function(double value) onValueChanged;
 
   @override
-  State<FontScaleBottomSheet> createState() => _FontScaleBottomSheetState();
+  State<SliderBottomSheet<T>> createState() => _SliderBottomSheetState<T>();
 }
 
-class _FontScaleBottomSheetState extends State<FontScaleBottomSheet> {
-  late double _fontScale = widget.fontScale;
-  late final double _presetFontScale = widget.fontScale;
+class _SliderBottomSheetState<T> extends State<SliderBottomSheet<T>> {
+  late double _value = widget.value;
+  late final double _presetValue = widget.value;
 
   void updateFontScaleScale(double value) {
-    widget.onFontScaleChanged(value);
-    _fontScale = value;
+    widget.onValueChanged(value);
+    _value = value;
     setState(() {});
   }
 
@@ -71,22 +91,25 @@ class _FontScaleBottomSheetState extends State<FontScaleBottomSheet> {
   }
 
   Widget _buildHeader() {
+    String factorText =
+        widget.showFactorInTitle ? ' ${_value.toStringAsFixed(1)}x' : '';
+
     return BottomSheetHeaderRow(
-      title: '${widget.i18n.fontScale} ${_fontScale.toStringAsFixed(1)}x',
+      title: '${widget.title}$factorText',
       theme: widget.theme,
-      textStyle: widget.configs.style.fontSizeBottomSheetTitle,
-      closeButton: widget.configs.widgets.fontSizeCloseButton != null
-          ? (fn) =>
-              widget.configs.widgets.fontSizeCloseButton!(widget.state, fn)
+      padding: const EdgeInsets.fromLTRB(16, 8, 0, 4),
+      textStyle: widget.headerTextStyle,
+      closeButton: widget.closeButton != null
+          ? (fn) => widget.closeButton!(widget.state, fn)
           : null,
     );
   }
 
   Widget _buildBody() {
-    return widget.configs.widgets.sliderFontSize?.call(
+    return widget.customSlider?.call(
           widget.state,
           widget.rebuildController.stream,
-          _fontScale,
+          _value,
           updateFontScaleScale,
           (onChangedEnd) {},
         ) ??
@@ -94,18 +117,18 @@ class _FontScaleBottomSheetState extends State<FontScaleBottomSheet> {
           children: [
             Expanded(
               child: Slider.adaptive(
-                max: widget.configs.maxFontScale,
-                min: widget.configs.minFontScale,
-                divisions: (widget.configs.maxFontScale -
-                        widget.configs.minFontScale) ~/
-                    0.1,
-                value: _fontScale,
+                max: widget.max,
+                min: widget.min,
+                divisions: widget.divisions,
+                value: _value,
                 onChanged: updateFontScaleScale,
               ),
             ),
-            const SizedBox(width: 8),
-            _buildResetButton(),
-            const SizedBox(width: 2),
+            if (widget.resetIcon != null) ...[
+              const SizedBox(width: 8),
+              _buildResetButton(),
+              const SizedBox(width: 2),
+            ],
           ],
         );
   }
@@ -115,19 +138,19 @@ class _FontScaleBottomSheetState extends State<FontScaleBottomSheet> {
       data: Theme.of(context).primaryIconTheme,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 150),
-        child: _fontScale != _presetFontScale
+        child: _value != _presetValue
             ? IconButton(
                 key: const ValueKey('ResetFontScaleButtonActive'),
                 onPressed: () {
-                  updateFontScaleScale(_presetFontScale);
+                  updateFontScaleScale(_presetValue);
                 },
-                icon: Icon(widget.configs.icons.resetFontScale),
+                icon: Icon(widget.resetIcon),
               )
             : IconButton(
                 key: const ValueKey('ResetFontScaleButtonInactive'),
                 color: Colors.transparent,
                 onPressed: null,
-                icon: Icon(widget.configs.icons.resetFontScale),
+                icon: Icon(widget.resetIcon),
               ),
       ),
     );

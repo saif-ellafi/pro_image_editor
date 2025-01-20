@@ -2,16 +2,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:pro_image_editor/features/text_editor/widgets/bottom_sheets/font_scale_bottom_sheet.dart';
-import 'package:pro_image_editor/features/text_editor/widgets/text_editor_appbar.dart';
-import 'package:pro_image_editor/features/text_editor/widgets/text_editor_color_picker.dart';
-import 'package:pro_image_editor/features/text_editor/widgets/text_editor_input.dart';
 
 import '/core/mixins/converted_callbacks.dart';
 import '/core/mixins/converted_configs.dart';
 import '/core/mixins/editor_configs_mixin.dart';
+import '/features/text_editor/widgets/text_editor_appbar.dart';
+import '/features/text_editor/widgets/text_editor_color_picker.dart';
+import '/features/text_editor/widgets/text_editor_input.dart';
 import '/pro_image_editor.dart';
 import '/shared/extensions/color_extension.dart';
+import '/shared/widgets/slider_bottom_sheet.dart';
 import 'widgets/text_editor_bottom_bar.dart';
 
 /// A StatefulWidget that provides a text editing interface for adding and
@@ -260,15 +260,24 @@ class TextEditorState extends State<TextEditor>
       context: context,
       backgroundColor: textEditorConfigs.style.fontScaleBottomSheetBackground,
       builder: (BuildContext context) {
-        return FontScaleBottomSheet(
+        return SliderBottomSheet<TextEditorState>(
+          value: _fontScale,
+          title: i18n.textEditor.fontScale,
+          headerTextStyle: textEditorConfigs.style.fontSizeBottomSheetTitle,
+          resetIcon: textEditorConfigs.icons.resetFontScale,
+          max: textEditorConfigs.maxFontScale,
+          min: textEditorConfigs.minFontScale,
+          divisions: (textEditorConfigs.maxFontScale -
+                  textEditorConfigs.minFontScale) ~/
+              0.1,
           state: this,
-          configs: textEditorConfigs,
-          i18n: i18n.textEditor,
-          fontScale: fontScale,
+          showFactorInTitle: true,
+          closeButton: textEditorConfigs.widgets.fontSizeCloseButton,
+          customSlider: textEditorConfigs.widgets.sliderFontSize,
           designMode: designMode,
           theme: widget.theme,
           rebuildController: _rebuildController,
-          onFontScaleChanged: (value) {
+          onValueChanged: (value) {
             fontScale = value;
           },
         );
