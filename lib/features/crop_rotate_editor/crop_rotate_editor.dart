@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/services.dart';
+import 'package:pro_image_editor/features/crop_rotate_editor/widgets/crop_editor_appbar.dart';
+import 'package:pro_image_editor/features/crop_rotate_editor/widgets/crop_editor_bottombar.dart';
 
 import '/core/mixins/converted_callbacks.dart';
 import '/core/mixins/converted_configs.dart';
@@ -2014,39 +2016,16 @@ class CropRotateEditorState extends State<CropRotateEditor>
       return customToolbar;
     }
     _hasToolbar = true;
-    return AppBar(
-      automaticallyImplyLeading: false,
-      backgroundColor: cropRotateEditorConfigs.style.appBarBackground,
-      foregroundColor: cropRotateEditorConfigs.style.appBarColor,
-      actions: [
-        if (initConfigs.enableCloseButton)
-          IconButton(
-            tooltip: i18n.cropRotateEditor.back,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            icon: Icon(cropRotateEditorConfigs.icons.backButton),
-            onPressed: close,
-          ),
-        const Spacer(),
-        IconButton(
-          tooltip: i18n.cropRotateEditor.undo,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(
-            cropRotateEditorConfigs.icons.undoAction,
-            color: canUndo ? Colors.white : Colors.white.withAlpha(80),
-          ),
-          onPressed: undoAction,
-        ),
-        IconButton(
-          tooltip: i18n.cropRotateEditor.redo,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(
-            cropRotateEditorConfigs.icons.redoAction,
-            color: canRedo ? Colors.white : Colors.white.withAlpha(80),
-          ),
-          onPressed: redoAction,
-        ),
-        _buildDoneBtn(),
-      ],
+    return CropEditorAppbar(
+      configs: configs.cropRotateEditor,
+      i18n: i18n.cropRotateEditor,
+      enableCloseButton: initConfigs.enableCloseButton,
+      canUndo: canUndo,
+      canRedo: canRedo,
+      onDone: done,
+      onClose: close,
+      onUndo: undoAction,
+      onRedo: redoAction,
     );
   }
 
@@ -2060,93 +2039,15 @@ class CropRotateEditorState extends State<CropRotateEditor>
             cropRotateEditorConfigs.canFlip ||
             cropRotateEditorConfigs.canChangeAspectRatio ||
             cropRotateEditorConfigs.canReset
-        ? Theme(
-            data: theme,
-            child: Scrollbar(
-              controller: _bottomBarScrollCtrl,
-              scrollbarOrientation: ScrollbarOrientation.top,
-              thickness: isDesktop ? null : 0,
-              child: BottomAppBar(
-                height: kToolbarHeight,
-                color: cropRotateEditorConfigs.style.bottomBarBackground,
-                padding: EdgeInsets.zero,
-                child: Center(
-                  child: SingleChildScrollView(
-                    controller: _bottomBarScrollCtrl,
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: min(MediaQuery.of(context).size.width, 500),
-                        maxWidth: 500,
-                      ),
-                      child: Builder(builder: (context) {
-                        Color foregroundColor =
-                            cropRotateEditorConfigs.style.appBarColor;
-                        return Wrap(
-                          direction: Axis.horizontal,
-                          alignment: WrapAlignment.spaceAround,
-                          children: <Widget>[
-                            if (cropRotateEditorConfigs.canRotate)
-                              FlatIconTextButton(
-                                key: const ValueKey(
-                                    'crop-rotate-editor-rotate-btn'),
-                                label: Text(
-                                  i18n.cropRotateEditor.rotate,
-                                  style: TextStyle(
-                                      fontSize: 10.0, color: foregroundColor),
-                                ),
-                                icon: Icon(cropRotateEditorConfigs.icons.rotate,
-                                    color: foregroundColor),
-                                onPressed: rotate,
-                              ),
-                            if (cropRotateEditorConfigs.canFlip)
-                              FlatIconTextButton(
-                                key: const ValueKey(
-                                    'crop-rotate-editor-flip-btn'),
-                                label: Text(
-                                  i18n.cropRotateEditor.flip,
-                                  style: TextStyle(
-                                      fontSize: 10.0, color: foregroundColor),
-                                ),
-                                icon: Icon(cropRotateEditorConfigs.icons.flip,
-                                    color: foregroundColor),
-                                onPressed: flip,
-                              ),
-                            if (cropRotateEditorConfigs.canChangeAspectRatio)
-                              FlatIconTextButton(
-                                key: const ValueKey(
-                                    'crop-rotate-editor-ratio-btn'),
-                                label: Text(
-                                  i18n.cropRotateEditor.ratio,
-                                  style: TextStyle(
-                                      fontSize: 10.0, color: foregroundColor),
-                                ),
-                                icon: Icon(
-                                    cropRotateEditorConfigs.icons.aspectRatio,
-                                    color: foregroundColor),
-                                onPressed: openAspectRatioOptions,
-                              ),
-                            if (cropRotateEditorConfigs.canReset)
-                              FlatIconTextButton(
-                                key: const ValueKey(
-                                    'crop-rotate-editor-reset-btn'),
-                                label: Text(
-                                  i18n.cropRotateEditor.reset,
-                                  style: TextStyle(
-                                      fontSize: 10.0, color: foregroundColor),
-                                ),
-                                icon: Icon(cropRotateEditorConfigs.icons.reset,
-                                    color: foregroundColor),
-                                onPressed: reset,
-                              ),
-                          ],
-                        );
-                      }),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+        ? CropEditorBottombar(
+            bottomBarScrollCtrl: _bottomBarScrollCtrl,
+            i18n: i18n.cropRotateEditor,
+            configs: cropRotateEditorConfigs,
+            theme: theme,
+            onRotate: rotate,
+            onFlip: flip,
+            onOpenAspectRatioOptions: openAspectRatioOptions,
+            onReset: reset,
           )
         : null;
   }
@@ -2442,17 +2343,6 @@ class CropRotateEditorState extends State<CropRotateEditor>
           ],
         );
       }),
-    );
-  }
-
-  /// Builds and returns an IconButton for applying changes.
-  Widget _buildDoneBtn() {
-    return IconButton(
-      tooltip: i18n.cropRotateEditor.done,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      icon: Icon(cropRotateEditorConfigs.icons.applyChanges),
-      iconSize: 28,
-      onPressed: done,
     );
   }
 
