@@ -10,11 +10,8 @@ import 'package:flutter/services.dart';
 
 import '/core/mixins/converted_callbacks.dart';
 import '/core/mixins/converted_configs.dart';
-import '/core/mixins/extended_loop.dart';
 import '/core/mixins/standalone_editor.dart';
 import '/core/models/transform_helper.dart';
-import '/core/utils/debounce.dart';
-import '/core/utils/layer_transform_generator.dart';
 import '/features/crop_rotate_editor/widgets/outside_gestures/crop_rotate_gesture_detector.dart';
 import '/features/crop_rotate_editor/widgets/outside_gestures/outside_gesture_listener.dart';
 import '/plugins/defer_pointer/defer_pointer.dart';
@@ -27,6 +24,9 @@ import '/shared/widgets/extended/extended_transform_translate.dart';
 import '/shared/widgets/layer/layer_stack.dart';
 import '/shared/widgets/screen_resize_detector.dart';
 import '/shared/widgets/transform/transformed_content_generator.dart';
+import '../../shared/mixins/extended_loop.dart';
+import '../../shared/services/layer_transform_generator.dart';
+import '../../shared/utils/debounce.dart';
 import '../filter_editor/widgets/filtered_image.dart';
 import 'enums/crop_area_part.dart';
 import 'enums/crop_rotate_angle_side.dart';
@@ -123,33 +123,34 @@ class CropRotateEditor extends StatefulWidget
   /// Either [byteArray], [file], [networkUrl], or [assetPath] must be provided.
   factory CropRotateEditor.autoSource({
     Key? key,
-    required CropRotateEditorInitConfigs initConfigs,
     Uint8List? byteArray,
     File? file,
     String? assetPath,
     String? networkUrl,
+    EditorImage? editorImage,
+    required CropRotateEditorInitConfigs initConfigs,
   }) {
-    if (byteArray != null) {
+    if (byteArray != null || editorImage?.byteArray != null) {
       return CropRotateEditor.memory(
-        byteArray,
+        byteArray ?? editorImage!.byteArray!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (file != null) {
+    } else if (file != null || editorImage?.file != null) {
       return CropRotateEditor.file(
-        file,
+        file ?? editorImage!.file!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (networkUrl != null) {
+    } else if (networkUrl != null || editorImage?.networkUrl != null) {
       return CropRotateEditor.network(
-        networkUrl,
+        networkUrl ?? editorImage!.networkUrl!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (assetPath != null) {
+    } else if (assetPath != null || editorImage?.assetPath != null) {
       return CropRotateEditor.asset(
-        assetPath,
+        assetPath ?? editorImage!.assetPath!,
         key: key,
         initConfigs: initConfigs,
       );

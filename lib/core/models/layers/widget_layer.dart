@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '/shared/services/import_export/types/widget_loader.dart';
-import '../../utils/parser/int_parser.dart';
+import '../../../shared/utils/parser/int_parser.dart';
 import '../editor_image.dart';
 import 'layer.dart';
 

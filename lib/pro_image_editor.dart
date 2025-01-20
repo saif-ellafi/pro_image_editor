@@ -43,8 +43,8 @@ export 'features/text_editor/text_editor.dart';
 export 'shared/services/content_recorder/utils/generate_high_quality_image.dart';
 
 /// Utils
-export 'core/utils/converters.dart';
-export 'core/utils/decode_image.dart';
+export 'shared/utils/converters.dart';
+export 'shared/utils/decode_image.dart';
 export 'shared/widgets/color_picker/bar_color_picker.dart';
 export 'shared/widgets/custom_widgets/reactive_custom_appbar.dart';
 export 'shared/widgets/custom_widgets/reactive_custom_widget.dart';

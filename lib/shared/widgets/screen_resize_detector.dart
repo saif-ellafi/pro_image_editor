@@ -5,7 +5,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 // Project imports:
-import '/core/utils/debounce.dart';
+import '../utils/debounce.dart';
 
 /// A widget that detects changes in screen size and notifies listeners.
 ///

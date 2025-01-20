@@ -4,7 +4,7 @@ import 'dart:async';
 // Project imports:
 import '/core/models/multi_threading/thread_request_model.dart';
 import '/core/models/multi_threading/thread_response_model.dart';
-import '/core/utils/unique_id_generator.dart';
+import '/shared/utils/unique_id_generator.dart';
 
 /// An abstract class representing a thread (isolate) used for processing tasks.
 ///

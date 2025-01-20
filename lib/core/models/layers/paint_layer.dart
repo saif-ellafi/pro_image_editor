@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 
+import '../../../features/paint_editor/models/painted_model.dart';
 import '../../../shared/services/import_export/utils/key_minifier.dart';
-import '../../utils/parser/double_parser.dart';
-import '../paint_editor/painted_model.dart';
+import '../../../shared/utils/parser/double_parser.dart';
 import 'layer.dart';
 
 /// A class representing a layer with custom paint content.

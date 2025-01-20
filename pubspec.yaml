@@ -42,7 +42,7 @@ dependencies:
   http: ^1.2.2
   image: ^4.5.2
   mime: ^2.0.0
-  vibration: ^2.0.1
+  vibration: ^2.1.0
   web: ^1.1.0
 
 dev_dependencies:

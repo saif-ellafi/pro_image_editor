@@ -11,8 +11,8 @@ import 'package:vibration/vibration.dart';
 // Project imports:
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
 import '/core/models/history/last_layer_interaction_position.dart';
-import '/core/utils/debounce.dart';
 import '../../../core/models/layers/layer.dart';
+import '../../../shared/utils/debounce.dart';
 
 /// A helper class responsible for managing layer interactions in the editor.
 ///

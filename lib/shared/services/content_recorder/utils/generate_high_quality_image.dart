@@ -2,9 +2,10 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
-import '/core/utils/unique_id_generator.dart';
 import '/shared/services/content_recorder/controllers/content_recorder_controller.dart';
+import '/shared/utils/unique_id_generator.dart';
 
 /// Generates a high-quality image from the provided [ui.Image].
 ///

@@ -12,8 +12,8 @@ import 'package:mime/mime.dart';
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
 import '/core/models/multi_threading/thread_capture_model.dart';
 import '/core/models/multi_threading/thread_request_model.dart';
-import '/core/utils/decode_image.dart';
-import '/core/utils/unique_id_generator.dart';
+import '/shared/utils/unique_id_generator.dart';
+import '../../../utils/decode_image.dart';
 import '../managers/isolate/isolate_manager.dart';
 import '../managers/web_worker/web_worker_manager_dummy.dart'
     if (dart.library.js_interop) '../managers/web_worker/web_worker_manager.dart';

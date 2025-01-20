@@ -10,15 +10,15 @@ import '/core/mixins/converted_callbacks.dart';
 import '/core/mixins/converted_configs.dart';
 import '/core/mixins/standalone_editor.dart';
 import '/core/models/transform_helper.dart';
-import '/core/models/tune_editor/tune_adjustment_matrix.dart';
 import '/pro_image_editor.dart';
 import '/shared/services/content_recorder/widgets/content_recorder.dart';
 import '/shared/widgets/layer/layer_stack.dart';
 import '/shared/widgets/transform/transformed_content_generator.dart';
 import '../filter_editor/widgets/filtered_image.dart';
+import 'models/tune_adjustment_matrix.dart';
 import 'utils/tune_presets.dart';
 
-export '/core/models/tune_editor/tune_adjustment_item.dart';
+export 'models/tune_adjustment_item.dart';
 
 /// The `TuneEditor` widget allows users to edit images with various
 /// tune adjustment tools such as brightness, contrast, and saturation.
@@ -103,33 +103,34 @@ class TuneEditor extends StatefulWidget
   /// Either [byteArray], [file], [networkUrl], or [assetPath] must be provided.
   factory TuneEditor.autoSource({
     Key? key,
-    required TuneEditorInitConfigs initConfigs,
     Uint8List? byteArray,
     File? file,
     String? assetPath,
     String? networkUrl,
+    EditorImage? editorImage,
+    required TuneEditorInitConfigs initConfigs,
   }) {
-    if (byteArray != null) {
+    if (byteArray != null || editorImage?.byteArray != null) {
       return TuneEditor.memory(
-        byteArray,
+        byteArray ?? editorImage!.byteArray!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (file != null) {
+    } else if (file != null || editorImage?.file != null) {
       return TuneEditor.file(
-        file,
+        file ?? editorImage!.file!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (networkUrl != null) {
+    } else if (networkUrl != null || editorImage?.networkUrl != null) {
       return TuneEditor.network(
-        networkUrl,
+        networkUrl ?? editorImage!.networkUrl!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (assetPath != null) {
+    } else if (assetPath != null || editorImage?.assetPath != null) {
       return TuneEditor.asset(
-        assetPath,
+        assetPath ?? editorImage!.assetPath!,
         key: key,
         initConfigs: initConfigs,
       );

@@ -5,10 +5,11 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '/core/mixins/converted_callbacks.dart';
-import '/core/models/tune_editor/tune_adjustment_matrix.dart';
 import '/features/filter_editor/types/filter_matrix.dart';
 import '/shared/services/content_recorder/controllers/content_recorder_controller.dart';
 import '/shared/widgets/overlays/loading_dialog/loading_dialog.dart';
+import '../../features/tune_editor/models/tune_adjustment_matrix.dart';
+import '../../shared/utils/decode_image.dart';
 import '../models/editor_callbacks/pro_image_editor_callbacks.dart';
 import '../models/editor_configs/pro_image_editor_configs.dart';
 import '../models/editor_image.dart';
@@ -19,7 +20,6 @@ import '../models/init_configs/filter_editor_init_configs.dart';
 import '../models/init_configs/paint_editor_init_configs.dart';
 import '../models/layers/layer.dart';
 import '../models/multi_threading/thread_capture_model.dart';
-import '../utils/decode_image.dart';
 import 'converted_configs.dart';
 
 /// A mixin providing access to standalone editor configurations and image.

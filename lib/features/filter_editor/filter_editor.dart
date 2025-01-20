@@ -10,6 +10,7 @@ import '/core/mixins/converted_callbacks.dart';
 import '/core/mixins/converted_configs.dart';
 import '/core/mixins/standalone_editor.dart';
 import '/core/models/transform_helper.dart';
+import '/features/filter_editor/widgets/filter_editor_appbar.dart';
 import '/pro_image_editor.dart';
 import '/shared/services/content_recorder/widgets/content_recorder.dart';
 import '/shared/widgets/layer/layer_stack.dart';
@@ -104,33 +105,34 @@ class FilterEditor extends StatefulWidget
   /// Either [byteArray], [file], [networkUrl], or [assetPath] must be provided.
   factory FilterEditor.autoSource({
     Key? key,
-    required FilterEditorInitConfigs initConfigs,
     Uint8List? byteArray,
     File? file,
     String? assetPath,
     String? networkUrl,
+    EditorImage? editorImage,
+    required FilterEditorInitConfigs initConfigs,
   }) {
-    if (byteArray != null) {
+    if (byteArray != null || editorImage?.byteArray != null) {
       return FilterEditor.memory(
-        byteArray,
+        byteArray ?? editorImage!.byteArray!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (file != null) {
+    } else if (file != null || editorImage?.file != null) {
       return FilterEditor.file(
-        file,
+        file ?? editorImage!.file!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (networkUrl != null) {
+    } else if (networkUrl != null || editorImage?.networkUrl != null) {
       return FilterEditor.network(
-        networkUrl,
+        networkUrl ?? editorImage!.networkUrl!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (assetPath != null) {
+    } else if (assetPath != null || editorImage?.assetPath != null) {
       return FilterEditor.asset(
-        assetPath,
+        assetPath ?? editorImage!.assetPath!,
         key: key,
         initConfigs: initConfigs,
       );
@@ -267,26 +269,11 @@ class FilterEditorState extends State<FilterEditor>
       return filterEditorConfigs.widgets.appBar!
           .call(this, rebuildController.stream);
     }
-    return AppBar(
-      automaticallyImplyLeading: false,
-      backgroundColor: filterEditorConfigs.style.appBarBackground,
-      foregroundColor: filterEditorConfigs.style.appBarColor,
-      actions: [
-        IconButton(
-          tooltip: i18n.filterEditor.back,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(filterEditorConfigs.icons.backButton),
-          onPressed: close,
-        ),
-        const Spacer(),
-        IconButton(
-          tooltip: i18n.filterEditor.done,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(filterEditorConfigs.icons.applyChanges),
-          iconSize: 28,
-          onPressed: done,
-        ),
-      ],
+    return FilterEditorAppBar(
+      filterEditorConfigs: filterEditorConfigs,
+      i18n: i18n.filterEditor,
+      close: close,
+      done: done,
     );
   }
 

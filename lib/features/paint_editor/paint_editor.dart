@@ -7,12 +7,12 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pro_image_editor/features/paint_editor/widgets/paint_editor_color_picker.dart';
 
 import '/core/constants/image_constants.dart';
 import '/core/mixins/converted_callbacks.dart';
 import '/core/mixins/converted_configs.dart';
 import '/core/mixins/standalone_editor.dart';
-import '/core/models/paint_editor/painted_model.dart';
 import '/core/models/transform_helper.dart';
 import '/pro_image_editor.dart';
 import '/shared/services/content_recorder/widgets/content_recorder.dart';
@@ -25,11 +25,12 @@ import '/shared/widgets/platform/platform_popup_menu.dart';
 import '/shared/widgets/transform/transformed_content_generator.dart';
 import '../filter_editor/widgets/filtered_image.dart';
 import 'controllers/paint_controller.dart';
+import 'models/painted_model.dart';
 import 'services/paint_desktop_interaction_manager.dart';
 import 'widgets/paint_canvas.dart';
 
-export '/core/models/paint_editor/paint_bottom_bar_item.dart';
 export 'enums/paint_editor_enum.dart';
+export 'models/paint_bottom_bar_item.dart';
 export 'widgets/draw_paint_item.dart';
 
 /// The `PaintEditor` widget allows users to editing images with paint
@@ -133,29 +134,30 @@ class PaintEditor extends StatefulWidget
     File? file,
     String? assetPath,
     String? networkUrl,
+    EditorImage? editorImage,
     required PaintEditorInitConfigs initConfigs,
   }) {
-    if (byteArray != null) {
+    if (byteArray != null || editorImage?.byteArray != null) {
       return PaintEditor.memory(
-        byteArray,
+        byteArray ?? editorImage!.byteArray!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (file != null) {
+    } else if (file != null || editorImage?.file != null) {
       return PaintEditor.file(
-        file,
+        file ?? editorImage!.file!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (networkUrl != null) {
+    } else if (networkUrl != null || editorImage?.networkUrl != null) {
       return PaintEditor.network(
-        networkUrl,
+        networkUrl ?? editorImage!.networkUrl!,
         key: key,
         initConfigs: initConfigs,
       );
-    } else if (assetPath != null) {
+    } else if (assetPath != null || editorImage?.assetPath != null) {
       return PaintEditor.asset(
-        assetPath,
+        assetPath ?? editorImage!.assetPath!,
         key: key,
         initConfigs: initConfigs,
       );
@@ -201,13 +203,13 @@ class PaintEditorState extends State<PaintEditor>
   late ScrollController _bottomBarScrollCtrl;
 
   /// A boolean flag representing whether the fill mode is enabled or disabled.
-  bool _fill = false;
+  bool _isFillMode = false;
 
   /// Controls high-performance for free-style drawing.
   bool _freeStyleHighPerformance = false;
 
   /// Get the fillBackground status.
-  bool get fillBackground => _fill;
+  bool get fillBackground => _isFillMode;
 
   /// Determines whether undo actions can be performed on the current state.
   bool get canUndo => paintCtrl.canUndo;
@@ -298,7 +300,7 @@ class PaintEditorState extends State<PaintEditor>
       strokeMultiplier: 1,
     );
 
-    _fill = paintEditorConfigs.initialFill;
+    _isFillMode = paintEditorConfigs.initialFill;
 
     initStreamControllers();
 
@@ -507,8 +509,8 @@ class PaintEditorState extends State<PaintEditor>
 
   /// Toggles the fill mode.
   void toggleFill() {
-    _fill = !_fill;
-    setFill(_fill);
+    _isFillMode = !_isFillMode;
+    setFill(_isFillMode);
     rebuildController.add(null);
   }
 
@@ -795,13 +797,13 @@ class PaintEditorState extends State<PaintEditor>
             PopupMenuOption(
               label: i18n.paintEditor.toggleFill,
               icon: Icon(
-                !_fill
+                !_isFillMode
                     ? paintEditorConfigs.icons.noFill
                     : paintEditorConfigs.icons.fill,
               ),
               onTap: () {
-                _fill = !_fill;
-                setFill(_fill);
+                _isFillMode = !_isFillMode;
+                setFill(_isFillMode);
                 if (designMode == ImageEditorDesignMode.cupertino) {
                   Navigator.pop(context);
                 }
@@ -863,7 +865,7 @@ class PaintEditorState extends State<PaintEditor>
                   tooltip: i18n.paintEditor.toggleFill,
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   icon: Icon(
-                    !_fill
+                    !_isFillMode
                         ? paintEditorConfigs.icons.noFill
                         : paintEditorConfigs.icons.fill,
                     color: Colors.white,
@@ -1189,44 +1191,10 @@ class PaintEditorState extends State<PaintEditor>
   /// Builds the color picker widget for selecting colors while paint.
   /// Returns a [Widget] representing the color picker.
   Widget _buildColorPicker() {
-    if (paintEditorConfigs.widgets.colorPicker != null) {
-      return paintEditorConfigs.widgets.colorPicker!.call(
-            this,
-            rebuildController.stream,
-            paintCtrl.color,
-            colorChanged,
-          ) ??
-          const SizedBox.shrink();
-    }
-
-    return Positioned(
-      top: 10,
-      right: 0,
-      child: StreamBuilder(
-        stream: uiPickerStream.stream,
-        builder: (context, snapshot) {
-          return BarColorPicker(
-            configs: configs,
-            length: min(
-              350,
-              MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).viewInsets.bottom -
-                  kToolbarHeight -
-                  kBottomNavigationBarHeight -
-                  MediaQuery.of(context).padding.top -
-                  30,
-            ),
-            horizontal: false,
-            thumbColor: Colors.white,
-            cornerRadius: 10,
-            pickMode: PickMode.color,
-            initialColor: paintEditorConfigs.style.initialColor,
-            colorListener: (int value) {
-              colorChanged(Color(value));
-            },
-          );
-        },
-      ),
+    return PaintEditorColorPicker(
+      state: this,
+      configs: configs,
+      rebuildController: rebuildController,
     );
   }
 }

@@ -86,7 +86,7 @@ mixin ExampleHelperState<T extends StatefulWidget> on State<T> {
       if (!mounted) return;
 
       // Navigate to the preview page to display the edited image.
-      editorKey.currentState?.disablePopScope = true;
+      editorKey.currentState?.isPopScopeDisabled = true;
       await Navigator.push(
         context,
         MaterialPageRoute(

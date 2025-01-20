@@ -5,15 +5,15 @@ import 'dart:io';
 // Flutter imports:
 import 'package:flutter/services.dart';
 
-import '/core/models/crop_rotate_editor/transform_factors.dart';
 import '/core/models/editor_image.dart';
 import '/core/models/history/state_history.dart';
 import '/core/models/layers/layer.dart';
-import '/core/models/tune_editor/tune_adjustment_matrix.dart';
-import '/core/utils/parser/double_parser.dart';
-import '/core/utils/parser/int_parser.dart';
-import '/core/utils/parser/size_parser.dart';
 import '/features/filter_editor/utils/filter_generator/filter_addons.dart';
+import '../../../features/crop_rotate_editor/models/transform_factors.dart';
+import '../../../features/tune_editor/models/tune_adjustment_matrix.dart';
+import '../../utils/parser/double_parser.dart';
+import '../../utils/parser/int_parser.dart';
+import '../../utils/parser/size_parser.dart';
 import 'constants/export_import_version.dart';
 import 'models/import_state_history_configs.dart';
 import 'utils/key_minifier.dart';
