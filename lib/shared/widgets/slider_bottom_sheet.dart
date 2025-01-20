@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '/core/enums/design_mode.dart';
 import '/shared/styles/platform_text_styles.dart';
 import '/shared/widgets/bottom_sheets_header_row.dart';
-import 'custom_widgets/reactive_custom_widget.dart';
+import 'reactive_widgets/reactive_custom_widget.dart';
 
 class SliderBottomSheet<T> extends StatefulWidget {
   const SliderBottomSheet({
