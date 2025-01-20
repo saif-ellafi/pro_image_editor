@@ -66,11 +66,7 @@ List<TuneAdjustmentItem> tunePresets({
         max: .5,
         divisions: 200,
         labelMultiplier: 200,
-        toMatrix: (value) {
-          double r = value > 0 ? 1 : 1 + value;
-          double b = value < 0 ? 1 : 1 - value;
-          return ColorFilterAddons.rgbScale(r, 1, b);
-        },
+        toMatrix: ColorFilterAddons.temperature,
       ),
       TuneAdjustmentItem(
         id: 'sharpness',

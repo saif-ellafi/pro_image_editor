@@ -54,8 +54,16 @@ class _TuneEditorBottombarState extends State<TuneEditorBottombar> {
 
   final _iconSize = 22.0;
 
-  late ValueNotifier<double> _sliderValue =
-      ValueNotifier(widget.tuneAdjustmentMatrix[widget.selectedIndex].value);
+  late final ValueNotifier<double> _sliderValue = ValueNotifier(
+    widget.tuneAdjustmentMatrix[widget.selectedIndex].value,
+  );
+
+  @override
+  void didUpdateWidget(covariant TuneEditorBottombar oldWidget) {
+    _sliderValue.value =
+        widget.tuneAdjustmentMatrix[widget.selectedIndex].value;
+    super.didUpdateWidget(oldWidget);
+  }
 
   @override
   Widget build(BuildContext context) {
