@@ -6,7 +6,18 @@ import '../controllers/main_editor_controllers.dart';
 import '../services/layer_interaction_manager.dart';
 import '../services/sizes_manager.dart';
 
+/// A widget that displays helper lines in the main editor to assist with
+/// alignment and positioning of elements.
 class MainEditorHelperLines extends StatelessWidget {
+  /// Creates a `MainEditorHelperLines` widget with the necessary managers,
+  /// controllers, and configurations.
+  ///
+  /// - [sizesManager]: Manages size-related settings and adjustments.
+  /// - [layerInteractionManager]: Handles interactions with editor layers.
+  /// - [controllers]: Manages the main editor's controllers.
+  /// - [interactiveViewer]: A key for managing the interactive viewer state.
+  /// - [helperLines]: Configurations for displaying helper lines.
+  /// - [configs]: Configuration settings for the editor.
   const MainEditorHelperLines({
     super.key,
     required this.sizesManager,
@@ -17,11 +28,22 @@ class MainEditorHelperLines extends StatelessWidget {
     required this.configs,
   });
 
+  /// Manages size-related settings and adjustments.
   final SizesManager sizesManager;
+
+  /// Handles interactions with editor layers.
   final LayerInteractionManager layerInteractionManager;
+
+  /// Manages the main editor's controllers.
   final MainEditorControllers controllers;
+
+  /// A key for managing the interactive viewer state.
   final GlobalKey<ExtendedInteractiveViewerState> interactiveViewer;
+
+  /// Configurations for displaying helper lines.
   final HelperLineConfigs helperLines;
+
+  /// Configuration settings for the editor.
   final ProImageEditorConfigs configs;
 
   final double _lineHeight = 1.25;

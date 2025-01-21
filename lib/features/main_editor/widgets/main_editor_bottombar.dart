@@ -7,7 +7,26 @@ import '/shared/widgets/flat_icon_text_button.dart';
 import '../controllers/main_editor_controllers.dart';
 import '../services/sizes_manager.dart';
 
+/// A widget representing the bottom bar for the main editor, providing access
+/// to various editing tools like paint, text, crop, filters, and more.
 class MainEditorBottombar extends StatelessWidget {
+  /// Creates a `MainEditorBottombar` with the provided configurations,
+  /// controllers,
+  /// and callbacks for opening different editor tools.
+  ///
+  /// - [controllers]: Manages the main editor's controllers.
+  /// - [configs]: Configuration settings for the editor.
+  /// - [sizesManager]: Handles size-related settings for the bottom bar.
+  /// - [bottomBarKey]: A unique key for managing the bottom bar widget's state.
+  /// - [theme]: The theme data for styling the bottom bar.
+  /// - [openPaintEditor]: Callback for opening the paint editor.
+  /// - [openTextEditor]: Callback for opening the text editor.
+  /// - [openCropRotateEditor]: Callback for opening the crop and rotate editor.
+  /// - [openTuneEditor]: Callback for opening the tuning editor.
+  /// - [openFilterEditor]: Callback for opening the filter editor.
+  /// - [openBlurEditor]: Callback for opening the blur editor.
+  /// - [openEmojiEditor]: Callback for opening the emoji editor.
+  /// - [openStickerEditor]: Callback for opening the sticker editor.
   const MainEditorBottombar({
     super.key,
     required this.controllers,
@@ -25,19 +44,43 @@ class MainEditorBottombar extends StatelessWidget {
     required this.openStickerEditor,
   });
 
+  /// Manages the main editor's controllers.
   final MainEditorControllers controllers;
+
+  /// Configuration settings for the editor.
   final ProImageEditorConfigs configs;
+
+  /// Handles size-related settings for the bottom bar.
   final SizesManager sizesManager;
+
+  /// A unique key for managing the bottom bar widget's state.
   final GlobalKey<State<StatefulWidget>> bottomBarKey;
+
+  /// The theme data for styling the bottom bar.
   final ThemeData theme;
 
+  /// Callback for opening the paint editor.
   final Function() openPaintEditor;
+
+  /// Callback for opening the text editor.
   final Function() openTextEditor;
+
+  /// Callback for opening the crop and rotate editor.
   final Function() openCropRotateEditor;
+
+  /// Callback for opening the tuning editor.
   final Function() openTuneEditor;
+
+  /// Callback for opening the filter editor.
   final Function() openFilterEditor;
+
+  /// Callback for opening the blur editor.
   final Function() openBlurEditor;
+
+  /// Callback for opening the emoji editor.
   final Function() openEmojiEditor;
+
+  /// Callback for opening the sticker editor.
   final Function() openStickerEditor;
 
   final double _bottomIconSize = 22.0;

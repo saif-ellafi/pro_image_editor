@@ -6,7 +6,20 @@ import '../controllers/main_editor_controllers.dart';
 import '../main_editor.dart';
 import '../services/layer_interaction_manager.dart';
 
+/// A widget that defines the area for removing layers in the main editor,
+/// facilitating interactions for deleting layers by dragging them into this
+/// area.
 class MainEditorRemoveLayerArea extends StatelessWidget {
+  /// Creates a `MainEditorRemoveLayerArea` widget with the necessary managers,
+  /// configurations, and state.
+  ///
+  /// - [state]: Represents the current state of the editor.
+  /// - [mainEditorConfigs]: Configuration settings for the main editor.
+  /// - [controllers]: Manages the main editor's controllers.
+  /// - [layerInteraction]: Configurations for layer interactions.
+  /// - [layerInteractionManager]: Handles layer interaction logic.
+  /// - [removeAreaKey]: Key for identifying and managing the remove area
+  ///   widget.
   const MainEditorRemoveLayerArea({
     super.key,
     required this.layerInteraction,
@@ -17,12 +30,23 @@ class MainEditorRemoveLayerArea extends StatelessWidget {
     required this.removeAreaKey,
   });
 
-  final LayerInteractionConfigs layerInteraction;
-  final LayerInteractionManager layerInteractionManager;
-  final MainEditorConfigs mainEditorConfigs;
-  final MainEditorControllers controllers;
-  final GlobalKey<State<StatefulWidget>> removeAreaKey;
+  /// Represents the current state of the editor.
   final ProImageEditorState state;
+
+  /// Configuration settings for the main editor.
+  final MainEditorConfigs mainEditorConfigs;
+
+  /// Manages the main editor's controllers.
+  final MainEditorControllers controllers;
+
+  /// Configurations for layer interactions.
+  final LayerInteractionConfigs layerInteraction;
+
+  /// Handles logic for interacting with layers.
+  final LayerInteractionManager layerInteractionManager;
+
+  /// Key for identifying and managing the remove area widget.
+  final GlobalKey<State<StatefulWidget>> removeAreaKey;
 
   @override
   Widget build(BuildContext context) {

@@ -17,7 +17,7 @@ import '../services/image_render_service.dart';
 import '../services/isolate_manager.dart';
 import '../services/thread_manager.dart';
 import '../services/web_worker/web_worker_manager_dummy.dart'
-    if (dart.library.js_interop) '../managers/web_worker/web_worker_manager.dart';
+    if (dart.library.js_interop) '../services/web_worker/web_worker_manager.dart';
 import '../utils/converters/convert_flutter_ui_to_image.dart';
 import '../utils/encoder/encode_image.dart';
 
@@ -354,15 +354,8 @@ class ContentRecorderController {
         /// Recapture the image if the output format is incorrect or the output
         /// size is too large.
         if (kIsWeb || isOutputSizeTooLarge) {
-          /// TODO: test
-          /// currently in the web flutter decode the image wrong so we need
-          /// to recapture it.
-          /// bytes = await _webWorkerManager.send(
-          ///   await _generateSendEncodeData(
-          ///     id: id,
-          ///     image: image,
-          ///   ),
-          /// );
+          /// Due to a known issue with image decoding in Flutter web, we need
+          /// to recapture the image to ensure accuracy.
           bytes = widget == null
               ? await _captureImageContent(
                   id: id,

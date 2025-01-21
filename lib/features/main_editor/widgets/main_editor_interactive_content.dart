@@ -14,7 +14,29 @@ import '../services/sizes_manager.dart';
 import '../services/state_manager.dart';
 import 'main_editor_font_preloader.dart';
 
+/// A widget representing the interactive content area of the main editor,
+/// including layers, helper lines, and editing interactions.
 class MainEditorInteractiveContent extends StatelessWidget {
+  /// Creates a `MainEditorInteractiveContent` widget with the provided
+  /// builders, managers, configurations, and callbacks.
+  ///
+  /// - [buildImage]: A builder function to create the image widget.
+  /// - [buildLayers]: A builder function to create the layer widgets.
+  /// - [buildHelperLines]: A builder function to create the helper lines
+  ///   widget.
+  /// - [buildRemoveIcon]: A builder function to create the remove icon widget.
+  /// - [stateManager]: Manages the state of the editor.
+  /// - [sizesManager]: Handles size-related settings and adjustments.
+  /// - [state]: Represents the current state of the editor.
+  /// - [configs]: Configuration settings for the editor.
+  /// - [callbacks]: Provides callbacks for editor interactions.
+  /// - [controllers]: Manages the main editor's controllers.
+  /// - [layerInteractionManager]: Handles interactions with editor layers.
+  /// - [rebuildController]: A stream controller for triggering UI rebuilds.
+  /// - [interactiveViewerKey]: A key for managing the interactive viewer state.
+  /// - [selectedLayerIndex]: The index of the currently selected layer.
+  /// - [processFinalImage]: Indicates whether the final image is being
+  ///   processed.
   const MainEditorInteractiveContent({
     super.key,
     required this.buildImage,
@@ -34,22 +56,50 @@ class MainEditorInteractiveContent extends StatelessWidget {
     required this.state,
   });
 
+  /// A builder function to create the image widget.
   final Widget Function() buildImage;
+
+  /// A builder function to create the layer widgets.
   final Widget Function() buildLayers;
+
+  /// A builder function to create the helper lines widget.
   final Widget Function() buildHelperLines;
+
+  /// A builder function to create the remove icon widget.
   final Widget Function() buildRemoveIcon;
 
-  final SizesManager sizesManager;
-  final ProImageEditorState state;
-  final ProImageEditorConfigs configs;
-  final ProImageEditorCallbacks callbacks;
-  final LayerInteractionManager layerInteractionManager;
-  final MainEditorControllers controllers;
-  final int selectedLayerIndex;
-  final bool processFinalImage;
-  final StreamController<void> rebuildController;
+  /// Manages the state of the editor.
   final StateManager stateManager;
+
+  /// Handles size-related settings and adjustments.
+  final SizesManager sizesManager;
+
+  /// Represents the current state of the editor.
+  final ProImageEditorState state;
+
+  /// Configuration settings for the editor.
+  final ProImageEditorConfigs configs;
+
+  /// Provides callbacks for editor interactions.
+  final ProImageEditorCallbacks callbacks;
+
+  /// Manages the main editor's controllers.
+  final MainEditorControllers controllers;
+
+  /// Handles interactions with editor layers.
+  final LayerInteractionManager layerInteractionManager;
+
+  /// A stream controller for triggering UI rebuilds.
+  final StreamController<void> rebuildController;
+
+  /// A key for managing the interactive viewer state.
   final GlobalKey<ExtendedInteractiveViewerState> interactiveViewerKey;
+
+  /// The index of the currently selected layer.
+  final int selectedLayerIndex;
+
+  /// Indicates whether the final image is being processed.
+  final bool processFinalImage;
 
   @override
   Widget build(BuildContext context) {

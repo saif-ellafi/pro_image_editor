@@ -8,7 +8,24 @@ import '/shared/widgets/flat_icon_text_button.dart';
 import '../models/tune_adjustment_matrix.dart';
 import '../tune_editor.dart';
 
+/// A bottom bar for the tune editor, providing UI for adjusting image
+/// properties like brightness, contrast, and other tunable parameters.
 class TuneEditorBottombar extends StatefulWidget {
+  /// Creates a `TuneEditorBottombar` with the provided configurations,
+  /// adjustment options, and callbacks for user interactions.
+  ///
+  /// - [tuneEditorConfigs]: Configuration settings for the tune editor.
+  /// - [tuneAdjustmentList]: A list of available tune adjustment items.
+  /// - [tuneAdjustmentMatrix]: A list of matrices representing applied
+  ///   adjustments.
+  /// - [selectedIndex]: The index of the currently selected adjustment item.
+  /// - [rebuildController]: A stream controller for triggering UI rebuilds.
+  /// - [bottomBarScrollCtrl]: Controls the scroll behavior of the bottom bar.
+  /// - [state]: Represents the current state of the tune editor.
+  /// - [onChangedStart]: Callback triggered at the start of an adjustment.
+  /// - [onChanged]: Callback triggered during adjustment changes.
+  /// - [onChangedEnd]: Callback triggered when an adjustment is completed.
+  /// - [onSelect]: Callback triggered when a tune adjustment item is selected.
   const TuneEditorBottombar({
     super.key,
     required this.tuneEditorConfigs,
@@ -24,6 +41,7 @@ class TuneEditorBottombar extends StatefulWidget {
     required this.selectedIndex,
   });
 
+  /// Configuration settings for the tune editor.
   final TuneEditorConfigs tuneEditorConfigs;
 
   /// A list of tune adjustment items available in the editor.
@@ -35,14 +53,25 @@ class TuneEditorBottombar extends StatefulWidget {
   /// The index of the currently selected tune adjustment item.
   final int selectedIndex;
 
+  /// A stream controller for triggering UI rebuilds.
   final StreamController<void> rebuildController;
+
+  /// Controls the scroll behavior of the bottom bar.
   final ScrollController bottomBarScrollCtrl;
 
+  /// Represents the current state of the tune editor.
   final TuneEditorState state;
 
+  /// Callback triggered at the start of an adjustment.
   final Function(double value) onChangedStart;
+
+  /// Callback triggered during adjustment changes.
   final Function(double value) onChanged;
+
+  /// Callback triggered when an adjustment is completed.
   final Function(double value) onChangedEnd;
+
+  /// Callback triggered when a tune adjustment item is selected.
   final Function(int index) onSelect;
 
   @override

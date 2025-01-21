@@ -4,7 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:pro_image_editor/core/models/editor_configs/pro_image_editor_configs.dart';
 import 'package:pro_image_editor/shared/widgets/flat_icon_text_button.dart';
 
+/// A widget representing the bottom bar for the crop editor, providing
+/// options like rotate, flip, aspect ratio, and reset.
 class CropEditorBottombar extends StatelessWidget {
+  /// Creates a `CropEditorBottombar` with the provided configurations and
+  /// callbacks.
+  ///
+  /// - [bottomBarScrollCtrl]: Controls the scroll behavior of the bottom bar.
+  /// - [i18n]: Provides localized strings for tooltips and labels.
+  /// - [configs]: Contains configurations for the crop and rotate editor.
+  /// - [theme]: Defines the theme to style the bottom bar.
+  /// - [onRotate]: Callback invoked when the rotate option is selected.
+  /// - [onFlip]: Callback invoked when the flip option is selected.
+  /// - [onOpenAspectRatioOptions]: Callback invoked when the aspect ratio
+  /// options are opened.
+  /// - [onReset]: Callback invoked when the reset option is selected.
   const CropEditorBottombar({
     super.key,
     required this.bottomBarScrollCtrl,
@@ -17,14 +31,28 @@ class CropEditorBottombar extends StatelessWidget {
     required this.onReset,
   });
 
+  /// Controls the scroll behavior of the bottom bar.
   final ScrollController bottomBarScrollCtrl;
+
+  /// Provides localized strings for tooltips and labels.
   final I18nCropRotateEditor i18n;
+
+  /// Configurations for the crop and rotate editor.
   final CropRotateEditorConfigs configs;
+
+  /// Theme data for styling the bottom bar.
   final ThemeData theme;
 
+  /// Callback for the rotate option.
   final Function() onRotate;
+
+  /// Callback for the flip option.
   final Function() onFlip;
+
+  /// Callback for opening the aspect ratio options.
   final Function() onOpenAspectRatioOptions;
+
+  /// Callback for resetting the editor.
   final Function() onReset;
 
   @override

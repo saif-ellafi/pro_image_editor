@@ -1634,7 +1634,7 @@ class ProImageEditorState extends State<ProImageEditor>
 
       if (!mounted) return;
 
-      _controllers.screenshot.capture(
+      await _controllers.screenshot.capture(
         imageInfos: _imageInfos!,
         screenshots: stateManager.screenshots,
       );

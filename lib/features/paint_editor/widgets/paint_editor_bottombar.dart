@@ -7,7 +7,21 @@ import '/features/paint_editor/enums/paint_editor_enum.dart';
 import '/shared/widgets/flat_icon_text_button.dart';
 import '../models/paint_bottom_bar_item.dart';
 
+/// A widget representing the bottom bar for the paint editor, providing
+/// options for selecting paint modes, enabling zoom, and other related actions.
 class PaintEditorBottombar extends StatelessWidget {
+  /// Creates a `PaintEditorBottombar` with the provided configurations,
+  /// modes, and callbacks for interactions.
+  ///
+  /// - [i18n]: Localization strings for tooltips and labels.
+  /// - [configs]: Configuration settings for the paint editor.
+  /// - [paintMode]: The current paint mode being used.
+  /// - [bottomBarScrollCtrl]: Controls the scroll behavior of the bottom bar.
+  /// - [theme]: Theme data for styling the bottom bar.
+  /// - [enableZoom]: Whether zoom functionality is enabled.
+  /// - [paintModes]: A list of available paint modes displayed in the bottom
+  ///   bar.
+  /// - [setMode]: Callback triggered when a new paint mode is selected.
   const PaintEditorBottombar({
     super.key,
     required this.configs,
@@ -20,13 +34,28 @@ class PaintEditorBottombar extends StatelessWidget {
     required this.bottomBarScrollCtrl,
   });
 
-  final PaintEditorConfigs configs;
-  final PaintMode paintMode;
+  /// Localization strings for tooltips and labels.
   final I18nPaintEditor i18n;
-  final ThemeData theme;
-  final bool enableZoom;
-  final List<PaintModeBottomBarItem> paintModes;
+
+  /// Configuration settings for the paint editor.
+  final PaintEditorConfigs configs;
+
+  /// The current paint mode being used.
+  final PaintMode paintMode;
+
+  /// Controls the scroll behavior of the bottom bar.
   final ScrollController bottomBarScrollCtrl;
+
+  /// Theme data for styling the bottom bar.
+  final ThemeData theme;
+
+  /// Whether zoom functionality is enabled.
+  final bool enableZoom;
+
+  /// A list of available paint modes displayed in the bottom bar.
+  final List<PaintModeBottomBarItem> paintModes;
+
+  /// Callback triggered when a new paint mode is selected.
   final Function(PaintMode mode) setMode;
 
   @override

@@ -5,7 +5,23 @@ import '/core/models/editor_configs/text_editor_configs.dart';
 import '/core/models/i18n/i18n_text_editor.dart';
 import '/shared/widgets/platform/platform_popup_menu.dart';
 
+/// A custom AppBar for the text editor, providing options for text alignment,
+/// background mode, and font scaling.
 class TextEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
+  /// Creates a `TextEditorAppBar` with the provided configurations, design
+  /// mode, and callbacks for user interactions.
+  ///
+  /// - [textEditorConfigs]: Configuration settings for the text editor's
+  /// appearance.
+  /// - [i18n]: Localization strings for tooltips and labels.
+  /// - [align]: The current text alignment.
+  /// - [designMode]: Indicates the current design mode of the editor.
+  /// - [constraints]: Box constraints for responsive layout adjustments.
+  /// - [onClose]: Callback triggered when the editor is closed.
+  /// - [onDone]: Callback triggered when editing is completed.
+  /// - [onToggleTextAlign]: Callback triggered to toggle the text alignment.
+  /// - [onOpenFontScaleBottomSheet]: Callback to open the font scaling options.
+  /// - [onToggleBackgroundMode]: Callback triggered to toggle background mode.
   const TextEditorAppBar({
     super.key,
     required this.textEditorConfigs,
@@ -19,16 +35,35 @@ class TextEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.designMode,
     required this.constraints,
   });
+
+  /// Configuration settings for the text editor's appearance.
   final TextEditorConfigs textEditorConfigs;
+
+  /// Localization strings for tooltips and labels.
   final I18nTextEditor i18n;
+
+  /// The current text alignment.
   final TextAlign align;
+
+  /// Indicates the current design mode of the editor.
   final ImageEditorDesignMode designMode;
+
+  /// Box constraints for responsive layout adjustments.
   final BoxConstraints constraints;
 
+  /// Callback triggered when the editor is closed.
   final Function() onClose;
+
+  /// Callback triggered when editing is completed.
   final Function() onDone;
+
+  /// Callback triggered to toggle the text alignment.
   final Function() onToggleTextAlign;
+
+  /// Callback to open the font scaling options.
   final Function() onOpenFontScaleBottomSheet;
+
+  /// Callback triggered to toggle background mode.
   final Function() onToggleBackgroundMode;
 
   @override

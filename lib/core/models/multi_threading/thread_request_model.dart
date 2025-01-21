@@ -39,6 +39,17 @@ class ThreadRequest {
     this.generateOnlyImageBounds,
   });
 
+  /// Creates a [ThreadRequest] instance from the provided configurations.
+  ///
+  /// The [id] parameter is a unique identifier for the thread request.
+  ///
+  /// The [image] parameter is the image to be processed.
+  ///
+  /// The [configs] parameter contains the configuration settings for image
+  /// generation.
+  ///
+  /// Returns a [ThreadRequest] object initialized with the provided
+  /// configurations.
   factory ThreadRequest.fromConfigs({
     required String id,
     required img.Image image,

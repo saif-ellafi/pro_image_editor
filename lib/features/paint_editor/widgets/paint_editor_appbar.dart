@@ -3,7 +3,31 @@ import 'package:flutter/material.dart';
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
 import '/shared/widgets/platform/platform_popup_menu.dart';
 
+/// A custom AppBar for the paint editor, providing controls for undo, redo,
+/// toggling fill mode, and accessing additional settings like opacity and
+/// line weight.
 class PaintEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
+  /// Creates a `PaintEditorAppBar` with the provided configurations,
+  /// constraints, and callbacks for various actions.
+  ///
+  /// - [paintEditorConfigs]: Configuration settings for the paint editor's
+  ///   appearance.
+  /// - [i18n]: Localization strings for tooltips and labels.
+  /// - [constraints]: Box constraints for responsive layout adjustments.
+  /// - [designMode]: Indicates the current design mode of the editor.
+  /// - [canUndo]: Whether undo action is currently available.
+  /// - [canRedo]: Whether redo action is currently available.
+  /// - [isFillMode]: Whether fill mode is currently enabled.
+  /// - [onTapMenuFill]: Callback triggered when the fill menu is tapped.
+  /// - [onUndo]: Callback triggered for undoing the last action.
+  /// - [onRedo]: Callback triggered for redoing the last undone action.
+  /// - [onToggleFill]: Callback triggered for toggling fill mode.
+  /// - [onDone]: Callback triggered for completing the paint editing session.
+  /// - [onClose]: Callback triggered for closing the paint editor.
+  /// - [onOpenOpacityBottomSheet]: Callback triggered to open the opacity
+  ///   settings.
+  /// - [onOpenLineWeightBottomSheet]: Callback triggered to open the line
+  ///   weight settings.
   const PaintEditorAppBar({
     super.key,
     required this.paintEditorConfigs,
@@ -22,22 +46,50 @@ class PaintEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.isFillMode,
     required this.designMode,
   });
+
+  /// Configuration settings for the paint editor's appearance.
   final PaintEditorConfigs paintEditorConfigs;
+
+  /// Localization strings for tooltips and labels.
   final I18nPaintEditor i18n;
+
+  /// Box constraints for responsive layout adjustments.
   final BoxConstraints constraints;
+
+  /// Indicates the current design mode of the editor.
   final ImageEditorDesignMode designMode;
 
+  /// Whether undo action is currently available.
   final bool canUndo;
+
+  /// Whether redo action is currently available.
   final bool canRedo;
+
+  /// Whether fill mode is currently enabled.
   final bool isFillMode;
 
+  /// Callback triggered when the fill menu is tapped.
   final Function() onTapMenuFill;
+
+  /// Callback triggered for undoing the last action.
   final Function() onUndo;
+
+  /// Callback triggered for redoing the last undone action.
   final Function() onRedo;
+
+  /// Callback triggered for toggling fill mode.
   final Function() onToggleFill;
+
+  /// Callback triggered for completing the paint editing session.
   final Function() onDone;
+
+  /// Callback triggered for closing the paint editor.
   final Function() onClose;
+
+  /// Callback triggered to open the opacity settings.
   final Function() onOpenOpacityBottomSheet;
+
+  /// Callback triggered to open the line weight settings.
   final Function() onOpenLineWeightBottomSheet;
 
   @override

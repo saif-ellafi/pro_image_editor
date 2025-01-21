@@ -16,7 +16,18 @@ import '../controllers/main_editor_controllers.dart';
 import 'sizes_manager.dart';
 import 'state_manager.dart';
 
+/// A service to manage the state history of the main editor, including
+/// screenshots and size configurations.
 class MainEditorStateHistoryService {
+  /// Creates a `MainEditorStateHistoryService` with the provided configurations
+  /// and dependencies.
+  ///
+  /// - [configs]: Configuration settings for the main editor.
+  /// - [takeScreenshot]: Callback for capturing a screenshot of the editor.
+  /// - [sizesManager]: Manages size-related settings and adjustments.
+  /// - [stateManager]: Handles state changes and history management.
+  /// - [controllers]: Contains the controllers for managing editor behaviors.
+  /// - [mainEditorCallbacks]: Optional callbacks for additional editor actions.
   MainEditorStateHistoryService({
     required this.configs,
     required this.takeScreenshot,
@@ -25,12 +36,23 @@ class MainEditorStateHistoryService {
     required this.controllers,
     required this.mainEditorCallbacks,
   });
+
+  /// Manages size-related settings and adjustments.
   final SizesManager sizesManager;
+
+  /// Handles state changes and history management.
   final StateManager stateManager;
+
+  /// Contains the controllers for managing editor behaviors.
   final MainEditorControllers controllers;
+
+  /// Configuration settings for the main editor.
   final ProImageEditorConfigs configs;
+
+  /// Optional callbacks for additional editor actions.
   final MainEditorCallbacks? mainEditorCallbacks;
 
+  /// Callback for capturing a screenshot of the editor.
   final Function() takeScreenshot;
 
   /// Imports state history and performs necessary recalculations.

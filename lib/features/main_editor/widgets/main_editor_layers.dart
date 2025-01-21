@@ -12,7 +12,29 @@ import '/shared/widgets/extended/extended_mouse_cursor.dart';
 import '/shared/widgets/layer/layer_widget.dart';
 import '../main_editor.dart';
 
+/// A widget that manages and displays layers in the main editor, handling
+/// interactions, configurations, and callbacks for user actions.
 class MainEditorLayers extends StatelessWidget {
+  /// Creates a `MainEditorLayers` widget with the necessary configurations,
+  /// managers, and callbacks.
+  ///
+  /// - [state]: Represents the current state of the editor.
+  /// - [configs]: Configuration settings for the editor.
+  /// - [callbacks]: Provides callbacks for editor interactions.
+  /// - [sizesManager]: Manages size-related settings and adjustments.
+  /// - [controllers]: Manages the main editor's controllers.
+  /// - [layerInteraction]: Configurations for layer interactions.
+  /// - [layerInteractionManager]: Handles interactions with editor layers.
+  /// - [mouseCursorsKey]: Key for managing mouse cursor regions.
+  /// - [activeLayers]: List of active layers in the editor.
+  /// - [selectedLayerIndex]: The index of the currently selected layer.
+  /// - [isSubEditorOpen]: Indicates whether a sub-editor is currently open.
+  /// - [checkInteractiveViewer]: Callback to check the state of the
+  ///   interactive viewer.
+  /// - [onTextLayerTap]: Callback triggered when a text layer is tapped.
+  /// - [setTempLayer]: Callback to temporarily set a layer for interaction.
+  /// - [onContextMenuToggled]: Callback triggered when the context menu is
+  ///   toggled.
   const MainEditorLayers({
     super.key,
     required this.controllers,
@@ -32,20 +54,49 @@ class MainEditorLayers extends StatelessWidget {
     required this.onContextMenuToggled,
   });
 
-  final MainEditorControllers controllers;
-  final LayerInteractionConfigs layerInteraction;
-  final LayerInteractionManager layerInteractionManager;
-  final ProImageEditorConfigs configs;
-  final ProImageEditorCallbacks callbacks;
-  final SizesManager sizesManager;
-  final GlobalKey<ExtendedMouseRegionState> mouseCursorsKey;
-  final int selectedLayerIndex;
-  final List<Layer> activeLayers;
-  final bool isSubEditorOpen;
+  /// Represents the current state of the editor.
   final ProImageEditorState state;
+
+  /// Configuration settings for the editor.
+  final ProImageEditorConfigs configs;
+
+  /// Provides callbacks for editor interactions.
+  final ProImageEditorCallbacks callbacks;
+
+  /// Manages size-related settings and adjustments.
+  final SizesManager sizesManager;
+
+  /// Manages the main editor's controllers.
+  final MainEditorControllers controllers;
+
+  /// Configurations for layer interactions.
+  final LayerInteractionConfigs layerInteraction;
+
+  /// Handles interactions with editor layers.
+  final LayerInteractionManager layerInteractionManager;
+
+  /// Key for managing mouse cursor regions.
+  final GlobalKey<ExtendedMouseRegionState> mouseCursorsKey;
+
+  /// List of active layers in the editor.
+  final List<Layer> activeLayers;
+
+  /// The index of the currently selected layer.
+  final int selectedLayerIndex;
+
+  /// Indicates whether a sub-editor is currently open.
+  final bool isSubEditorOpen;
+
+  /// Callback to check the state of the interactive viewer.
   final Function() checkInteractiveViewer;
+
+  /// Callback triggered when a text layer is tapped.
   final Function(TextLayer layer) onTextLayerTap;
+
+  /// Callback to temporarily set a layer for interaction.
   final Function(Layer layer) setTempLayer;
+
+  /// Callback triggered when the context menu is toggled.
   final Function(bool isOpen)? onContextMenuToggled;
 
   // Helper methods for handling layer interactions

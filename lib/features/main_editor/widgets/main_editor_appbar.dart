@@ -4,7 +4,20 @@ import '/core/models/editor_configs/pro_image_editor_configs.dart';
 import '/shared/widgets/platform/platform_circular_progress_indicator.dart';
 import '../services/state_manager.dart';
 
+/// A custom AppBar for the main editor, providing actions for closing,
+/// undoing, redoing, and completing editing tasks.
 class MainEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
+  /// Creates a `MainEditorAppBar` with the given configurations and actions.
+  ///
+  /// - [i18n]: Localization for tooltips and labels.
+  /// - [configs]: Configuration settings for the editor.
+  /// - [closeEditor]: Callback for closing the editor.
+  /// - [undoAction]: Callback for undoing the last action.
+  /// - [redoAction]: Callback for redoing the last undone action.
+  /// - [doneEditing]: Callback for applying changes and completing editing.
+  /// - [isInitialized]: Indicates whether the editor has been fully
+  /// initialized.
+  /// - [stateManager]: Manages the editor's state.
   const MainEditorAppBar({
     super.key,
     required this.i18n,
@@ -17,17 +30,35 @@ class MainEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.stateManager,
   });
 
-  final bool isInitialized;
+  /// Localization for tooltips and labels.
   final I18n i18n;
-  final ProImageEditorConfigs configs;
-  final Function() closeEditor;
-  final Function() undoAction;
-  final Function() redoAction;
-  final Function() doneEditing;
 
-  Color get foregroundColor => mainEditorConfigs.style.appBarColor;
-  MainEditorConfigs get mainEditorConfigs => configs.mainEditor;
+  /// Configuration settings for the editor.
+  final ProImageEditorConfigs configs;
+
+  /// Manages the editor's state.
   final StateManager stateManager;
+
+  /// Retrieves the main editor's specific configurations.
+  MainEditorConfigs get mainEditorConfigs => configs.mainEditor;
+
+  /// Determines the foreground color for the AppBar.
+  Color get foregroundColor => mainEditorConfigs.style.appBarColor;
+
+  /// Indicates whether the editor has been fully initialized.
+  final bool isInitialized;
+
+  /// Callback for closing the editor.
+  final Function() closeEditor;
+
+  /// Callback for undoing the last action.
+  final Function() undoAction;
+
+  /// Callback for redoing the last undone action.
+  final Function() redoAction;
+
+  /// Callback for applying changes and completing editing.
+  final Function() doneEditing;
 
   @override
   Widget build(BuildContext context) {

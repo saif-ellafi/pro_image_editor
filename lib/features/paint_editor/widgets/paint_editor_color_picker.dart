@@ -7,7 +7,17 @@ import '/core/models/editor_configs/pro_image_editor_configs.dart';
 import '/shared/widgets/color_picker/bar_color_picker.dart';
 import '../paint_editor.dart';
 
+/// A widget for selecting colors in the paint editor, allowing users to
+/// customize their brush or fill colors.
 class PaintEditorColorPicker extends StatelessWidget {
+  /// Creates a `PaintEditorColorPicker` with the provided state,
+  /// configurations, and a controller for triggering UI rebuilds.
+  ///
+  /// - [state]: Represents the current state of the paint editor.
+  /// - [configs]: Configuration settings for the paint editor, including
+  ///   available colors and styles.
+  /// - [rebuildController]: A stream controller for triggering UI updates
+  ///   when the color picker state changes.
   const PaintEditorColorPicker({
     super.key,
     required this.state,
@@ -15,8 +25,14 @@ class PaintEditorColorPicker extends StatelessWidget {
     required this.rebuildController,
   });
 
+  /// Represents the current state of the paint editor.
   final PaintEditorState state;
+
+  /// Configuration settings for the paint editor, including available colors.
   final ProImageEditorConfigs configs;
+
+  /// A stream controller for triggering UI updates when the color picker
+  /// changes.
   final StreamController<void> rebuildController;
 
   @override
