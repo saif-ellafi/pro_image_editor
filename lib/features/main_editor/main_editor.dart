@@ -382,9 +382,7 @@ class ProImageEditorState extends State<ProImageEditor>
   void initState() {
     super.initState();
     _rebuildController = StreamController.broadcast();
-    _controllers = MainEditorControllers(configs);
-    _controllers.screenshot.generateOnlyThumbnail =
-        callbacks.onThumbnailGenerated != null;
+    _controllers = MainEditorControllers(configs, callbacks);
     _desktopInteractionManager = DesktopInteractionManager(
       configs: configs,
       context: context,
@@ -1636,7 +1634,7 @@ class ProImageEditorState extends State<ProImageEditor>
 
       if (!mounted) return;
 
-      _controllers.screenshot.captureImage(
+      _controllers.screenshot.capture(
         imageInfos: _imageInfos!,
         screenshots: stateManager.screenshots,
       );
@@ -1692,7 +1690,8 @@ class ProImageEditorState extends State<ProImageEditor>
 
         final results = await Future.wait([
           captureEditorImage(),
-          _controllers.screenshot.getOriginalImage(imageInfos: _imageInfos!),
+          _controllers.screenshot.getRawRenderedImage(
+              imageInfos: _imageInfos!, useThumbnailSize: false),
         ]);
 
         await callbacks.onThumbnailGenerated!(

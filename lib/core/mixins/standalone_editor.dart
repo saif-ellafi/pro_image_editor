@@ -213,7 +213,7 @@ mixin StandaloneEditorState<T extends StatefulWidget,
     screenshotHistory.removeRange(
         screenshotHistoryPosition, screenshotHistory.length);
     screenshotHistoryPosition++;
-    screenshotCtrl.captureImage(
+    screenshotCtrl.capture(
       imageInfos: imageInfos!,
       screenshots: screenshotHistory,
     );
@@ -223,7 +223,9 @@ mixin StandaloneEditorState<T extends StatefulWidget,
   @mustCallSuper
   void initState() {
     screenshotCtrl = ContentRecorderController(
-        configs: configs, ignoreGeneration: !initConfigs.convertToUint8List);
+      configs: configs.imageGeneration,
+      ignoreGeneration: !initConfigs.convertToUint8List,
+    );
     rebuildController = StreamController.broadcast();
     super.initState();
   }

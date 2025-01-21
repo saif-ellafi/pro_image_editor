@@ -7,7 +7,8 @@ import 'package:image/image.dart' as img;
 
 // Project imports:
 import '/core/models/editor_configs/image_generation_configs/output_formats.dart';
-import 'encoder/jpeg_encoder.dart';
+import '/core/models/multi_threading/thread_request_model.dart';
+import 'jpeg_encoder.dart';
 
 /// Encodes an image into the specified format and returns the encoded data.
 ///
@@ -88,4 +89,29 @@ Future<Uint8List> encodeImage({
       break;
   }
   return bytes;
+}
+
+/// Encodes an image based on the provided [ThreadRequest].
+///
+/// This function takes a [ThreadRequest] object and uses its properties to
+/// encode the image accordingly. The encoding process can handle different
+/// output formats, JPEG quality and chroma settings, and PNG filter and level
+/// settings.
+///
+/// Parameters:
+/// - [threadRequest]: The request object containing the image and encoding
+///   settings.
+///
+/// Returns:
+/// - A [Future] that completes with the encoded image as a [Uint8List].
+Future<Uint8List> encodeImageFromThreadRequest(ThreadRequest threadRequest) {
+  return encodeImage(
+    image: threadRequest.image,
+    outputFormat: threadRequest.outputFormat,
+    singleFrame: threadRequest.singleFrame,
+    jpegQuality: threadRequest.jpegQuality,
+    jpegChroma: threadRequest.jpegChroma,
+    pngFilter: threadRequest.pngFilter,
+    pngLevel: threadRequest.pngLevel,
+  );
 }

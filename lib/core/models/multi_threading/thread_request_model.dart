@@ -1,8 +1,7 @@
 // Package imports:
 import 'package:image/image.dart' as img;
-import 'package:image/image.dart' show JpegChroma, PngFilter;
 
-import '../editor_configs/image_generation_configs/output_formats.dart';
+import '../editor_configs/image_generation_configs/image_generation_configs.dart';
 
 /// Represents an image object sent from the main thread.
 class ImageConvertThreadRequest extends ThreadRequest {
@@ -39,6 +38,23 @@ class ThreadRequest {
     required this.jpegChroma,
     this.generateOnlyImageBounds,
   });
+
+  factory ThreadRequest.fromConfigs({
+    required String id,
+    required img.Image image,
+    required ImageGenerationConfigs configs,
+  }) {
+    return ThreadRequest(
+      id: id,
+      image: image,
+      outputFormat: configs.outputFormat,
+      singleFrame: configs.singleFrame,
+      jpegQuality: configs.jpegQuality,
+      jpegChroma: configs.jpegChroma,
+      pngFilter: configs.pngFilter,
+      pngLevel: configs.pngLevel,
+    );
+  }
 
   /// The unique identifier for this task.
   final String id;

@@ -8,7 +8,7 @@ import 'package:image/image.dart' as img;
 // Project imports:
 import '/core/models/multi_threading/thread_request_model.dart';
 import '/core/models/multi_threading/thread_response_model.dart';
-import 'encode_image.dart';
+import '../encoder/encode_image.dart';
 
 /// Converts an image to PNG format and finds the bounding box of
 /// non-transparent areas.

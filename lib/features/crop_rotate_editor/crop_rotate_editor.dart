@@ -805,7 +805,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
               ? initialTransformConfigs!
               : activeHistory;
 
-      screenshotCtrl.captureImage(
+      screenshotCtrl.capture(
         imageInfos: imageInfos!,
         screenshots: screenshotHistory,
         targetSize: _rotated90deg

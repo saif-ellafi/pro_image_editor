@@ -9,15 +9,28 @@ import 'package:flutter/foundation.dart';
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
 import '/core/models/multi_threading/thread_request_model.dart';
 import '/core/models/multi_threading/thread_task_model.dart';
-import '/shared/services/content_recorder/managers/threads/thread.dart';
+import '../models/thread.dart';
 
 /// Manages multiple threads for background operations.
 ///
 /// This abstract class defines the contract for managing and interacting
 /// with threads, including starting, stopping, and communicating with them.
-abstract class ThreadManager {
+abstract class ThreadManager<T extends Thread> {
+  /// Constructs a `ThreadManager` instance with the specified configuration and
+  /// initializes the threading environment.
+  ThreadManager(this.configs) {
+    initialize();
+  }
+
   /// List of threads.
-  List<Thread> get threads;
+  final List<T> threads = [];
+
+  /// Configuration settings for image generation and processing.
+  ///
+  /// This includes parameters like output format, compression quality, and
+  /// other options that dictate how images should be processed and converted.
+  @protected
+  final ImageGenerationConfigs configs;
 
   /// List of active tasks.
   @protected
@@ -25,17 +38,23 @@ abstract class ThreadManager {
 
   /// Configuration settings for the image processing.
   @protected
-  late final ProcessorConfigs processorConfigs;
+  ProcessorConfigs get processorConfigs => configs.processorConfigs;
 
   /// Flag indicating if the manager has been destroyed.
   @protected
   bool isDestroyed = false;
 
-  /// Initializes the thread manager with the provided configuration settings.
+  /// A getter that returns whether the current platform supports multi
+  /// threading.
+  bool get isSupported => true;
+
+  /// Initializes the thread manager. This method should be overridden by
+  /// subclasses to provide specific initialization logic.
   ///
-  /// [configs] - The configuration settings for the image editor.
+  /// This method is protected and should not be called directly from outside
+  /// the class.
   @protected
-  void init(ProImageEditorConfigs configs);
+  void initialize();
 
   /// Destroys the thread manager and all associated threads.
   ///

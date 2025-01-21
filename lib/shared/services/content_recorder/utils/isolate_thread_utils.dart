@@ -5,8 +5,8 @@ import 'dart:isolate';
 // Project imports:
 import '/core/models/multi_threading/thread_request_model.dart';
 import '/core/models/multi_threading/thread_response_model.dart';
-import '/shared/services/content_recorder/utils/convert_raw_image.dart';
-import '/shared/services/content_recorder/utils/encode_image.dart';
+import 'converters/convert_raw_image.dart';
+import 'encoder/encode_image.dart';
 
 /// The isolated function to handle image conversion in a separate thread.
 ///

@@ -1,18 +1,15 @@
-// ignore_for_file: avoid_web_libraries_in_flutter
-
 // Dart imports:
 import 'dart:async';
 import 'dart:js_interop' as js;
 
 import 'package:flutter/foundation.dart';
-// ignore: depend_on_referenced_packages
 import 'package:web/web.dart' as web;
 
 import '/core/constants/editor_web_constants.dart';
 import '/core/models/multi_threading/thread_request_model.dart';
 import '/core/models/multi_threading/thread_response_model.dart';
-import '../threads/thread.dart';
-import 'web_utils.dart';
+import '../utils/web_worker_utils.dart';
+import 'thread.dart';
 
 /// A class representing a web worker thread.
 ///
@@ -40,7 +37,7 @@ class WebWorkerThread extends Thread {
       worker = web.Worker(
         kImageEditorWebWorkerPath.toJS,
         web.WorkerOptions(
-          name: 'PIE-Thread-$coreNumber',
+          name: '$debugThreadName-$coreNumber',
         ),
       );
 

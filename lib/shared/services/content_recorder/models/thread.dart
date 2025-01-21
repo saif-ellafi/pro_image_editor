@@ -25,6 +25,12 @@ abstract class Thread {
     init();
   }
 
+  /// The name of the debug thread used in the Pro Image Editor plugin.
+  ///
+  /// This is a constant string that identifies the thread for debugging
+  /// purposes.
+  final String debugThreadName = 'PIE-Thread';
+
   /// A unique id for this thread.
   late String id;
 

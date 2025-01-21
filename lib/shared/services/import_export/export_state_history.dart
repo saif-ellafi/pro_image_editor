@@ -268,9 +268,9 @@ class ExportStateHistory {
                   MediaQuery.of(context).size.width *
                   imageWidth);
 
-          Uint8List? result = await contentRecorderCtrl.captureFromWidget(
-            layer.widget,
-            format: OutputFormat.png,
+          Uint8List? result = await contentRecorderCtrl.capture(
+            widget: layer.widget,
+            outputFormat: OutputFormat.png,
             imageInfos: imageInfos,
             targetSize: targetSize,
           );

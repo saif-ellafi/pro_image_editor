@@ -16,8 +16,12 @@ class ExportEditorConfigs {
     this.exportTuneAdjustments = true,
     this.exportEmoji = true,
     this.exportBlur = true,
-    this.exportSticker,
+    @Deprecated('Use exportWidgets instead') this.exportSticker,
     this.exportWidgets = true,
+    @Deprecated(
+      'The parameter is no longer used. Instead, add `exportConfigs` to the '
+      '`WidgetLayer`',
+    )
     this.serializeSticker = true,
     this.enableMinify = true,
   });
