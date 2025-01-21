@@ -15,6 +15,7 @@ import '/shared/utils/unique_id_generator.dart';
 import '../services/image_converter_service.dart';
 import '../services/image_render_service.dart';
 import '../services/isolate_manager.dart';
+import '../services/thread_fallback_manager.dart';
 import '../services/thread_manager.dart';
 import '../services/web_worker/web_worker_manager_dummy.dart'
     if (dart.library.js_interop) '../services/web_worker/web_worker_manager.dart';
@@ -35,7 +36,7 @@ class ContentRecorderController {
     recorderKey = GlobalKey();
     recorderStream = StreamController();
 
-    if (!ignoreGeneration) _initializeMultiThreading();
+    _initializeMultiThreading(ignoreGeneration);
   }
 
   /// A flag indicating whether thumbnail generation is enabled.
@@ -66,8 +67,10 @@ class ContentRecorderController {
   Completer<bool> recordReadyHelper = Completer();
 
   /// Sets up the multi-threading environment, using isolates or web workers.
-  void _initializeMultiThreading() async {
-    if (!kIsWeb) {
+  void _initializeMultiThreading(bool ignoreGeneration) async {
+    if (ignoreGeneration) {
+      _threadManager = ThreadFallbackManager(_configs);
+    } else if (!kIsWeb) {
       _threadManager = IsolateManager(_configs);
     } else {
       _threadManager = WebWorkerManager(_configs);
