@@ -2,8 +2,8 @@ import 'package:pro_image_editor/shared/services/content_recorder/services/threa
 
 /// Fallback manager for ThreadManager if multithreading isn't required.
 class ThreadFallbackManager extends ThreadManager {
-  /// Constructs a `ThreadFallbackManager` instance with the specified configuration and
-  /// initializes the threading environment.
+  /// Constructs a `ThreadFallbackManager` instance with the specified
+  /// configuration and initializes the threading environment.
   ThreadFallbackManager(super.configs);
 
   @override
