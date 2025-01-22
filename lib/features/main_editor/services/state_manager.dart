@@ -1,9 +1,9 @@
-import '/core/models/crop_rotate_editor/transform_factors.dart';
 import '/core/models/history/state_history.dart';
+import '/core/models/layers/layer.dart';
 import '/core/models/multi_threading/thread_capture_model.dart';
-import '/core/models/tune_editor/tune_adjustment_matrix.dart';
-import '../../../core/models/layers/layer.dart';
-import '../../filter_editor/types/filter_matrix.dart';
+import '/features/crop_rotate_editor/models/transform_factors.dart';
+import '/features/filter_editor/types/filter_matrix.dart';
+import '/features/tune_editor/models/tune_adjustment_matrix.dart';
 
 /// A class for managing the state and history of image editing changes.
 class StateManager {

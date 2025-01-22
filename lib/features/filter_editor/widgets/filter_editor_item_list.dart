@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
 import '/core/models/editor_image.dart';
-import '/core/models/tune_editor/tune_adjustment_matrix.dart';
+import '/features/tune_editor/models/tune_adjustment_matrix.dart';
 import '/shared/widgets/animated/fade_in_up.dart';
 import '../types/filter_matrix.dart';
 import '../utils/filter_generator/filter_model.dart';

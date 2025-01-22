@@ -2,7 +2,7 @@
 import 'dart:ui';
 
 // Project imports:
-import '../../../core/models/layers/layer.dart';
+import '/core/models/layers/layer.dart';
 
 /// A class responsible for managing layers in an image editing environment.
 ///

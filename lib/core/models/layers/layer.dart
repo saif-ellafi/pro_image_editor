@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:pro_image_editor/shared/services/import_export/utils/key_minifier.dart';
 
 import '/shared/services/import_export/types/widget_loader.dart';
-import '../../utils/parser/double_parser.dart';
-import '../../utils/unique_id_generator.dart';
+import '/shared/utils/parser/double_parser.dart';
+import '/shared/utils/unique_id_generator.dart';
 import '../editor_image.dart';
 import 'emoji_layer.dart';
 import 'paint_layer.dart';

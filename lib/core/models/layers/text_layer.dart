@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 import '/shared/extensions/color_extension.dart';
-import '../../utils/parser/double_parser.dart';
-import '../../utils/parser/int_parser.dart';
+import '/shared/utils/parser/double_parser.dart';
+import '/shared/utils/parser/int_parser.dart';
 import 'enums/layer_background_mode.dart';
 import 'layer.dart';
 
@@ -116,7 +116,13 @@ class TextLayer extends Layer {
       scale: layer.scale,
       text: map[keyConverter('text')] ?? '-',
       fontScale: map[keyConverter('fontScale')] ?? 1.0,
-      textStyle: map[keyConverter('fontFamily')] != null
+      textStyle: fontFamily != null ||
+              wordSpacing != null ||
+              height != null ||
+              letterSpacing != null ||
+              fontWeight != null ||
+              fontStyle != null ||
+              decoration != null
           ? TextStyle(
               fontFamily: fontFamily,
               height: height,

@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import '/shared/services/content_recorder/controllers/content_recorder_controller.dart';
+import '../controllers/content_recorder_controller.dart';
 
 /// A widget that records an invisible child widget.
 class RecordInvisibleWidget extends StatefulWidget {

@@ -7,8 +7,8 @@ import '/core/mixins/converted_configs.dart';
 import '/core/mixins/editor_configs_mixin.dart';
 import '/core/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
+import '/core/models/layers/layer.dart';
 import '/plugins/defer_pointer/defer_pointer.dart';
-import '../../../../core/models/layers/layer.dart';
 import 'layer_interaction_border_painter.dart';
 import 'layer_interaction_button.dart';
 

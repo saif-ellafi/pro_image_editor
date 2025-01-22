@@ -9,8 +9,8 @@ import 'package:flutter/widgets.dart';
 
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
 import '/core/models/history/state_history.dart';
-import '/core/utils/decode_image.dart';
-import '../../../core/models/layers/layer.dart';
+import '/core/models/layers/layer.dart';
+import '../../utils/decode_image.dart';
 import '../content_recorder/controllers/content_recorder_controller.dart';
 import 'constants/export_import_version.dart';
 import 'enums/export_import_enum.dart';
@@ -268,9 +268,9 @@ class ExportStateHistory {
                   MediaQuery.of(context).size.width *
                   imageWidth);
 
-          Uint8List? result = await contentRecorderCtrl.captureFromWidget(
-            layer.widget,
-            format: OutputFormat.png,
+          Uint8List? result = await contentRecorderCtrl.capture(
+            widget: layer.widget,
+            outputFormat: OutputFormat.png,
             imageInfos: imageInfos,
             targetSize: targetSize,
           );

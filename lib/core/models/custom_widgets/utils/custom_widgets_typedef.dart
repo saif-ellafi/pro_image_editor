@@ -2,7 +2,7 @@
 import 'package:flutter/widgets.dart';
 
 import '/features/main_editor/main_editor.dart';
-import '/shared/widgets/custom_widgets/reactive_custom_widget.dart';
+import '/shared/widgets/reactive_widgets/reactive_custom_widget.dart';
 
 /// {@template removeLayerArea}
 /// A function that returns a [Widget] used as a remove area in the
