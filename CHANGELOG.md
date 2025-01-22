@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.6.5
+- **CHORE**(dependencies): Update `emoji_picker_flutter` to `4.3.0`, `vibration` to `3.0.0` and `http` to `1.3.0`.
+
 ## 7.6.4
 - **CHORE**(vibration): Updated the `vibration` package to version `2.1.0`.
 - **FIX**(vibration): Resolved lint issues introduced by the package update.
