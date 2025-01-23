@@ -831,6 +831,12 @@ class ProImageEditorState extends State<ProImageEditor>
     });
   }
 
+  /// Resets the zoom and pan of the image editor.
+  void resetZoom() {
+    _interactiveViewer.currentState?.reset();
+    _controllers.cropLayerPainterCtrl.add(null);
+  }
+
   /// Handle the start of a scaling operation.
   ///
   /// This method is called when a scaling operation begins and initializes the
@@ -878,12 +884,6 @@ class ProImageEditorState extends State<ProImageEditor>
               : LayerLastPosition.center;
     setState(() {});
     mainEditorCallbacks?.handleScaleStart(details);
-  }
-
-  /// Resets the zoom and pan of the image editor.
-  void resetZoom() {
-    _interactiveViewer.currentState?.reset();
-    _controllers.cropLayerPainterCtrl.add(null);
   }
 
   /// Handle updates during scaling.

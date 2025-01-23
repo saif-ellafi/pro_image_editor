@@ -198,9 +198,7 @@ class _CustomWidgetsExampleState extends State<CustomWidgetsExample>
           ),
           layerInteraction: LayerInteractionConfigs(
             widgets: LayerInteractionWidgets(
-              editIcon:
-                  (rebuildStream, onTap, toggleTooltipVisibility, rotation) =>
-                      ReactiveWidget(
+              editButton: (rebuildStream, onTap, rotation) => ReactiveWidget(
                 builder: (_) {
                   return Positioned(
                     top: 0,
@@ -234,9 +232,7 @@ class _CustomWidgetsExampleState extends State<CustomWidgetsExample>
                 },
                 stream: rebuildStream,
               ),
-              removeIcon:
-                  (rebuildStream, onTap, toggleTooltipVisibility, rotation) =>
-                      ReactiveWidget(
+              removeButton: (rebuildStream, onTap, rotation) => ReactiveWidget(
                 builder: (_) {
                   return Positioned(
                     top: 0,
@@ -270,8 +266,8 @@ class _CustomWidgetsExampleState extends State<CustomWidgetsExample>
                 },
                 stream: rebuildStream,
               ),
-              rotateScaleIcon: (rebuildStream, onScaleRotateDown,
-                      onScaleRotateUp, toggleTooltipVisibility, rotation) =>
+              rotateScaleButton: (rebuildStream, onScaleRotateDown,
+                      onScaleRotateUp, rotation) =>
                   ReactiveWidget(
                 builder: (_) {
                   return Positioned(

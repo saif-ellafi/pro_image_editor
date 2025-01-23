@@ -181,16 +181,19 @@ class LayerInteractionManager {
         rotateScaleLayerScaleHelper!;
 
     activeLayer.scale = newDistance / realSize.distance;
+    // TODO: fix calculation
+    print(newDistance);
     _setMinMaxScaleFactor(configs, activeLayer);
-    activeLayer.rotation =
+    /*   activeLayer.rotation =
         touchPositionFromCenter.direction - atan(1 / activeSize.aspectRatio);
+
 
     if (editorScaleFactor != 1) return;
     checkRotationLine(
       activeLayer: activeLayer,
       editorSize: editorSize,
       configEnabledHitVibration: configEnabledHitVibration,
-    );
+    ); */
   }
 
   /// Calculates movement of a layer based on user interactions, considering
