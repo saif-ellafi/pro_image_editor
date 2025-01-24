@@ -52,17 +52,3 @@ class ReactiveWidget<T extends Widget> extends StatelessWidget {
     );
   }
 }
-
-// TODO: Remove in version 8.0.0
-/// Old version of `ReactiveWidget`.
-/// Deprecated: Use `ReactiveWidget` instead.
-@Deprecated(
-    'Use ReactiveWidget instead. This will be removed in a future release.')
-class ReactiveCustomWidget<T extends Widget> extends ReactiveWidget<T> {
-  /// Creates an instance of [ReactiveCustomWidget].
-  const ReactiveCustomWidget({
-    super.key,
-    required super.builder,
-    required super.stream,
-  });
-}

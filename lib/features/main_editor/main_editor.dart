@@ -831,6 +831,12 @@ class ProImageEditorState extends State<ProImageEditor>
     });
   }
 
+  /// Resets the zoom and pan of the image editor.
+  void resetZoom() {
+    _interactiveViewer.currentState?.reset();
+    _controllers.cropLayerPainterCtrl.add(null);
+  }
+
   /// Handle the start of a scaling operation.
   ///
   /// This method is called when a scaling operation begins and initializes the
@@ -859,8 +865,7 @@ class ProImageEditorState extends State<ProImageEditor>
       ..baseAngleFactor = layer.rotation
       ..snapStartRotation = layer.rotation * 180 / pi
       ..snapLastRotation = layerInteractionManager.snapStartRotation
-      ..rotationStartedHelper = false
-      ..showHelperLines = true;
+      ..reset();
 
     double posX = layer.offset.dx;
     double posY = layer.offset.dy;
@@ -878,12 +883,6 @@ class ProImageEditorState extends State<ProImageEditor>
               : LayerLastPosition.center;
     setState(() {});
     mainEditorCallbacks?.handleScaleStart(details);
-  }
-
-  /// Resets the zoom and pan of the image editor.
-  void resetZoom() {
-    _interactiveViewer.currentState?.reset();
-    _controllers.cropLayerPainterCtrl.add(null);
   }
 
   /// Handle updates during scaling.
@@ -924,7 +923,6 @@ class ProImageEditorState extends State<ProImageEditor>
           configEnabledHitVibration: helperLines.hitVibration,
           details: details,
           editorSize: sizesManager.bodySize,
-          appBarHeight: sizesManager.appBarHeight,
           layerTheme: layerInteraction.style,
           editorScaleFactor:
               _interactiveViewer.currentState?.scaleFactor ?? 1.0,
@@ -1861,6 +1859,7 @@ class ProImageEditorState extends State<ProImageEditor>
 
     return await _stateHistoryService.exportStateHistory(
       imageInfos: _imageInfos!,
+      configs: configs,
       context: context,
     );
   }

@@ -14,6 +14,7 @@ import '/features/tune_editor/models/tune_adjustment_matrix.dart';
 import '../../utils/parser/double_parser.dart';
 import '../../utils/parser/int_parser.dart';
 import '../../utils/parser/size_parser.dart';
+import './utils/history_compatibility/history_compatibility_layer_interaction.dart';
 import 'constants/export_import_version.dart';
 import 'models/import_state_history_configs.dart';
 import 'utils/key_minifier.dart';
@@ -88,16 +89,17 @@ class ImportStateHistory {
         case ExportImportVersion.version_3_0_1:
         case ExportImportVersion.version_3_0_0:
         case ExportImportVersion.version_4_0_0:
-          layers = (historyItem['layers'] as List<dynamic>? ?? [])
-              .map(
-                (layer) => Layer.fromMap(
-                  layer,
-                  widgetRecords: widgetRecords,
-                  widgetLoader: configs.widgetLoader,
-                  requirePrecache: requirePrecacheList.add,
-                ),
-              )
-              .toList();
+          layers =
+              (historyItem['layers'] as List<dynamic>? ?? []).map((rawLayer) {
+            historyCompatibilityLayerInteraction(
+                layerMap: rawLayer, minifier: minifier, version: version);
+            return Layer.fromMap(
+              rawLayer,
+              widgetRecords: widgetRecords,
+              widgetLoader: configs.widgetLoader,
+              requirePrecache: requirePrecacheList.add,
+            );
+          }).toList();
           break;
         default:
           for (var rawLayer in List.from(
@@ -107,6 +109,14 @@ class ImportStateHistory {
               ...lastLayerStateHelper[id] ?? {},
               ...rawLayer,
             };
+
+            if (version == ExportImportVersion.version_5_0_0) {
+              historyCompatibilityLayerInteraction(
+                layerMap: convertedLayerMap,
+                minifier: minifier,
+                version: version,
+              );
+            }
 
             layers.add(Layer.fromMap(
               convertedLayerMap,

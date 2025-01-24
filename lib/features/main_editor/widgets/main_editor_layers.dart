@@ -110,7 +110,8 @@ class MainEditorLayers extends StatelessWidget {
   }
 
   void _handleLayerTap(Layer layer) {
-    if (layerInteractionManager.layersAreSelectable(configs)) {
+    if (layerInteractionManager.layersAreSelectable(configs) &&
+        layer.interaction.enableSelection) {
       layerInteractionManager.selectedLayerId =
           layer.id == layerInteractionManager.selectedLayerId ? '' : layer.id;
       checkInteractiveViewer();

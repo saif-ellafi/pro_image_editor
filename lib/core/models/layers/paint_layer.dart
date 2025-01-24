@@ -37,7 +37,7 @@ class PaintLayer extends Layer {
     super.id,
     super.flipX,
     super.flipY,
-    super.enableInteraction,
+    super.interaction,
   });
 
   /// Factory constructor for creating a PaintLayer instance from a
@@ -55,7 +55,7 @@ class PaintLayer extends Layer {
       id: layer.id,
       flipX: layer.flipX,
       flipY: layer.flipY,
-      enableInteraction: layer.enableInteraction,
+      interaction: layer.interaction,
       offset: layer.offset,
       rotation: layer.rotation,
       scale: layer.scale,
@@ -110,44 +110,5 @@ class PaintLayer extends Layer {
         },
       if (paintLayer.opacity != opacity) 'opacity': opacity,
     };
-  }
-}
-
-// TODO: Remove in version 8.0.0
-/// **DEPRECATED:** Use [PaintLayer] instead.
-@Deprecated('Use PaintLayer instead')
-class PaintLayerData extends PaintLayer {
-  /// Creates an instance of PaintLayerData.
-  PaintLayerData({
-    required super.item,
-    required super.rawSize,
-    required super.opacity,
-    super.offset,
-    super.rotation,
-    super.scale,
-    super.id,
-    super.flipX,
-    super.flipY,
-    super.enableInteraction,
-  });
-
-  /// Factory constructor for creating a PaintLayerData instance from a
-  /// Layer and a map.
-  factory PaintLayerData.fromMap(Layer layer, Map<String, dynamic> map) {
-    return PaintLayerData(
-      id: layer.id,
-      flipX: layer.flipX,
-      flipY: layer.flipY,
-      enableInteraction: layer.enableInteraction,
-      offset: layer.offset,
-      rotation: layer.rotation,
-      scale: layer.scale,
-      opacity: safeParseDouble(map['opacity'], fallback: 1.0),
-      rawSize: Size(
-        safeParseDouble(map['rawSize']?['w'], fallback: 0),
-        safeParseDouble(map['rawSize']?['h'], fallback: 0),
-      ),
-      item: PaintedModel.fromMap(map['item'] ?? {}),
-    );
   }
 }

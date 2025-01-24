@@ -129,7 +129,6 @@ class ExportStateHistory {
     EditorKeyMinifier minifier = EditorKeyMinifier(
       enableMinify: _configs.enableMinify,
     );
-
     List<Map<String, dynamic>> history = [];
     List<Uint8List> widgetRecords = [];
     List<EditorStateHistory> changes = List.from(stateHistory);
@@ -198,7 +197,7 @@ class ExportStateHistory {
     history = convertedLayer.history;
 
     return {
-      minifier.convertMainKey('version'): ExportImportVersion.version_5_0_0,
+      minifier.convertMainKey('version'): ExportImportVersion.version_6_0_0,
       if (_configs.enableMinify) minifier.convertMainKey('minify'): true,
       minifier.convertMainKey('position'):
           _configs.historySpan == ExportHistorySpan.current ||
@@ -248,8 +247,7 @@ class ExportStateHistory {
         updateReference(layer);
 
         // ignore: deprecated_member_use_from_same_package
-      } else if ((_configs.exportSticker ?? _configs.exportWidgets) &&
-          layer.runtimeType == WidgetLayer) {
+      } else if (_configs.exportWidgets && layer.runtimeType == WidgetLayer) {
         WidgetLayer widgetLayer = layer as WidgetLayer;
 
         if (widgetLayer.exportConfigs.hasParameter) {

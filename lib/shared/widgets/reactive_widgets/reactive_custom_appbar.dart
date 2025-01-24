@@ -62,17 +62,3 @@ class ReactiveAppbar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
-
-// TODO: Remove in version 8.0.0
-/// Old version of `ReactiveAppbar`.
-/// Deprecated: Use `ReactiveAppbar` instead.
-@Deprecated(
-    'Use ReactiveAppbar instead. This will be removed in a future release.')
-class ReactiveCustomAppbar<T extends Widget> extends ReactiveAppbar {
-  /// Creates an instance of [ReactiveCustomAppbar].
-  const ReactiveCustomAppbar({
-    super.key,
-    required super.builder,
-    required super.stream,
-  });
-}

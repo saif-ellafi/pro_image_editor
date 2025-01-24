@@ -8,6 +8,7 @@ import '/shared/utils/parser/double_parser.dart';
 import '/shared/utils/unique_id_generator.dart';
 import '../editor_image.dart';
 import 'emoji_layer.dart';
+import 'layer_interaction.dart';
 import 'paint_layer.dart';
 import 'text_layer.dart';
 import 'widget_layer.dart';
@@ -38,7 +39,7 @@ class Layer {
     double? scale,
     bool? flipX,
     bool? flipY,
-    bool? enableInteraction,
+    LayerInteraction? interaction,
     bool? isDeleted,
   }) {
     key = GlobalKey();
@@ -49,7 +50,7 @@ class Layer {
     this.scale = scale ?? 1;
     this.flipX = flipX ?? false;
     this.flipY = flipY ?? false;
-    this.enableInteraction = enableInteraction ?? true;
+    this.interaction = interaction ?? LayerInteraction();
     this.isDeleted = isDeleted ?? false;
   }
 
@@ -64,13 +65,18 @@ class Layer {
     EditorKeyMinifier? minifier,
   }) {
     var keyConverter = minifier?.convertLayerKey ?? (String key) => key;
+    var keyInteractionConverter =
+        minifier?.convertLayerInteractionKey ?? (String key) => key;
 
     /// Creates a base Layer instance with default or map-provided properties.
     Layer layer = Layer(
       id: id,
       flipX: map[keyConverter('flipX')] ?? false,
       flipY: map[keyConverter('flipY')] ?? false,
-      enableInteraction: map[keyConverter('enableInteraction')] ?? true,
+      interaction: LayerInteraction.fromMap(
+        map[keyConverter('interaction')] ?? {},
+        keyConverter: keyInteractionConverter,
+      ),
       offset: Offset(safeParseDouble(map['x']), safeParseDouble(map['y'])),
       rotation: safeParseDouble(map[keyConverter('rotation')]),
       scale: safeParseDouble(map[keyConverter('scale')], fallback: 1),
@@ -120,8 +126,11 @@ class Layer {
   /// Flags to control horizontal and vertical flipping.
   late bool flipX, flipY;
 
-  /// Flag to enable or disable the user interaction with the layer.
-  late bool enableInteraction;
+  /// The interaction settings for the layer.
+  ///
+  /// It holds the interaction properties, such as whether moving, scaling,
+  /// rotating, or selecting the layer is enabled.
+  late LayerInteraction interaction;
 
   /// Flag which indicates to the history that the layer is removed.
   late bool isDeleted;
@@ -143,7 +152,7 @@ class Layer {
       'flipX': flipX,
       'flipY': flipY,
       if (isDeleted) 'isDeleted': isDeleted,
-      'enableInteraction': enableInteraction,
+      'interaction': interaction.toMap(),
       'type': 'default',
     };
   }
@@ -163,8 +172,8 @@ class Layer {
       if (layer.flipX != flipX) 'flipX': flipX,
       if (layer.flipY != flipY) 'flipY': flipY,
       if (isDeleted) 'isDeleted': isDeleted,
-      if (layer.enableInteraction != enableInteraction)
-        'enableInteraction': enableInteraction,
+      if (layer.interaction != interaction)
+        'interaction': interaction.toMapFromReference(layer.interaction),
     };
   }
 
@@ -179,7 +188,7 @@ class Layer {
         other.scale == scale &&
         other.flipX == flipX &&
         other.flipY == flipY &&
-        other.enableInteraction == enableInteraction &&
+        other.interaction == interaction &&
         other.isDeleted == isDeleted;
   }
 
@@ -191,7 +200,7 @@ class Layer {
         scale.hashCode ^
         flipX.hashCode ^
         flipY.hashCode ^
-        enableInteraction.hashCode ^
+        interaction.hashCode ^
         isDeleted.hashCode;
   }
 }

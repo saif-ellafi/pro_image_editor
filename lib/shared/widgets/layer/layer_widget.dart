@@ -262,56 +262,51 @@ class _LayerWidgetState extends State<LayerWidget>
       child: Transform(
         transform: transformMatrix,
         alignment: Alignment.center,
-        child: IgnorePointer(
-          ignoring: !widget.layerData.enableInteraction,
-          child: LayerInteractionHelperWidget(
-            layerData: widget.layerData,
-            configs: configs,
-            callbacks: callbacks,
-            selected: widget.selected,
-            onEditLayer: widget.onEditTap,
-            isInteractive:
-                widget.isInteractive && widget.layerData.enableInteraction,
-            onScaleRotateDown: (details) {
-              widget.onScaleRotateDown
-                  ?.call(details, context.size ?? Size.zero);
+        child: LayerInteractionHelperWidget(
+          layerData: widget.layerData,
+          configs: configs,
+          callbacks: callbacks,
+          selected: widget.selected,
+          onEditLayer: widget.onEditTap,
+          isInteractive: widget.isInteractive,
+          onScaleRotateDown: (details) {
+            widget.onScaleRotateDown?.call(details, context.size ?? Size.zero);
+          },
+          onScaleRotateUp: widget.onScaleRotateUp,
+          onRemoveLayer: widget.onRemoveTap,
+          child: MouseRegion(
+            hitTestBehavior: HitTestBehavior.translucent,
+            cursor: _showMoveCursor && widget.layerData.interaction.enableMove
+                ? layerInteraction.style.hoverCursor
+                : MouseCursor.defer,
+            onEnter: (event) {
+              if (_layerType != _LayerType.canvas) {
+                setState(() {
+                  _showMoveCursor = true;
+                });
+              }
             },
-            onScaleRotateUp: widget.onScaleRotateUp,
-            onRemoveLayer: widget.onRemoveTap,
-            child: MouseRegion(
-              hitTestBehavior: HitTestBehavior.translucent,
-              cursor: _showMoveCursor
-                  ? layerInteraction.style.hoverCursor
-                  : MouseCursor.defer,
-              onEnter: (event) {
-                if (_layerType != _LayerType.canvas) {
-                  setState(() {
-                    _showMoveCursor = true;
-                  });
-                }
-              },
-              onExit: (event) {
-                if (_layerType == _LayerType.canvas) {
-                  (widget.layerData as PaintLayer).item.hit = false;
-                } else {
-                  setState(() {
-                    _showMoveCursor = false;
-                  });
-                }
-              },
-              child: GestureDetector(
+            onExit: (event) {
+              if (_layerType == _LayerType.canvas) {
+                (widget.layerData as PaintLayer).item.hit = false;
+              } else {
+                setState(() {
+                  _showMoveCursor = false;
+                });
+              }
+            },
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onSecondaryTapUp: isDesktop ? _onSecondaryTapUp : null,
+              onTap: _onTap,
+              child: Listener(
                 behavior: HitTestBehavior.translucent,
-                onSecondaryTapUp: isDesktop ? _onSecondaryTapUp : null,
-                onTap: _onTap,
-                child: Listener(
-                  behavior: HitTestBehavior.translucent,
-                  onPointerDown: _onPointerDown,
-                  onPointerUp: _onPointerUp,
-                  child: Padding(
-                    padding: EdgeInsets.all(widget.selected ? 7.0 : 0),
-                    child: FittedBox(
-                      child: _buildContent(),
-                    ),
+                onPointerDown: _onPointerDown,
+                onPointerUp: _onPointerUp,
+                child: Padding(
+                  padding: EdgeInsets.all(widget.selected ? 7.0 : 0),
+                  child: FittedBox(
+                    child: _buildContent(),
                   ),
                 ),
               ),
