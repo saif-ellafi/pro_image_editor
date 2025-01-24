@@ -1859,6 +1859,7 @@ class ProImageEditorState extends State<ProImageEditor>
 
     return await _stateHistoryService.exportStateHistory(
       imageInfos: _imageInfos!,
+      configs: configs,
       context: context,
     );
   }

@@ -8,7 +8,6 @@ class LayerItemInteractions {
   LayerItemInteractions({
     required this.edit,
     required this.remove,
-    required this.lockLayer,
     required this.scaleRotateDown,
     required this.scaleRotateUp,
   });
@@ -18,9 +17,6 @@ class LayerItemInteractions {
 
   /// Callback function for removing the layer.
   final Function() remove;
-
-  /// Callback function for locking the layer.
-  final Function() lockLayer;
 
   /// Callback function triggered when a scale/rotate gesture starts.
   ///

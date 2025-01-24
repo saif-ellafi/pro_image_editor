@@ -225,26 +225,29 @@ class LayerInteractionManager {
 
     _rotateScaleButtonStartPosition ??= touchPositionFromLayerCenter;
 
-    activeLayer.scale = baseScaleFactor *
-        calculateScale(
-          _rotateScaleButtonStartPosition!,
-          touchPositionFromLayerCenter,
-        );
+    if (activeLayer.interaction.enableScale) {
+      activeLayer.scale = baseScaleFactor *
+          calculateScale(
+            _rotateScaleButtonStartPosition!,
+            touchPositionFromLayerCenter,
+          );
+      _setMinMaxScaleFactor(configs, activeLayer);
+    }
 
-    _setMinMaxScaleFactor(configs, activeLayer);
+    if (activeLayer.interaction.enableRotate) {
+      activeLayer.rotation = baseAngleFactor +
+          calculateRotation(
+            _rotateScaleButtonStartPosition!,
+            touchPositionFromLayerCenter,
+          );
 
-    activeLayer.rotation = baseAngleFactor +
-        calculateRotation(
-          _rotateScaleButtonStartPosition!,
-          touchPositionFromLayerCenter,
-        );
-
-    if (editorScaleFactor != 1) return;
-    checkRotationLine(
-      activeLayer: activeLayer,
-      editorSize: editorSize,
-      configEnabledHitVibration: configEnabledHitVibration,
-    );
+      if (editorScaleFactor != 1) return;
+      checkRotationLine(
+        activeLayer: activeLayer,
+        editorSize: editorSize,
+        configEnabledHitVibration: configEnabledHitVibration,
+      );
+    }
   }
 
   /// Calculates movement of a layer based on user interactions, considering
@@ -258,7 +261,7 @@ class LayerInteractionManager {
     required GlobalKey removeAreaKey,
     required Function(bool) onHoveredRemoveChanged,
   }) {
-    if (_activeScale) return;
+    if (_activeScale || !activeLayer.interaction.enableMove) return;
 
     RenderBox? box =
         removeAreaKey.currentContext?.findRenderObject() as RenderBox?;
@@ -352,16 +355,20 @@ class LayerInteractionManager {
   }) {
     _activeScale = true;
 
-    activeLayer.scale = baseScaleFactor * detail.scale;
-    _setMinMaxScaleFactor(configs, activeLayer);
-    activeLayer.rotation = baseAngleFactor + detail.rotation;
+    if (activeLayer.interaction.enableScale) {
+      activeLayer.scale = baseScaleFactor * detail.scale;
+      _setMinMaxScaleFactor(configs, activeLayer);
+    }
+    if (activeLayer.interaction.enableRotate) {
+      activeLayer.rotation = baseAngleFactor + detail.rotation;
 
-    if (editorScaleFactor == 1) {
-      checkRotationLine(
-        activeLayer: activeLayer,
-        editorSize: editorSize,
-        configEnabledHitVibration: configEnabledHitVibration,
-      );
+      if (editorScaleFactor == 1) {
+        checkRotationLine(
+          activeLayer: activeLayer,
+          editorSize: editorSize,
+          configEnabledHitVibration: configEnabledHitVibration,
+        );
+      }
     }
 
     scaleDebounce(() => _activeScale = false);

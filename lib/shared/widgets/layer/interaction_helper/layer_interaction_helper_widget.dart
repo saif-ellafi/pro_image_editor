@@ -194,9 +194,6 @@ class _LayerInteractionHelperWidgetState
                 LayerItemInteractions(
                   edit: widget.onEditLayer ?? () {},
                   remove: widget.onRemoveLayer ?? () {},
-                  lockLayer: () {
-                    widget.layerData.enableInteraction = false;
-                  },
                   scaleRotateDown: (event) {
                     widget.onScaleRotateDown?.call(event);
                   },

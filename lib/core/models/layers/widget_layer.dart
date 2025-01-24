@@ -7,6 +7,7 @@ import '/shared/services/import_export/types/widget_loader.dart';
 import '/shared/utils/parser/int_parser.dart';
 import '../editor_image.dart';
 import 'layer.dart';
+import 'layer_interaction.dart';
 
 export '/shared/services/import_export/models/widget_layer_export_configs.dart';
 
@@ -36,7 +37,7 @@ class WidgetLayer extends Layer {
     super.id,
     super.flipX,
     super.flipY,
-    super.enableInteraction,
+    super.interaction,
     this.exportConfigs = const WidgetLayerExportConfigs(),
   });
 
@@ -112,7 +113,7 @@ class WidgetLayer extends Layer {
       id: layer.id,
       flipX: layer.flipX,
       flipY: layer.flipY,
-      enableInteraction: layer.enableInteraction,
+      interaction: layer.interaction,
       offset: layer.offset,
       rotation: layer.rotation,
       scale: layer.scale,
@@ -168,7 +169,7 @@ class WidgetLayer extends Layer {
     String? id,
     bool? flipX,
     bool? flipY,
-    bool? enableInteraction,
+    LayerInteraction? interaction,
   }) {
     return WidgetLayer(
       widget: widget ?? this.widget,
@@ -178,69 +179,7 @@ class WidgetLayer extends Layer {
       id: id ?? this.id,
       flipX: flipX ?? this.flipX,
       flipY: flipY ?? this.flipY,
-      enableInteraction: enableInteraction ?? this.enableInteraction,
-    );
-  }
-}
-
-/// **DEPRECATED:** Use [WidgetLayer] instead.
-///
-/// A class representing a layer with custom sticker content.
-@Deprecated('Use WidgetLayer instead')
-class StickerLayerData extends WidgetLayer {
-  /// Constructor for StickerLayerData
-  StickerLayerData({
-    required Widget sticker,
-    super.offset,
-    super.rotation,
-    super.scale,
-    super.id,
-    super.flipX,
-    super.flipY,
-    super.enableInteraction,
-  }) : super(widget: sticker);
-
-  /// Factory constructor for creating a StickerLayerData instance from a
-  /// Layer, a map, and a list of stickers.
-  factory StickerLayerData.fromMap(
-    Layer layer,
-    Map<String, dynamic> map,
-    List<Uint8List> stickers,
-  ) {
-    /// Determines the position of the sticker in the list.
-    int stickerPosition = safeParseInt(
-        map['recordPosition'] ?? map['listPosition'],
-        fallback: -1);
-
-    /// Widget to display a sticker or a placeholder if not found.
-    Widget sticker = kDebugMode
-        ? Text(
-            'Sticker $stickerPosition not found',
-            style: const TextStyle(color: Color(0xFFF44336), fontSize: 24),
-          )
-        : const SizedBox.shrink();
-
-    /// Updates the sticker widget if the position is valid.
-    if (stickers.isNotEmpty && stickers.length > stickerPosition) {
-      sticker = ConstrainedBox(
-        constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
-        child: Image.memory(
-          stickers[stickerPosition],
-        ),
-      );
-    }
-
-    /// Constructs and returns a StickerLayerData instance with properties
-    /// derived from the layer and map.
-    return StickerLayerData(
-      id: layer.id,
-      flipX: layer.flipX,
-      flipY: layer.flipY,
-      enableInteraction: layer.enableInteraction,
-      offset: layer.offset,
-      rotation: layer.rotation,
-      scale: layer.scale,
-      sticker: sticker,
+      interaction: interaction ?? this.interaction,
     );
   }
 }
