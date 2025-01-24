@@ -865,8 +865,7 @@ class ProImageEditorState extends State<ProImageEditor>
       ..baseAngleFactor = layer.rotation
       ..snapStartRotation = layer.rotation * 180 / pi
       ..snapLastRotation = layerInteractionManager.snapStartRotation
-      ..rotationStartedHelper = false
-      ..showHelperLines = true;
+      ..reset();
 
     double posX = layer.offset.dx;
     double posY = layer.offset.dy;
@@ -924,7 +923,6 @@ class ProImageEditorState extends State<ProImageEditor>
           configEnabledHitVibration: helperLines.hitVibration,
           details: details,
           editorSize: sizesManager.bodySize,
-          appBarHeight: sizesManager.appBarHeight,
           layerTheme: layerInteraction.style,
           editorScaleFactor:
               _interactiveViewer.currentState?.scaleFactor ?? 1.0,

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:pro_image_editor/pro_image_editor.dart';
-import 'package:pro_image_editor/shared/widgets/layer/interaction_helper/layer_interaction_button.dart';
 
 // Project imports:
 import '/core/constants/example_constants.dart';
@@ -65,7 +64,7 @@ class _SelectableLayerExampleState extends State<SelectableLayerExample>
             processorMode: ProcessorMode.auto,
           ),
         ),
-        layerInteraction: LayerInteractionConfigs(
+        layerInteraction: const LayerInteractionConfigs(
           /// Choose between `auto`, `enabled` and `disabled`.
           ///
           /// Mode `auto`:
@@ -75,12 +74,12 @@ class _SelectableLayerExampleState extends State<SelectableLayerExample>
           /// otherwise, the layer is not selectable.
           selectable: LayerInteractionSelectable.enabled,
           initialSelected: true,
-          icons: const LayerInteractionIcons(
+          icons: LayerInteractionIcons(
             remove: Icons.clear,
             edit: Icons.edit_outlined,
             rotateScale: Icons.sync,
           ),
-          style: const LayerInteractionStyle(
+          style: LayerInteractionStyle(
             buttonRadius: 10,
             strokeWidth: 1.2,
             borderElementWidth: 7,
@@ -92,68 +91,6 @@ class _SelectableLayerExampleState extends State<SelectableLayerExample>
             hoverCursor: SystemMouseCursors.move,
             borderStyle: LayerInteractionBorderStyle.solid,
             showTooltips: false,
-          ),
-          widgets: LayerInteractionWidgets(
-            children: [
-              /// FIXME: delete test buttons
-              (rebuildStream, layer, interactions) => ReactiveWidget(
-                    stream: rebuildStream,
-                    builder: (_) => Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: LayerInteractionButton(
-                          rotation: -layer.rotation,
-                          onScaleRotateDown: interactions.scaleRotateDown,
-                          onScaleRotateUp: interactions.scaleRotateUp,
-                          buttonRadius: 10,
-                          cursor: SystemMouseCursors.click,
-                          icon: Icons.sync,
-                          tooltip: 'Rotate and Scale',
-                          color: Colors.black,
-                          background: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-              (rebuildStream, layer, interactions) => ReactiveWidget(
-                    stream: rebuildStream,
-                    builder: (_) => Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: LayerInteractionButton(
-                        rotation: -layer.rotation,
-                        onScaleRotateDown: interactions.scaleRotateDown,
-                        onScaleRotateUp: interactions.scaleRotateUp,
-                        buttonRadius: 10,
-                        cursor: SystemMouseCursors.click,
-                        icon: Icons.sync,
-                        tooltip: 'Rotate and Scale',
-                        color: Colors.black,
-                        background: Colors.white,
-                      ),
-                    ),
-                  ),
-              (rebuildStream, layer, interactions) => ReactiveWidget(
-                    stream: rebuildStream,
-                    builder: (_) => Positioned(
-                      bottom: 0,
-                      left: 0,
-                      child: LayerInteractionButton(
-                        rotation: -layer.rotation,
-                        onScaleRotateDown: interactions.scaleRotateDown,
-                        onScaleRotateUp: interactions.scaleRotateUp,
-                        buttonRadius: 10,
-                        cursor: SystemMouseCursors.click,
-                        icon: Icons.sync,
-                        tooltip: 'Rotate and Scale',
-                        color: Colors.black,
-                        background: Colors.white,
-                      ),
-                    ),
-                  ),
-            ],
           ),
         ),
         i18n: const I18n(

@@ -34,10 +34,10 @@ class LayerInteractionManager {
   /// Rotation angle of the rotation helper line.
   double rotationHelperLineDeg = 0;
 
-  /// The base scale factor for the editor.
+  /// The base scale factor from the layer;
   double baseScaleFactor = 1.0;
 
-  /// The base angle factor for the editor.
+  /// The base angle factor from the layer;
   double baseAngleFactor = 0;
 
   /// X-coordinate where snapping started.
@@ -68,7 +68,7 @@ class LayerInteractionManager {
   bool deviceCanCustomVibrate = false;
 
   /// Flag indicating if rotation helper lines have started.
-  bool rotationStartedHelper = false;
+  bool _rotationStartedHelper = false;
 
   /// Flag indicating if helper lines should be displayed.
   bool showHelperLines = false;
@@ -124,6 +124,20 @@ class LayerInteractionManager {
   /// Last recorded Y-axis position for layers.
   LayerLastPosition lastPositionY = LayerLastPosition.center;
 
+  Offset? _rotateScaleButtonStartPosition;
+
+  /// Resets the state of the layer interaction manager by:
+  ///
+  /// - Setting `_rotateScaleButtonStartPosition` to `null`.
+  /// - Setting `_rotationStartedHelper` to `false`.
+  /// - Enabling the display of helper lines by setting `showHelperLines` to
+  /// `true`.
+  reset() {
+    _rotateScaleButtonStartPosition = null;
+    _rotationStartedHelper = false;
+    showHelperLines = true;
+  }
+
   /// Determines if layers are selectable based on the configuration and device
   /// type.
   bool layersAreSelectable(ProImageEditorConfigs configs) {
@@ -143,57 +157,94 @@ class LayerInteractionManager {
     required ScaleUpdateDetails details,
     required Layer activeLayer,
     required Size editorSize,
-    required double appBarHeight,
     required bool configEnabledHitVibration,
     required LayerInteractionStyle layerTheme,
   }) {
-    Size activeSize = rotateScaleLayerSizeHelper!;
+    /// Calculates the rotation angle (in radians) for a button moved to a
+    /// new position.
+    /// [oldPosition] is the initial button position,
+    /// [newPosition] is the final button position.
+    double calculateRotation(Offset oldPosition, Offset newPosition) {
+      // Calculate the vectors from the origin to the old and new positions
+      Offset oldVector = oldPosition;
+      Offset newVector = newPosition;
 
-    Offset layerOffset = Offset(
-      activeLayer.offset.dx,
-      activeLayer.offset.dy,
-    );
+      // Get the angle of each vector relative to the x-axis
+      double oldAngle = atan2(oldVector.dy, oldVector.dx);
+      double newAngle = atan2(newVector.dy, newVector.dx);
 
-    double realDx =
-        (details.localFocalPoint.dx - editorScaleOffset.dx) / editorScaleFactor;
+      // Calculate the rotation angle
+      double rotation = newAngle - oldAngle;
 
-    double realDy =
-        (details.localFocalPoint.dy - editorScaleOffset.dy) / editorScaleFactor;
+      // Normalize the rotation angle to be between -pi and pi
+      if (rotation > pi) rotation -= 2 * pi;
+      if (rotation < -pi) rotation += 2 * pi;
 
-    Offset touchPositionFromCenter = Offset(
-          realDx - editorSize.width / 2,
-          realDy - editorSize.height / 2,
-        ) -
-        layerOffset;
+      return rotation; // In radians
+    }
 
-    touchPositionFromCenter = Offset(
-      touchPositionFromCenter.dx * (activeLayer.flipX ? -1 : 1),
-      touchPositionFromCenter.dy * (activeLayer.flipY ? -1 : 1),
-    );
+    /// Calculates the scale factor based on the movement of a button.
+    /// [oldPosition] is the initial button position,
+    /// [newPosition] is the final button position.
+    double calculateScale(
+      Offset oldPosition,
+      Offset newPosition,
+    ) {
+      // Calculate distances from the origin to the old and new positions
+      double oldDistance = (oldPosition).distance;
+      double newDistance = (newPosition).distance;
 
-    double newDistance = touchPositionFromCenter.distance;
+      // Calculate the scale factor
+      if (oldDistance == 0 || newDistance == 0) {
+        return 1;
+      }
 
-    double margin = layerTheme.buttonRadius + layerTheme.strokeWidth * 2;
-    var realSize = Offset(
-          activeSize.width / 2 - margin,
-          activeSize.height / 2 - margin,
-        ) /
-        rotateScaleLayerScaleHelper!;
+      return newDistance / oldDistance;
+    }
 
-    activeLayer.scale = newDistance / realSize.distance;
-    // TODO: fix calculation
-    print(newDistance);
+    Offset layerOffset = activeLayer.offset;
+
+    Offset realTouchPosition =
+        (details.localFocalPoint - editorScaleOffset) / editorScaleFactor;
+
+    Offset touchPositionFromLayerCenter =
+        realTouchPosition - editorSize.center(Offset.zero) - layerOffset;
+
+    if (activeLayer.flipX) {
+      touchPositionFromLayerCenter = Offset(
+        -touchPositionFromLayerCenter.dx,
+        touchPositionFromLayerCenter.dy,
+      );
+    }
+    if (activeLayer.flipY) {
+      touchPositionFromLayerCenter = Offset(
+        touchPositionFromLayerCenter.dx,
+        -touchPositionFromLayerCenter.dy,
+      );
+    }
+
+    _rotateScaleButtonStartPosition ??= touchPositionFromLayerCenter;
+
+    activeLayer.scale = baseScaleFactor *
+        calculateScale(
+          _rotateScaleButtonStartPosition!,
+          touchPositionFromLayerCenter,
+        );
+
     _setMinMaxScaleFactor(configs, activeLayer);
-    /*   activeLayer.rotation =
-        touchPositionFromCenter.direction - atan(1 / activeSize.aspectRatio);
 
+    activeLayer.rotation = baseAngleFactor +
+        calculateRotation(
+          _rotateScaleButtonStartPosition!,
+          touchPositionFromLayerCenter,
+        );
 
     if (editorScaleFactor != 1) return;
     checkRotationLine(
       activeLayer: activeLayer,
       editorSize: editorSize,
       configEnabledHitVibration: configEnabledHitVibration,
-    ); */
+    );
   }
 
   /// Calculates movement of a layer based on user interactions, considering
@@ -339,7 +390,7 @@ class LayerInteractionManager {
                     degHit >= 45 - hitSpanX &&
                     snapLastRotation > deg))) ||
         (showRotationHelperLine && hitArea)) {
-      if (rotationStartedHelper) {
+      if (_rotationStartedHelper) {
         activeLayer.rotation =
             (deg - (degHit > 45 - hitSpanX ? degHit - 45 : degHit)) / 180 * pi;
         rotationHelperLineDeg = activeLayer.rotation;
@@ -357,7 +408,7 @@ class LayerInteractionManager {
       snapLastRotation = deg;
     } else {
       showRotationHelperLine = false;
-      rotationStartedHelper = true;
+      _rotationStartedHelper = true;
     }
   }
 
