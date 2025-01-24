@@ -1,5 +1,29 @@
 # Changelog
 
+## 8.0.0
+
+#### Features
+- **Layer Interaction Overhaul**:
+  - Replaced the old `enableInteraction` property on layers with the new `LayerInteraction` class, introducing more specific configuration options:
+    - `enableMove`, `enableScale`, `enableRotate`, and `enableSelection`.
+  - This provides greater flexibility and precision in configuring layer interactions.
+
+- **Customizable Interaction Widgets**:
+  - Updated `LayerInteractionWidgets` with two new options:
+    - **`children`**: Allows users to define their own interactive button designs when the layer is selected.
+    - **`border`**: Enables users to customize the border appearance of selected layers for a fully tailored design.
+
+#### Breaking Changes
+- Removed all deprecated values, including:
+  - `TextLayerData`
+  - `PaintingLayerData`
+  - `EmojiLayerData`
+  - `StickerLayerData`
+  - `ReactiveWidgetData`
+  - `ReactiveAppbarData`
+  - `serializeSticker`
+  - `exportStickers`
+
 ## 7.6.5
 - **CHORE**(dependencies): Update `emoji_picker_flutter` to `4.3.0`, `vibration` to `3.0.0` and `http` to `1.3.0`.
 
