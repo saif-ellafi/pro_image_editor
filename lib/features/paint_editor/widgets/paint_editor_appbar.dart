@@ -218,7 +218,7 @@ class PaintEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             icon: Icon(
               paintEditorConfigs.icons.lineWeight,
-              color: Colors.white,
+              color: paintEditorConfigs.style.appBarColor,
             ),
             onPressed: onOpenLineWeightBottomSheet,
           ),
@@ -230,7 +230,7 @@ class PaintEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
               !isFillMode
                   ? paintEditorConfigs.icons.noFill
                   : paintEditorConfigs.icons.fill,
-              color: Colors.white,
+              color: paintEditorConfigs.style.appBarColor,
             ),
             onPressed: onToggleFill,
           ),
@@ -240,7 +240,7 @@ class PaintEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             icon: Icon(
               paintEditorConfigs.icons.changeOpacity,
-              color: Colors.white,
+              color: paintEditorConfigs.style.appBarColor,
             ),
             onPressed: onOpenOpacityBottomSheet,
           ),
@@ -253,7 +253,9 @@ class PaintEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8),
           icon: Icon(
             paintEditorConfigs.icons.undoAction,
-            color: canUndo ? Colors.white : Colors.white.withAlpha(80),
+            color: canUndo
+                ? paintEditorConfigs.style.appBarColor
+                : paintEditorConfigs.style.appBarColor.withAlpha(80),
           ),
           onPressed: onUndo,
         ),
@@ -262,7 +264,9 @@ class PaintEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8),
           icon: Icon(
             paintEditorConfigs.icons.redoAction,
-            color: canRedo ? Colors.white : Colors.white.withAlpha(80),
+            color: canUndo
+                ? paintEditorConfigs.style.appBarColor
+                : paintEditorConfigs.style.appBarColor.withAlpha(80),
           ),
           onPressed: onRedo,
         ),
