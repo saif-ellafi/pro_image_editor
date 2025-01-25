@@ -3,6 +3,7 @@
 ## 8.0.3
 - **FIX**(blur-editor): Resolve issue where the slider animation does not work in the blur editor.
 - **FIX**(layer-context-menu): Resolve issue where the context menu is incorrectly positioned when the editor is embedded within the screen.
+- **CHORE**(dependencies): Update package `vibration` to `3.1.1`.
 
 ## 8.0.2
 - **FIX**(paint-editor): Resolve issue where the paint editor did not use `appBarColor` from the style configuration. More details in PR [#333](https://github.com/hm21/pro_image_editor/pull/333)
