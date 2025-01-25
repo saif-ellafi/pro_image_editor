@@ -158,12 +158,17 @@ class BlurEditorState extends State<BlurEditor>
   /// Update the image with the applied blur and the slider value.
   late final StreamController<void> _uiBlurStream;
 
+  late final ValueNotifier<double> _blurFactor =
+      ValueNotifier(appliedBlurFactor);
+
   /// Represents the selected blur state.
-  late double blurFactor;
+  double get blurFactor => _blurFactor.value;
+  set blurFactor(double value) {
+    _blurFactor.value = value;
+  }
 
   @override
   void initState() {
-    blurFactor = appliedBlurFactor;
     _uiBlurStream = StreamController.broadcast();
     _uiBlurStream.stream.listen((_) => rebuildController.add(null));
 
@@ -335,8 +340,7 @@ class BlurEditorState extends State<BlurEditor>
 
     return BlurEditorBottombar(
       blurEditorConfigs: blurEditorConfigs,
-      uiBlurStream: _uiBlurStream,
-      blurFactor: blurFactor,
+      blurFactor: _blurFactor,
       rebuildController: rebuildController,
       blurEditorState: this,
       onChanged: _onChanged,
