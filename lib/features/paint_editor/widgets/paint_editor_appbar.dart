@@ -253,7 +253,9 @@ class PaintEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8),
           icon: Icon(
             paintEditorConfigs.icons.undoAction,
-            color: canUndo ? paintEditorConfigs.style.appBarColor : paintEditorConfigs.style.appBarColor.withAlpha(80),
+            color: canUndo
+                ? paintEditorConfigs.style.appBarColor
+                : paintEditorConfigs.style.appBarColor.withAlpha(80),
           ),
           onPressed: onUndo,
         ),
@@ -262,7 +264,9 @@ class PaintEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8),
           icon: Icon(
             paintEditorConfigs.icons.redoAction,
-            color: canUndo ? paintEditorConfigs.style.appBarColor : paintEditorConfigs.style.appBarColor.withAlpha(80),
+            color: canUndo
+                ? paintEditorConfigs.style.appBarColor
+                : paintEditorConfigs.style.appBarColor.withAlpha(80),
           ),
           onPressed: onRedo,
         ),

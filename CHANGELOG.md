@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.0.2
+- **FIX**(paint-editor): Resolve the issue where the paint editor did not use `appBarColor` from the style configuration. More details in PR [#333](https://github.com/hm21/pro_image_editor/issues/333)
+
 ## 8.0.1
 - **FIX**(layer-interaction): Fix issue where layers remove-area still appear when attempting to move a layer, even when `enableMove` is set to `false`. Resolves issue [#332](https://github.com/hm21/pro_image_editor/issues/332)
 - **FEAT**(layer-interaction): Introduce `enableEdit` to the layer interaction options, allowing users to disable direct editing of text layers.
