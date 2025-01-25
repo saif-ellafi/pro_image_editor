@@ -2077,6 +2077,9 @@ class ProImageEditorState extends State<ProImageEditor>
   }
 
   Widget _buildRemoveIcon() {
+    if (_activeLayer?.interaction.enableMove == false) {
+      return const SizedBox.shrink();
+    }
     return MainEditorRemoveLayerArea(
       layerInteraction: layerInteraction,
       layerInteractionManager: layerInteractionManager,
