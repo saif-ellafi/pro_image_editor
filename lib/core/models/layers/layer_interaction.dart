@@ -14,11 +14,13 @@ class LayerInteraction {
   /// - [enableScale]: Enables the ability to scale the layer.
   /// - [enableRotate]: Enables the ability to rotate the layer.
   /// - [enableSelection]: Enables the ability to select the layer.
+  /// - [enableEdit]: Enables the ability to edit the layer.
   LayerInteraction({
     this.enableMove = true,
     this.enableScale = true,
     this.enableRotate = true,
     this.enableSelection = true,
+    this.enableEdit = true,
   });
 
   /// Creates a [LayerInteraction] instance from a [Map].
@@ -38,6 +40,7 @@ class LayerInteraction {
       enableScale: map[keyConverter('enableScale')] ?? false,
       enableRotate: map[keyConverter('enableRotate')] ?? false,
       enableSelection: map[keyConverter('enableSelection')] ?? false,
+      enableEdit: map[keyConverter('enableEdit')] ?? false,
     );
   }
 
@@ -49,6 +52,7 @@ class LayerInteraction {
   /// - [enableScale]
   /// - [enableRotate]
   /// - [enableSelection]
+  /// - [enableEdit]
   ///
   /// This factory constructor allows for quick initialization of a
   /// [LayerInteraction] object with uniform interaction capabilities.
@@ -58,6 +62,7 @@ class LayerInteraction {
       enableScale: value,
       enableRotate: value,
       enableSelection: value,
+      enableEdit: value,
     );
   }
 
@@ -73,6 +78,10 @@ class LayerInteraction {
   /// Whether selecting the layer is enabled.
   bool enableSelection;
 
+  /// Whether the layer is editable. This option currently affects only
+  /// TextLayers or WidgetLayers when the onTapEditSticker callback is set.
+  bool enableEdit;
+
   /// Creates a copy of this [LayerInteraction] with optional overrides.
   ///
   /// - [enableMove]: If provided, overrides the current `enableMove` setting.
@@ -81,17 +90,21 @@ class LayerInteraction {
   ///   setting.
   /// - [enableSelection]: If provided, overrides the current `enableSelection`
   ///   setting.
+  /// - [enableEdit]: if provided, overrides the current `enableEdit`
+  ///   setting.
   LayerInteraction copyWith({
     bool? enableMove,
     bool? enableScale,
     bool? enableRotate,
     bool? enableSelection,
+    bool? enableEdit,
   }) {
     return LayerInteraction(
       enableMove: enableMove ?? this.enableMove,
       enableScale: enableScale ?? this.enableScale,
       enableRotate: enableRotate ?? this.enableRotate,
       enableSelection: enableSelection ?? this.enableSelection,
+      enableEdit: enableEdit ?? this.enableEdit,
     );
   }
 
@@ -105,6 +118,7 @@ class LayerInteraction {
       'enableScale': enableScale,
       'enableRotate': enableRotate,
       'enableSelection': enableSelection,
+      'enableEdit': enableEdit,
     };
   }
 
@@ -121,6 +135,7 @@ class LayerInteraction {
         'enableRotate': enableRotate,
       if (interaction.enableSelection != enableSelection)
         'enableSelection': enableSelection,
+      if (interaction.enableEdit != enableEdit) 'enableEdit': enableEdit,
     };
   }
 
@@ -130,7 +145,8 @@ class LayerInteraction {
     return 'LayerInteraction(enableMove: $enableMove, '
         'enableScale: $enableScale, '
         'enableRotate: $enableRotate, '
-        'enableSelection: $enableSelection)';
+        'enableSelection: $enableSelection, '
+        'enableEdit: $enableEdit)';
   }
 
   /// Compares this [LayerInteraction] instance with another for equality.
@@ -145,7 +161,8 @@ class LayerInteraction {
         other.enableMove == enableMove &&
         other.enableScale == enableScale &&
         other.enableRotate == enableRotate &&
-        other.enableSelection == enableSelection;
+        other.enableSelection == enableSelection &&
+        other.enableEdit == enableEdit;
   }
 
   /// Returns a hash code for this [LayerInteraction] instance.
@@ -154,6 +171,7 @@ class LayerInteraction {
     return enableMove.hashCode ^
         enableScale.hashCode ^
         enableRotate.hashCode ^
-        enableSelection.hashCode;
+        enableSelection.hashCode ^
+        enableEdit.hashCode;
   }
 }
