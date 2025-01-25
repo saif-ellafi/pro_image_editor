@@ -2,15 +2,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:pro_image_editor/core/models/custom_widgets/utils/custom_widgets_typedef.dart';
-import 'package:pro_image_editor/shared/widgets/reactive_widgets/reactive_custom_widget.dart';
 
 import '/core/mixins/converted_configs.dart';
 import '/core/mixins/editor_configs_mixin.dart';
+import '/core/models/custom_widgets/utils/custom_widgets_typedef.dart';
 import '/core/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
 import '/core/models/layers/layer.dart';
 import '/plugins/defer_pointer/defer_pointer.dart';
+import '/shared/widgets/reactive_widgets/reactive_custom_widget.dart';
 import '../models/layer_item_interaction.dart';
 import 'layer_interaction_border_painter.dart';
 import 'layer_interaction_button.dart';
@@ -210,7 +210,8 @@ class _LayerInteractionHelperWidgetState
   }
 
   List<LayerInteractionItem> _buildDefaultInteractions() {
-    bool isLayerEditable = widget.layerData.runtimeType == TextLayer ||
+    bool isLayerEditable = widget.layerData.interaction.enableEdit &&
+            widget.layerData.runtimeType == TextLayer ||
         (widget.layerData.runtimeType == WidgetLayer &&
             widget.callbacks.stickerEditorCallbacks?.onTapEditSticker != null);
 

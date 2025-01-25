@@ -115,7 +115,7 @@ class MainEditorLayers extends StatelessWidget {
       layerInteractionManager.selectedLayerId =
           layer.id == layerInteractionManager.selectedLayerId ? '' : layer.id;
       checkInteractiveViewer();
-    } else if (layer is TextLayer) {
+    } else if (layer is TextLayer && layer.interaction.enableEdit) {
       onTextLayerTap(layer);
     }
   }
