@@ -163,12 +163,14 @@ class _LayerWidgetState extends State<LayerWidget>
   void _onSecondaryTapUp(TapUpDetails details) {
     if (_checkHitIsOutsideInCanvas()) return;
     final Offset clickPosition = details.globalPosition;
+    double spacing = 14.0;
 
     widget.onContextMenuToggled?.call(true);
 
     // Show a popup menu at the click position
     showMenu(
       context: context,
+      useRootNavigator: true,
       position: RelativeRect.fromLTRB(
         clickPosition.dx,
         clickPosition.dy,
@@ -176,21 +178,40 @@ class _LayerWidgetState extends State<LayerWidget>
         clickPosition.dy + 1.0, // Adding a small value to avoid zero height
       ),
       items: <PopupMenuEntry<String>>[
+        if (_layerType == _LayerType.text &&
+            widget.layerData.interaction.enableEdit)
+          PopupMenuItem<String>(
+            value: 'edit',
+            child: Row(
+              spacing: spacing,
+              children: [
+                Icon(layerInteraction.icons.edit),
+                Text(i18n.layerInteraction.edit),
+              ],
+            ),
+          ),
         PopupMenuItem<String>(
           value: 'remove',
           child: Row(
+            spacing: spacing,
             children: [
-              const Icon(Icons.delete_outline),
-              const SizedBox(width: 4),
+              Icon(layerInteraction.icons.remove),
               Text(i18n.layerInteraction.remove),
             ],
           ),
         ),
       ],
     ).then((String? selectedValue) {
-      if (selectedValue != null) {
-        widget.onRemoveTap?.call();
+      switch (selectedValue) {
+        case 'edit':
+          widget.onEditTap?.call();
+          break;
+        case 'remove':
+          widget.onRemoveTap?.call();
+          break;
+        default:
       }
+
       widget.onContextMenuToggled?.call(false);
     });
   }

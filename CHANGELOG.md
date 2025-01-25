@@ -1,7 +1,11 @@
 # Changelog
 
+## 8.0.3
+- **FIX**(blur-editor): Resolve issue where the slider animation does not work in the blur editor.
+- **FIX**(layer-context-menu): Resolve issue where the context menu is incorrectly positioned when the editor is embedded within the screen.
+
 ## 8.0.2
-- **FIX**(paint-editor): Resolve the issue where the paint editor did not use `appBarColor` from the style configuration. More details in PR [#333](https://github.com/hm21/pro_image_editor/pull/333)
+- **FIX**(paint-editor): Resolve issue where the paint editor did not use `appBarColor` from the style configuration. More details in PR [#333](https://github.com/hm21/pro_image_editor/pull/333)
 
 ## 8.0.1
 - **FIX**(layer-interaction): Fix issue where layers remove-area still appear when attempting to move a layer, even when `enableMove` is set to `false`. Resolves issue [#332](https://github.com/hm21/pro_image_editor/issues/332)
