@@ -12,8 +12,6 @@ import '../blur_editor.dart';
 /// The [BlurEditorBottombar] requires the following parameters:
 ///
 /// * [blurEditorConfigs]: Configuration settings for the blur editor.
-/// * [uiBlurStream]: A stream that provides updates to the UI for the blur
-/// effect.
 /// * [blurFactor]: The current factor by which the blur effect is applied.
 /// * [rebuildController]: A controller to manage rebuilding of the widget.
 /// * [blurEditorState]: The current state of the blur editor.
@@ -27,7 +25,6 @@ class BlurEditorBottombar extends StatelessWidget {
   const BlurEditorBottombar({
     super.key,
     required this.blurEditorConfigs,
-    required this.uiBlurStream,
     required this.blurFactor,
     required this.rebuildController,
     required this.blurEditorState,
@@ -41,14 +38,11 @@ class BlurEditorBottombar extends StatelessWidget {
   /// Configuration settings for the blur editor.
   final BlurEditorConfigs blurEditorConfigs;
 
-  /// Stream controller to handle UI blur updates.
-  final StreamController<void> uiBlurStream;
-
   /// Stream controller to handle rebuild events.
   final StreamController<void> rebuildController;
 
   /// The factor by which the blur effect is applied.
-  final double blurFactor;
+  final ValueNotifier<double> blurFactor;
 
   /// Callback function that is called when the blur value changes.
   ///
@@ -71,13 +65,13 @@ class BlurEditorBottombar extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 800),
             child: RepaintBoundary(
-              child: StreamBuilder(
-                  stream: uiBlurStream.stream,
-                  builder: (context, snapshot) {
+              child: ValueListenableBuilder(
+                  valueListenable: blurFactor,
+                  builder: (_, value, __) {
                     return blurEditorConfigs.widgets.slider?.call(
                           blurEditorState,
                           rebuildController.stream,
-                          blurFactor,
+                          value,
                           onChanged,
                           onChangedEnd,
                         ) ??
@@ -85,7 +79,7 @@ class BlurEditorBottombar extends StatelessWidget {
                           min: 0,
                           max: blurEditorConfigs.maxBlur,
                           divisions: 100,
-                          value: blurFactor,
+                          value: value,
                           onChanged: onChanged,
                           onChangeEnd: onChangedEnd,
                         );
