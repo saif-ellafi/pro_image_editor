@@ -67,7 +67,7 @@ class ImportStateHistory {
     final version = map[minifier.convertMainKey('version')] as String? ??
         ExportImportVersion.version_1_0_0;
     final stateHistory = <EditorStateHistory>[];
-    final widgetRecords = _parseWidgetRecords(map, version);
+    final widgetRecords = _parseWidgetRecords(map, version, minifier);
     final lastRenderedImgSize =
         safeParseSize(map[minifier.convertMainKey('lastRenderedImgSize')]);
     final List<EditorImage> requirePrecacheList = [];
@@ -193,7 +193,10 @@ class ImportStateHistory {
   }
 
   static List<Uint8List> _parseWidgetRecords(
-      Map<String, dynamic> map, String version) {
+    Map<String, dynamic> map,
+    String version,
+    EditorKeyMinifier minifier,
+  ) {
     List<dynamic> items = [];
     switch (version) {
       case ExportImportVersion.version_1_0_0:
@@ -203,7 +206,9 @@ class ImportStateHistory {
         items = (map['stickers'] as List<dynamic>? ?? []);
         break;
       default:
-        items = (map['widgetRecords'] as List<dynamic>? ?? []);
+        items =
+            (map[minifier.convertMainKey('widgetRecords')] as List<dynamic>? ??
+                []);
         break;
     }
 

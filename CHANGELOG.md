@@ -1,5 +1,8 @@
 # Changelog
 
+# 8.0.4
+- **FIX**(export/import): Resolve an issue where exported stickers within the JSON file could no longer be imported Resolves issue [#334](https://github.com/hm21/pro_image_editor/issues/334)
+
 ## 8.0.3
 - **FIX**(blur-editor): Resolve issue where the slider animation does not work in the blur editor.
 - **FIX**(layer-context-menu): Resolve issue where the context menu is incorrectly positioned when the editor is embedded within the screen.
