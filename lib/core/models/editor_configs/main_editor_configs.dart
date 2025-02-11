@@ -15,7 +15,7 @@ class MainEditorConfigs {
   const MainEditorConfigs({
     this.enableZoom = false,
     this.enableCloseButton = true,
-    this.enableEscapeButton = true,
+    this.onEscapeButton,
     this.editorMinScale = 1.0,
     this.editorMaxScale = 5.0,
     this.transformSetup,
@@ -28,12 +28,11 @@ class MainEditorConfigs {
   /// Determines whether the close button is displayed on the widget.
   final bool enableCloseButton;
 
-  /// A boolean flag to enable or disable the escape button functionality.
+  /// A function that handles pressing the ESC key.
   ///
-  /// When set to `true`, the escape button will be enabled, allowing users
-  /// to exit the editor or perform a specific action when the escape button
-  /// is pressed. When set to `false`, the escape button will be disabled.
-  final bool enableEscapeButton;
+  /// This function is called when the ESC key is pressed.
+  /// By default it is null, which runs the default onEscape behavior.
+  final Function()? onEscapeButton;
 
   /// {@template enableZoom}
   /// Indicates whether the editor supports zoom functionality.
@@ -106,7 +105,7 @@ class MainEditorConfigs {
   /// others unchanged.
   MainEditorConfigs copyWith({
     bool? enableCloseButton,
-    bool? enableEscapeButton,
+    Function()? onEscapeButton,
     bool? enableZoom,
     double? editorMinScale,
     double? editorMaxScale,
@@ -118,7 +117,7 @@ class MainEditorConfigs {
   }) {
     return MainEditorConfigs(
       enableCloseButton: enableCloseButton ?? this.enableCloseButton,
-      enableEscapeButton: enableEscapeButton ?? this.enableEscapeButton,
+      onEscapeButton: onEscapeButton ?? this.onEscapeButton,
       enableZoom: enableZoom ?? this.enableZoom,
       editorMinScale: editorMinScale ?? this.editorMinScale,
       editorMaxScale: editorMaxScale ?? this.editorMaxScale,
