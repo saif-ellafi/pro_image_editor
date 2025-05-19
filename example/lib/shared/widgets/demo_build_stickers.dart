@@ -21,7 +21,7 @@ class DemoBuildStickers extends StatelessWidget {
   });
 
   /// Callback function to set the selected sticker in the image editor layer.
-  final Function(Widget) setLayer;
+  final Function(WidgetLayer) setLayer;
 
   /// Controls the scroll behavior of the sticker grid.
   final ScrollController scrollController;
@@ -104,7 +104,7 @@ class DemoBuildStickers extends StatelessWidget {
     );
   }
 
-  SliverGrid _buildDemoStickers(int offset, Function(Widget) setLayer) {
+  SliverGrid _buildDemoStickers(int offset, Function(WidgetLayer) setLayer) {
     return SliverGrid.builder(
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 80,
@@ -115,42 +115,44 @@ class DemoBuildStickers extends StatelessWidget {
         itemBuilder: (context, index) {
           String url =
               'https://picsum.photos/id/${offset + (index + 3) * 3}/2000';
-          var widget = ClipRRect(
-            borderRadius: BorderRadius.circular(7),
-            child: Image.network(
-              url,
-              width: 120,
-              height: 120,
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                return AnimatedSwitcher(
-                  layoutBuilder: (currentChild, previousChildren) {
-                    return SizedBox(
-                      width: 120,
-                      height: 120,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        alignment: Alignment.center,
-                        children: <Widget>[
-                          ...previousChildren,
-                          if (currentChild != null) currentChild,
-                        ],
-                      ),
-                    );
-                  },
-                  duration: const Duration(milliseconds: 200),
-                  child: loadingProgress == null
-                      ? child
-                      : Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
+          var widget = WidgetLayer(
+            widget: ClipRRect(
+              borderRadius: BorderRadius.circular(7),
+              child: Image.network(
+                url,
+                width: 120,
+                height: 120,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  return AnimatedSwitcher(
+                    layoutBuilder: (currentChild, previousChildren) {
+                      return SizedBox(
+                        width: 120,
+                        height: 120,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          alignment: Alignment.center,
+                          children: <Widget>[
+                            ...previousChildren,
+                            if (currentChild != null) currentChild,
+                          ],
                         ),
-                );
-              },
+                      );
+                    },
+                    duration: const Duration(milliseconds: 200),
+                    child: loadingProgress == null
+                        ? child
+                        : Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          ),
+                  );
+                },
+              ),
             ),
           );
           return GestureDetector(
@@ -170,7 +172,7 @@ class DemoBuildStickers extends StatelessWidget {
             },
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
-              child: widget,
+              child: widget.widget,
             ),
           );
         });

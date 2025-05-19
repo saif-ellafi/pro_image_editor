@@ -107,8 +107,6 @@ class StickerEditorConfigs {
 /// manipulated within the user interface.
 typedef BuildStickers = Widget Function(
   Function(
-    Widget widget, {
-    WidgetLayerExportConfigs? exportConfigs,
-  }) setLayer,
+    WidgetLayer widgetLayer) setLayer,
   ScrollController scrollController,
 );

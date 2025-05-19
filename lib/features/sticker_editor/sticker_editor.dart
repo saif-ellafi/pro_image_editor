@@ -67,14 +67,9 @@ class StickerEditorState extends State<StickerEditor>
   ///
   /// [widget] is the widget to be set as the layer.
   void setLayer(
-    Widget widget, {
-    WidgetLayerExportConfigs? exportConfigs,
-  }) {
+    WidgetLayer widgetLayer) {
     Navigator.of(context).pop(
-      WidgetLayer(
-        widget: widget,
-        exportConfigs: exportConfigs ?? const WidgetLayerExportConfigs(),
-      ),
+      widgetLayer,
     );
   }
 }
