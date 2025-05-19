@@ -107,12 +107,12 @@ class _StickersExampleState extends State<StickersExample>
                           /// directly load the same sticker.
                           ///
                           /// If `exportConfigs` is not added, the editor will
-                          /// convert the exported state history to a `Uint8List`
+                          /// convert the exported state history to `Uint8List`
                           /// to restore the layer. However, this may reduce
                           /// quality and cause a delay during export.
                           ///
-                          /// If you use the ID parameter, it is important to set
-                          /// up a `widgetLoader` inside the `ImportEditorConfigs`
+                          /// If you use the ID parameter, it's important to set
+                          /// up a `widgetLoader` inside `ImportEditorConfigs`
                           ///  when importing the state history.
                           /// Refer to the [import-example](https://github.com/hm21/pro_image_editor/blob/stable/example/lib/features/import_export_example.dart)
                           /// for details on how this works.
