@@ -164,7 +164,7 @@ class StateManager {
   bool? get activeScreenshotIsBroken => activeScreenshot?.broken;
 
   /// Determines whether undo actions can be performed on the current state.
-  bool get canUndo => _historyPointer > 0;
+  bool get canUndo => _historyPointer > 1;
 
   /// Determines whether redo actions can be performed on the current state.
   bool get canRedo => _historyPointer < _stateHistory.length - 1;
