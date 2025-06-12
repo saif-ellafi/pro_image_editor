@@ -576,11 +576,6 @@ class ProImageEditorState extends State<ProImageEditor>
           }
         }
       },
-      onUndoRedo: (undo) {
-        if (_isDialogOpen || isSubEditorOpen) return;
-
-        undo ? undoAction() : redoAction();
-      },
     );
   }
 

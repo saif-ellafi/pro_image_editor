@@ -81,7 +81,6 @@ class DesktopInteractionManager {
     KeyEvent event, {
     required Layer? activeLayer,
     required Function onEscape,
-    required Function(bool) onUndoRedo,
   }) {
     final key = event.logicalKey.keyLabel;
     if (context.mounted) {
