@@ -71,9 +71,6 @@ class DesktopInteractionManager {
   /// A class representing callbacks for the Image Editor.
   final ProImageEditorCallbacks callbacks;
 
-  bool _ctrlDown = false;
-  bool _shiftDown = false;
-
   /// Handles keyboard events.
   ///
   /// This method responds to key events and performs actions based on the
@@ -115,28 +112,6 @@ class DesktopInteractionManager {
             break;
           case 'Arrow Right':
             _keyboardRotate(left: false, activeLayer: activeLayer);
-            break;
-          case 'Control Left':
-          case 'Control Right':
-            _ctrlDown = true;
-            break;
-          case 'Shift Left':
-          case 'Shift Right':
-            _shiftDown = true;
-            break;
-          case 'Z':
-            if (_ctrlDown) onUndoRedo(!_shiftDown);
-            break;
-        }
-      } else if (event is KeyUpEvent) {
-        switch (key) {
-          case 'Control Left':
-          case 'Control Right':
-            _ctrlDown = false;
-            break;
-          case 'Shift Left':
-          case 'Shift Right':
-            _shiftDown = false;
             break;
         }
       }
