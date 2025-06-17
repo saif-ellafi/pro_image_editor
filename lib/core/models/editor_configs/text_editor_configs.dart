@@ -43,6 +43,7 @@ class TextEditorConfigs {
     this.enableMainEditorZoomFactor = false,
     this.initFontSize = 24.0,
     this.initialTextAlign = TextAlign.center,
+    this.inputTextFieldAlign = Alignment.center,
     this.initFontScale = 1.0,
     this.maxFontScale = 3.0,
     this.minFontScale = 0.3,
@@ -84,6 +85,13 @@ class TextEditorConfigs {
 
   /// The initial text alignment for the layer.
   final TextAlign initialTextAlign;
+
+  /// The alignment of the input text field within the editor.
+  ///
+  /// Determines how the text field is positioned relative to its parent widget.
+  /// For example, [Alignment.center] will center the text field, while
+  /// [Alignment.topLeft] will align it to the top-left corner.
+  final Alignment inputTextFieldAlign;
 
   /// The initial font scale for text.
   final double initFontScale;
@@ -150,6 +158,7 @@ class TextEditorConfigs {
     bool? enableMainEditorZoomFactor,
     double? initFontSize,
     TextAlign? initialTextAlign,
+    Alignment? inputTextFieldAlign,
     double? initFontScale,
     double? maxFontScale,
     double? minFontScale,
@@ -174,6 +183,7 @@ class TextEditorConfigs {
           enableMainEditorZoomFactor ?? this.enableMainEditorZoomFactor,
       initFontSize: initFontSize ?? this.initFontSize,
       initialTextAlign: initialTextAlign ?? this.initialTextAlign,
+      inputTextFieldAlign: inputTextFieldAlign ?? this.inputTextFieldAlign,
       initFontScale: initFontScale ?? this.initFontScale,
       maxFontScale: maxFontScale ?? this.maxFontScale,
       minFontScale: minFontScale ?? this.minFontScale,

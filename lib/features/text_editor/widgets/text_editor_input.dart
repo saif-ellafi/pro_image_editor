@@ -106,7 +106,9 @@ class TextEditorInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Align(
+      alignment: configs.inputTextFieldAlign,
+
       ///  TODO: remove `IntrinsicWidth` after improve
       /// `RoundedBackgroundTextField` code
       child: IntrinsicWidth(

@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.13.0
+- **FEAT**(Text-Editor): Add the `inputTextFieldAlign` property to the `TextEditorConfigs` to dynamically align the input field. This was requested in [#502](https://github.com/hm21/pro_image_editor/issues/502).
+
+
 ## 9.12.0
 - **FEAT**(import): Add `enableInitialEmptyState` to `ImportEditorConfigs` so the editor can replace the existing state history without including an empty first page.
 
