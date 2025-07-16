@@ -82,7 +82,7 @@ class _PaintEditorLayerEditorState extends State<PaintEditorLayerEditor> {
       decoration: const BoxDecoration(),
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       height: 120,
-      child: FittedBox(
+      child: Center(
         child: SizedBox.fromSize(
           size: _layer.rawSize,
           child: LayerWidgetPaintItem(
