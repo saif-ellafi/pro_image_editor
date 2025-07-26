@@ -182,6 +182,7 @@ class _LayerWidgetState extends State<LayerWidget>
   Offset? _downPosition;
   Offset? _lastLayerOffset;
   int? _temporaryLayerHash;
+  int _currentMouseButtons = 0;
 
   DateTime _tapDownTimestamp = DateTime.now();
   Timer? _longPressTimer;
@@ -238,10 +239,17 @@ class _LayerWidgetState extends State<LayerWidget>
   void _onPointerDown(PointerDownEvent event) {
     if (GestureManager.instance.isBlocked) return;
 
+    // Ignore middle and right mouse button events
+    // let them pass through for canvas panning
+    if (event.buttons != kPrimaryButton && event.buttons != 0) {
+      return;
+    }
+
     _downPosition = event.position;
     _lastLayerOffset = _layer.offset;
     _temporaryLayerHash = _layer.hashCode;
     _tapDownTimestamp = DateTime.now();
+    _currentMouseButtons = event.buttons;
 
     if (_isOutsideHitBox()) return;
     if (!isDesktop || event.buttons != kSecondaryMouseButton) {
@@ -269,6 +277,14 @@ class _LayerWidgetState extends State<LayerWidget>
   void _onPointerUp(PointerUpEvent event) {
     _longPressTimer?.cancel();
     if (GestureManager.instance.isBlocked) return;
+
+    // Ignore middle and right mouse button events
+    // let them pass through for canvas panning
+    if (_currentMouseButtons != kPrimaryButton && _currentMouseButtons != 0) {
+      _currentMouseButtons = 0;
+      return;
+    }
+
     // Notify optional onTapUp callback
     widget.onTapUp?.call();
 
@@ -293,11 +309,16 @@ class _LayerWidgetState extends State<LayerWidget>
       if (timeElapsed > 250) return;
 
       // Fire onTap only if selection/edit is enabled and pointer is inside hit box
+      // Only process tap for left mouse button (primary) or touch gestures
       if ((interaction.enableSelection || interaction.enableEdit) &&
-          !_isOutsideHitBox()) {
+          !_isOutsideHitBox() &&
+          (_currentMouseButtons == 0 || _currentMouseButtons == kPrimaryButton)) {
         widget.onTap?.call(_layer);
       }
     });
+
+    // Reset mouse button state
+    _currentMouseButtons = 0;
   }
 
   bool _isOutsideHitBox() {
@@ -412,22 +433,37 @@ class _LayerWidgetState extends State<LayerWidget>
               return GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onSecondaryTapUp: isDesktop ? _onSecondaryTapUp : null,
-                child: Listener(
-                  behavior: HitTestBehavior.translucent,
-                  onPointerDown: _onPointerDown,
-                  onPointerUp: _onPointerUp,
-                  child: Padding(
-                    padding: !widget.selected
-                        ? EdgeInsets.zero
-                        : layerInteraction.style.overlayPadding,
-                    child: FittedBox(
-                      key: _layer.keyInternalSize,
-                      child: _buildContent(),
-                    ),
-                  ),
-                ),
+                child: _buildSelectiveListener(),
               );
             }),
+      ),
+    );
+  }
+
+  /// This Listener detects left mouse but also ignores undesired events
+  Widget _buildSelectiveListener() {
+    return Listener(
+      behavior: HitTestBehavior.deferToChild,
+      onPointerDown: (event) {
+        // Only handle left mouse button and touch events
+        if (event.buttons == kPrimaryButton || event.buttons == 0) {
+          _onPointerDown(event);
+        }
+      },
+      onPointerUp: (event) {
+        // Only handle if we processed the pointer down event
+        if (_currentMouseButtons == kPrimaryButton || _currentMouseButtons == 0) {
+          _onPointerUp(event);
+        }
+      },
+      child: Padding(
+        padding: !widget.selected
+            ? EdgeInsets.zero
+            : layerInteraction.style.overlayPadding,
+        child: FittedBox(
+          key: _layer.keyInternalSize,
+          child: _buildContent(),
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -495,6 +496,23 @@ class ProImageEditorState extends State<ProImageEditor>
   set enableMultiSelectMode(bool value) {
     _enableMultiSelectMode = value;
     setState(() {});
+  }
+
+  /// Tracks current pointer state for gesture control
+  bool _hasActivePointer = false;
+  int _currentMouseButtons = 0;
+
+  /// Indicates if pan/zoom should be enabled based on current interaction
+  bool get _shouldAllowPanZoom {
+    // Allow panning when:
+    // 1. No pointer is active (initial state) - for touch/trackpad
+    // 2. Middle mouse button is pressed (kTertiaryButton = 4)
+    // 3. Right mouse button is pressed (kSecondaryButton = 2)
+    // Block panning when only left mouse button is pressed (kPrimaryButton = 1)
+    if (!_hasActivePointer) return true; // Touch/trackpad gestures
+    
+    return (_currentMouseButtons & kTertiaryButton) != 0 ||  // Middle mouse
+           (_currentMouseButtons & kSecondaryButton) != 0;   // Right mouse
   }
 
   /// Get the current background image.
@@ -1041,8 +1059,13 @@ class ProImageEditorState extends State<ProImageEditor>
     }
 
     if (!hasSelectedLayers) {
-      _layerDragSelectionService.startDragging(details.localFocalPoint);
-      interactiveViewer.currentState?.onScaleStart(details);
+      // Only start rectangular selection for left mouse button (primary) or touch gestures
+      if (!_hasActivePointer || _currentMouseButtons == kPrimaryButton) {
+        _layerDragSelectionService.startDragging(details.localFocalPoint);
+      }
+      if (_shouldAllowPanZoom) {
+        interactiveViewer.currentState?.onScaleStart(details);
+      }
       return;
     }
 
@@ -1073,7 +1096,7 @@ class ProImageEditorState extends State<ProImageEditor>
 
     if (!hasSelectedLayers &&
         mainEditorConfigs.enableZoom &&
-        !enableMultiSelectMode) {
+        _shouldAllowPanZoom) {
       interactiveViewer.currentState?.onScaleUpdate(details);
       return;
     } else if (_layerDragSelectionService.isActive) {
@@ -1150,7 +1173,9 @@ class ProImageEditorState extends State<ProImageEditor>
       /// two-finger gestures as zooming the editor instead of scaling a layer.
       final hasMultiSelection = selectedLayers.length > 1;
 
-      if (hasMultiSelection && mainEditorConfigs.enableZoom) {
+      if (hasMultiSelection && 
+          mainEditorConfigs.enableZoom && 
+          _shouldAllowPanZoom) {
         interactiveViewer.currentState?.onScaleUpdate(details);
         return;
       }
@@ -1195,7 +1220,9 @@ class ProImageEditorState extends State<ProImageEditor>
     }
 
     if (!hasSelectedLayers) {
-      interactiveViewer.currentState?.onScaleEnd(details);
+      if (_shouldAllowPanZoom) {
+        interactiveViewer.currentState?.onScaleEnd(details);
+      }
     } else {
       /// At this point, we only create a screenshot since the new history
       /// entry was already added in [_onScaleStart].
@@ -2488,28 +2515,45 @@ class ProImageEditorState extends State<ProImageEditor>
                       );
                     }
                   : null,
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () {
-                  /// Only clear selection if the tap is not on any layer
-                  /// (e.g., background/canvas tap)
-                  /// This block should be triggered only for true
-                  /// background taps.
-                  if (!configs.videoEditor.enablePlayButton) {
-                    widget.videoController?.togglePlayState();
-                  }
-                  mainEditorCallbacks?.onTap?.call();
+              child: Listener(
+                onPointerDown: (PointerDownEvent event) {
+                  _hasActivePointer = true;
+                  _currentMouseButtons = event.buttons;
                 },
-                onLongPress: mainEditorCallbacks?.onLongPress,
-                onScaleStart: _onScaleStart,
-                onScaleUpdate: _onScaleUpdate,
-                onScaleEnd: _onScaleEnd,
-                child: mainEditorConfigs.widgets.wrapBody?.call(
-                      this,
-                      _rebuildController.stream,
+                onPointerUp: (PointerUpEvent event) {
+                  _hasActivePointer = false;
+                  _currentMouseButtons = 0;
+                },
+                onPointerCancel: (PointerCancelEvent event) {
+                  _hasActivePointer = false;
+                  _currentMouseButtons = 0;
+                },
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    // Only process tap for left mouse button or touch
+                    if (!_hasActivePointer || _currentMouseButtons == kPrimaryButton) {
+                      /// Only clear selection if the tap is not on any layer
+                      /// (e.g., background/canvas tap)
+                      /// This block should be triggered only for true
+                      /// background taps.
+                      if (!configs.videoEditor.enablePlayButton) {
+                        widget.videoController?.togglePlayState();
+                      }
+                      mainEditorCallbacks?.onTap?.call();
+                    }
+                  },
+                  onLongPress: mainEditorCallbacks?.onLongPress,
+                  onScaleStart: _onScaleStart,
+                  onScaleUpdate: _onScaleUpdate,
+                  onScaleEnd: _onScaleEnd,
+                  child: mainEditorConfigs.widgets.wrapBody?.call(
+                        this,
+                        _rebuildController.stream,
+                        _buildInteractiveContent(),
+                      ) ??
                       _buildInteractiveContent(),
-                    ) ??
-                    _buildInteractiveContent(),
+                ),
               ),
             );
     });
