@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '/core/models/layers/paint_layer.dart';
 import '/features/paint_editor/enums/paint_editor_enum.dart';
 import '/features/paint_editor/widgets/draw_paint_item.dart';
-import '/shared/utils/platform_info.dart';
 
 /// A widget representing a paint layer in the sticker editor.
 class LayerWidgetPaintItem extends StatelessWidget {
@@ -49,8 +48,7 @@ class LayerWidgetPaintItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      // Improves hit detection for mobile devices by adding padding.
-      padding: EdgeInsets.all(isDesktop ? 0 : 15),
+      padding: EdgeInsets.zero,
       child: RepaintBoundary(
         child: Opacity(
           opacity: layer.opacity,
