@@ -47,23 +47,20 @@ class LayerWidgetPaintItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.zero,
-      child: RepaintBoundary(
-        child: Opacity(
-          opacity: layer.opacity,
-          child: CustomPaint(
-            size: layer.size,
-            willChange: willChange,
-            isComplex: layer.item.mode == PaintMode.freeStyle,
-            painter: DrawPaintItem(
-              item: layer.item,
-              scale: scale,
-              selected: isSelected,
-              enabledHitDetection: enableHitDetection,
-              freeStyleHighPerformance: isHighPerformanceMode,
-              onHitChanged: onHitChanged,
-            ),
+    return RepaintBoundary(
+      child: Opacity(
+        opacity: layer.opacity,
+        child: CustomPaint(
+          size: layer.size,
+          willChange: willChange,
+          isComplex: layer.item.mode == PaintMode.freeStyle,
+          painter: DrawPaintItem(
+            item: layer.item,
+            scale: scale,
+            selected: isSelected,
+            enabledHitDetection: enableHitDetection,
+            freeStyleHighPerformance: isHighPerformanceMode,
+            onHitChanged: onHitChanged,
           ),
         ),
       ),
