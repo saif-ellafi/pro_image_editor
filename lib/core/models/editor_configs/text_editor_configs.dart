@@ -44,7 +44,7 @@ class TextEditorConfigs implements BaseEditorLayerConfigs {
     this.showFontScaleButton = true,
     this.showBackgroundModeButton = true,
     this.enableMainEditorZoomFactor = false,
-    this.enableAutoOverflow = false,
+    this.enableAutoOverflow = true,
     this.initFontSize = 24.0,
     this.initialPrimaryColor = const Color(0xFF000000),
     this.initialSecondaryColor,
