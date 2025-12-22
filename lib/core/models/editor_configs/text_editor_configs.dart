@@ -56,7 +56,7 @@ class TextEditorConfigs
       this.enableMainEditorZoomFactor = false,
       this.enableTapOutsideToSave = true,
       this.enableAutoOverflow = true,
-      this.enableAutoWrapOnLayer = false,
+      this.enableAutoWrapOnLayer = true,
       this.initFontSize = 24.0,
       this.initialPrimaryColor = const Color(0xFF000000),
       this.initialSecondaryColor,
