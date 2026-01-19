@@ -65,7 +65,8 @@ class TextEditorStyle {
     this.fontScaleBottomSheetBackground = const Color(0xFF252728),
     this.inputTextFieldBackground = Colors.transparent,
     this.inputTextFieldBorderColor = Colors.transparent,
-    this.inputTextFieldBorderRadius = const BorderRadius.all(Radius.circular(4)),
+    this.inputTextFieldBorderRadius =
+        const BorderRadius.all(Radius.circular(4)),
     this.inputTextFieldPadding = EdgeInsets.zero,
   });
 
