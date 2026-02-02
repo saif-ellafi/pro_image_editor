@@ -405,6 +405,7 @@ class ProImageEditorState extends State<ProImageEditor>
         EditorZoomMixin {
   final _bottomBarKey = GlobalKey();
   final _removeAreaKey = GlobalKey();
+  final _navigatorKey = GlobalKey<NavigatorState>();
   final _backgroundImageColorFilterKey = GlobalKey<ColorFilterGeneratorState>();
   @override
   final interactiveViewer = GlobalKey<ExtendedInteractiveViewerState>();
@@ -1475,87 +1476,91 @@ class ProImageEditorState extends State<ProImageEditor>
     _pageOpenCompleter = Completer();
 
     final subEditorStyle = mainEditorConfigs.style.subEditorPage;
-    return Navigator.push<T?>(
-      context,
-      PageRouteBuilder(
-        opaque: false,
-        barrierColor: subEditorStyle.barrierColor,
-        barrierDismissible: subEditorStyle.barrierDismissible,
-        transitionDuration: duration,
-        reverseTransitionDuration: duration,
-        transitionsBuilder: subEditorStyle.transitionsBuilder ??
-            (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-        pageBuilder: (context, animation, secondaryAnimation) {
-          void animationStatusListener(AnimationStatus status) {
-            switch (status) {
-              case AnimationStatus.completed:
-                if (cropRotateEditor.currentState != null) {
-                  cropRotateEditor.currentState!.hideFakeHero();
+    var route = PageRouteBuilder<T?>(
+      opaque: false,
+      barrierColor: subEditorStyle.barrierColor,
+      barrierDismissible: subEditorStyle.barrierDismissible,
+      transitionDuration: duration,
+      reverseTransitionDuration: duration,
+      transitionsBuilder: subEditorStyle.transitionsBuilder ??
+          (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+      pageBuilder: (context, animation, secondaryAnimation) {
+        void animationStatusListener(AnimationStatus status) {
+          switch (status) {
+            case AnimationStatus.completed:
+              if (cropRotateEditor.currentState != null) {
+                cropRotateEditor.currentState!.hideFakeHero();
+              }
+              break;
+            case AnimationStatus.dismissed:
+              setState(() {
+                isSubEditorOpen = false;
+                isSubEditorClosing = false;
+                if (!_pageOpenCompleter.isCompleted) {
+                  _pageOpenCompleter.complete(true);
                 }
-                break;
-              case AnimationStatus.dismissed:
-                setState(() {
-                  isSubEditorOpen = false;
-                  isSubEditorClosing = false;
-                  if (!_pageOpenCompleter.isCompleted) {
-                    _pageOpenCompleter.complete(true);
-                  }
 
-                  if (stateManager.heroScreenshotRequired) {
-                    stateManager.heroScreenshotRequired = false;
-                    _takeScreenshot();
-                  }
-                });
+                if (stateManager.heroScreenshotRequired) {
+                  stateManager.heroScreenshotRequired = false;
+                  _takeScreenshot();
+                }
+              });
 
-                animation.removeStatusListener(animationStatusListener);
-                mainEditorCallbacks?.handleEndCloseSubEditor(editorName);
-                break;
-              case AnimationStatus.reverse:
-                isSubEditorClosing = true;
-                mainEditorCallbacks?.handleStartCloseSubEditor(editorName);
+              animation.removeStatusListener(animationStatusListener);
+              mainEditorCallbacks?.handleEndCloseSubEditor(editorName);
+              break;
+            case AnimationStatus.reverse:
+              isSubEditorClosing = true;
+              mainEditorCallbacks?.handleStartCloseSubEditor(editorName);
 
-                break;
-              case AnimationStatus.forward:
-                break;
-            }
+              break;
+            case AnimationStatus.forward:
+              break;
           }
+        }
 
-          animation.addStatusListener(animationStatusListener);
+        animation.addStatusListener(animationStatusListener);
 
-          if (!subEditorStyle.requireReposition) return page;
+        if (!subEditorStyle.requireReposition) return page;
 
-          return SafeArea(
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Positioned(
-                  top: subEditorStyle.positionTop,
-                  left: subEditorStyle.positionLeft,
-                  right: subEditorStyle.positionRight,
-                  bottom: subEditorStyle.positionBottom,
-                  child: Center(
-                    child: Container(
-                      width: subEditorStyle.enforceSizeFromMainEditor
-                          ? sizesManager.editorSize.width
-                          : null,
-                      height: subEditorStyle.enforceSizeFromMainEditor
-                          ? sizesManager.editorSize.height
-                          : null,
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                        borderRadius: subEditorStyle.borderRadius,
-                      ),
-                      child: page,
+        return SafeArea(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Positioned(
+                top: subEditorStyle.positionTop,
+                left: subEditorStyle.positionLeft,
+                right: subEditorStyle.positionRight,
+                bottom: subEditorStyle.positionBottom,
+                child: Center(
+                  child: Container(
+                    width: subEditorStyle.enforceSizeFromMainEditor
+                        ? sizesManager.editorSize.width
+                        : null,
+                    height: subEditorStyle.enforceSizeFromMainEditor
+                        ? sizesManager.editorSize.height
+                        : null,
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(
+                      borderRadius: subEditorStyle.borderRadius,
                     ),
+                    child: page,
                   ),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (mainEditorConfigs.enableSubEditorPage) {
+      return _navigatorKey.currentState!.push<T?>(route);
+    }
+    return Navigator.push<T?>(
+      context,
+      route,
     );
   }
 
@@ -2493,10 +2498,17 @@ class ProImageEditorState extends State<ProImageEditor>
     return RecordInvisibleWidget(
       controller: _controllers.screenshot,
       child: ExtendedPopScope(
-        canPop: isPopScopeDisabled ||
-            !stateManager.canUndo ||
-            _isProcessingFinalImage,
+        canPop: (isPopScopeDisabled ||
+                !stateManager.canUndo ||
+                _isProcessingFinalImage) &&
+            (!mainEditorConfigs.enableSubEditorPage || !isSubEditorOpen),
         onPopInvokedWithResult: (didPop, result) {
+          if (mainEditorConfigs.enableSubEditorPage && isSubEditorOpen) {
+            if (_navigatorKey.currentState?.canPop() == true) {
+              _navigatorKey.currentState?.pop();
+              return;
+            }
+          }
           if (!didPop &&
               !isPopScopeDisabled &&
               stateManager.canUndo &&
@@ -2545,13 +2557,37 @@ class ProImageEditorState extends State<ProImageEditor>
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       sizesManager.editorSize = constraints.biggest;
-                      return Scaffold(
+                      var scaffold = Scaffold(
                         backgroundColor: mainEditorConfigs.style.background,
                         resizeToAvoidBottomInset: false,
                         appBar: _buildAppBar(),
                         body: _buildBody(),
                         bottomNavigationBar: _buildBottomNavBar(),
                       );
+
+                      if (mainEditorConfigs.enableSubEditorPage) {
+                        return Stack(
+                          children: [
+                            scaffold,
+                            Positioned.fill(
+                              child: IgnorePointer(
+                                ignoring: !isSubEditorOpen,
+                                child: Navigator(
+                                  key: _navigatorKey,
+                                  onGenerateRoute: (settings) =>
+                                      PageRouteBuilder(
+                                    opaque: false,
+                                    pageBuilder: (context, _, __) =>
+                                        const SizedBox.shrink(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+
+                      return scaffold;
                     },
                   ),
                 ),

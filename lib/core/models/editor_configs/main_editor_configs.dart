@@ -42,6 +42,7 @@ class MainEditorConfigs extends ZoomConfigs {
       SubEditorMode.emoji,
       // SubEditorMode.sticker,
     ],
+    this.enableSubEditorPage = false,
     this.style = const MainEditorStyle(),
     this.icons = const MainEditorIcons(),
     this.widgets = const MainEditorWidgets(),
@@ -89,6 +90,9 @@ class MainEditorConfigs extends ZoomConfigs {
 
   /// Defines the safe area configuration for the editor.
   final EditorSafeArea safeArea;
+
+  /// Whether to use the sub-editor page without pushing a new route.
+  final bool enableSubEditorPage;
 
   /// Defines which sub-editors are available in the bottom-bar of the editor.
   ///
@@ -138,8 +142,10 @@ class MainEditorConfigs extends ZoomConfigs {
     Curve? doubleTapZoomCurve,
     EditorSafeArea? safeArea,
     List<SubEditorMode>? tools,
+    bool? enableSubEditorPage,
   }) {
     return MainEditorConfigs(
+      enableSubEditorPage: enableSubEditorPage ?? this.enableSubEditorPage,
       enableCloseButton: enableCloseButton ?? this.enableCloseButton,
       enableEscapeButton: enableEscapeButton ?? this.enableEscapeButton,
       transformSetup: transformSetup ?? this.transformSetup,
