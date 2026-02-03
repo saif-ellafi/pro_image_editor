@@ -1,6 +1,18 @@
 # Changelog
 
-## 11.18.4
+## 11.20.1
+- **FIX**: Resolve issue where DeferPointer shows an error when the hero animations is running for the text layers from the custom screens.
+
+## 11.20.0
+- **FEAT**(main-editor): Add the flag `enableSubEditorPage` which allows sub-editors to be opened with the same constraints as the editor itself. More details in PR [#752](https://github.com/hm21/pro_image_editor/pull/752).
+
+## 11.19.1
+- **FEAT**(main-editor): Add `onEditTextLayer` callback to `MainEditorCallbacks`, allowing users to open a custom text editor when a text layer is tapped.
+- **FEAT**(main-editor): Add `onCreateTextLayer` callback to `MainEditorCallbacks`, allowing users to open a custom text editor when creating a new text layer.
+- **FEAT**(text-editor): Add `bodyItemsOverlay` to `TextEditorWidgets` for placing custom widgets above all other content in the text editor body.
+- **FEAT**(text-editor): Add `textFieldPadding` to `TextEditorStyle` for applying padding outside the scroll area of the text field.
+
+## 11.19.0
 - **FEAT**(CompleteParameters): Add serialization methods (`toMap`, `fromMap`, `toJson`, `fromJson`).
 
 ## 11.18.3
