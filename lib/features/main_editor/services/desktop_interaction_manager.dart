@@ -124,7 +124,9 @@ class DesktopInteractionManager {
         _keyboardRotate(isLeftRotation: false, selectedLayers: selectedLayers);
         break;
       case 'Z':
-        if (_keyboard.isCtrlPressed) onUndoRedo(!_keyboard.isShiftPressed);
+        if (_keyboard.isCtrlPressed && !_keyboard.isAltPressed) {
+          onUndoRedo(!_keyboard.isShiftPressed);
+        }
         break;
     }
 
