@@ -1,5 +1,15 @@
 # Changelog
 
+## 11.21.2
+- **FEAT**(video-editor): Add `showControls` config to `VideoEditorConfigs` to allow hiding the video editor controls UI.
+
+## 11.21.1
+- **FEAT**(text-editor): Add `resizeToAvoidBottomInset` config to control whether the editor resizes when the keyboard appears.
+- **FIX**(paint-editor): Resolve issue where erasing would randomly remove other layers.
+
+## 11.21.0
+- **FIX**(keyboard-shortcuts): Block Ctrl-based shortcuts when Alt is pressed to prevent conflicts with keyboard layouts (e.g., Polish) where Ctrl+Alt+Z is used for typing characters. More details in PR [#757](https://github.com/hm21/pro_image_editor/pull/757).
+
 ## 11.20.1
 - **FIX**: Resolve issue where DeferPointer shows an error when the hero animations is running for the text layers from the custom screens.
 
