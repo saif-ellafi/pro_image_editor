@@ -29,6 +29,7 @@ class MainEditorConfigs extends ZoomConfigs {
     super.invertTrackpadDirection,
     this.transformSetup,
     this.enableCloseButton = true,
+    this.enableKeyboardShortcuts = true,
     this.enableEscapeButton = true,
     this.canZoomWhenLayerSelected = true,
     this.mobilePanInteraction = MobilePanInteraction.move,
@@ -51,6 +52,12 @@ class MainEditorConfigs extends ZoomConfigs {
 
   /// Determines whether the close button is displayed on the widget.
   final bool enableCloseButton;
+
+  /// Whether keyboard shortcuts are enabled.
+  ///
+  /// When set to `true`, the editor responds to keyboard events (shortcuts).
+  /// If set to `false`, keyboard shortcuts are disabled.
+  final bool enableKeyboardShortcuts;
 
   /// Defines the configuration for pan interactions on mobile devices.
   ///
@@ -124,6 +131,7 @@ class MainEditorConfigs extends ZoomConfigs {
   /// others unchanged.
   MainEditorConfigs copyWith({
     bool? enableCloseButton,
+    bool? enableKeyboardShortcuts,
     bool? enableEscapeButton,
     MainEditorTransformSetup? transformSetup,
     MainEditorStyle? style,
@@ -147,6 +155,8 @@ class MainEditorConfigs extends ZoomConfigs {
     return MainEditorConfigs(
       enableSubEditorPage: enableSubEditorPage ?? this.enableSubEditorPage,
       enableCloseButton: enableCloseButton ?? this.enableCloseButton,
+      enableKeyboardShortcuts:
+          enableKeyboardShortcuts ?? this.enableKeyboardShortcuts,
       enableEscapeButton: enableEscapeButton ?? this.enableEscapeButton,
       transformSetup: transformSetup ?? this.transformSetup,
       style: style ?? this.style,
