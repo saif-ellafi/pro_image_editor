@@ -1340,6 +1340,10 @@ class ProImageEditorState extends State<ProImageEditor>
   /// lines and flags.
   void _onScaleEnd(ScaleEndDetails details) async {
     mainEditorCallbacks?.handleScaleEnd(details);
+    if (selectedLayers.isNotEmpty) {
+      mainEditorCallbacks
+          ?.handleLayerInteractionEnd(List.of(selectedLayers));
+    }
     layerInteractionManager.activeInteractionLayer = null;
 
     /// Check if layers should be removed.
