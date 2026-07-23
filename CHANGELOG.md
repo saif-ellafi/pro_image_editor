@@ -1,5 +1,8 @@
 # Changelog
 
+## 13.2.1
+- **FIX**(text-editor): Stop the rounded background text from growing and reflowing the moment editing completes (#849). The editing preview now reserves the same hit-box padding as the finished layer and wraps the background at the same column as the editable text, so the background no longer shifts or changes line count when editing ends.
+
 ## 13.2.0
 - **FEAT**(paint): Combine several selected paint layers into one via `mergeSelectedLayers()` / `canMergeSelectedLayers`. `PaintLayer` now holds multiple `items`, baking each source transform into a shared frame so the drawing looks identical after merging.
 - **FEAT**(filter): Flatten the active filter stack into a single `FilterState` via `mergeFilters()` / `canMergeFilters` (appearance-identical; skipped for video-timeline filters).
