@@ -1,5 +1,8 @@
 # Changelog
 
+## 13.3.0
+- **FEAT**(layers): Rasterize layers outside a live editor session with `LayerRasterizer` and `LayerRasterizerHost`.
+
 ## 13.2.3
 - **FIX**(main-editor): A layer sharing its position with others (a stack of overlapping layers) can now be dragged away instead of being trapped by their coincident alignment guides. Snapping re-arms once the layer moves clear.
 
