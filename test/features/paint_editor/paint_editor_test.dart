@@ -1,4 +1,5 @@
 // Flutter imports:
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -6,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 import 'package:pro_image_editor/features/paint_editor/widgets/paint_canvas.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
+import 'package:pro_image_editor/shared/widgets/extended/interactive_viewer/extended_interactive_viewer.dart';
 import 'package:pro_image_editor/shared/widgets/layer/layer_widget.dart';
 import 'package:pro_image_editor/shared/widgets/slider_bottom_sheet.dart';
 
@@ -444,5 +446,166 @@ void main() {
       expect(editor.historyPointer, 0);
       expect(editor.canUndo, isFalse);
     });
+  });
+
+  group('PaintEditor zoom while drawing', () {
+    Future<void> pumpZoomEditor(
+      WidgetTester tester, {
+      bool enableZoomWhileDrawing = true,
+      EdgeInsets boundaryMargin = EdgeInsets.zero,
+    }) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PaintEditor.memory(
+              mockMemoryImage,
+              key: key,
+              initConfigs: PaintEditorInitConfigs(
+                theme: ThemeData(),
+                configs: ProImageEditorConfigs(
+                  paintEditor: PaintEditorConfigs(
+                    enableZoom: true,
+                    enableZoomWhileDrawing: enableZoomWhileDrawing,
+                    boundaryMargin: boundaryMargin,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+    }
+
+    Future<void> expectMouseButtonPansWithoutDrawing(
+      WidgetTester tester,
+      int buttons,
+    ) async {
+      await pumpZoomEditor(
+        tester,
+        boundaryMargin: const EdgeInsets.all(double.infinity),
+      );
+
+      final editor = key.currentState!;
+      expect(editor.paintMode, PaintMode.freeStyle);
+
+      final Offset center = tester.getCenter(
+        find.byKey(editor.interactiveViewer),
+      );
+      final TestGesture gesture = await tester.startGesture(
+        center,
+        kind: PointerDeviceKind.mouse,
+        buttons: buttons,
+      );
+      await gesture.moveBy(const Offset(80, 40));
+      expect(
+        editor.interactiveViewer.currentState!.transformMatrix4
+            .getTranslation()
+            .x,
+        isNot(0),
+      );
+      await gesture.up();
+      await tester.pump();
+      expect(
+        editor.interactiveViewer.currentState!.transformMatrix4
+            .getTranslation()
+            .x,
+        isNot(0),
+      );
+      expect(editor.canUndo, isFalse);
+    }
+
+    testWidgets('keeps scale on and pan off in a drawing tool', (tester) async {
+      await pumpZoomEditor(tester);
+
+      final viewer = key.currentState!.interactiveViewer.currentState!;
+      expect(key.currentState!.paintMode, PaintMode.freeStyle);
+      expect(viewer.isPanEnabled, isFalse);
+      expect(viewer.isScaleEnabled, isTrue);
+    });
+
+    testWidgets('enables pan and scale in moveAndZoom', (tester) async {
+      await pumpZoomEditor(tester);
+
+      key.currentState!.setMode(PaintMode.moveAndZoom);
+      await tester.pump();
+
+      final viewer = key.currentState!.interactiveViewer.currentState!;
+      expect(viewer.isPanEnabled, isTrue);
+      expect(viewer.isScaleEnabled, isTrue);
+    });
+
+    testWidgets('freezes the viewer when enableZoomWhileDrawing is false', (
+      tester,
+    ) async {
+      await pumpZoomEditor(tester, enableZoomWhileDrawing: false);
+
+      final viewer = key.currentState!.interactiveViewer.currentState!;
+      expect(viewer.isPanEnabled, isFalse);
+      expect(viewer.isScaleEnabled, isFalse);
+    });
+
+    testWidgets(
+      'right mouse button pans without drawing',
+      (tester) async {
+        await expectMouseButtonPansWithoutDrawing(
+          tester,
+          kSecondaryMouseButton,
+        );
+      },
+    );
+
+    testWidgets(
+      'middle mouse button pans without drawing',
+      (tester) async {
+        await expectMouseButtonPansWithoutDrawing(
+          tester,
+          kMiddleMouseButton,
+        );
+      },
+    );
+
+    testWidgets(
+      'right mouse button pans when click-drag pan is disabled',
+      (tester) async {
+        final viewerKey = GlobalKey<ExtendedInteractiveViewerState>();
+        const childKey = Key('aux-pan-child');
+        await tester.pumpWidget(
+          MaterialApp(
+            home: SizedBox(
+              width: 400,
+              height: 400,
+              child: ExtendedInteractiveViewer(
+                key: viewerKey,
+                panEnabled: false,
+                scaleEnabled: true,
+                zoomConfigs: const PaintEditorConfigs(
+                  enableZoom: true,
+                  boundaryMargin: EdgeInsets.all(double.infinity),
+                ),
+                onInteractionStart: (_) {},
+                onInteractionUpdate: (_) {},
+                onInteractionEnd: (_) {},
+                child: const ColoredBox(key: childKey, color: Colors.red),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        final viewer = viewerKey.currentState!;
+        final Offset center = tester.getCenter(find.byKey(childKey));
+        final TestGesture gesture = await tester.startGesture(
+          center,
+          kind: PointerDeviceKind.mouse,
+          buttons: kSecondaryMouseButton,
+        );
+        await gesture.moveBy(const Offset(50, 0));
+        await tester.pump();
+        await gesture.up();
+
+        expect(viewer.transformMatrix4.getTranslation().x, isNot(0));
+      },
+    );
   });
 }

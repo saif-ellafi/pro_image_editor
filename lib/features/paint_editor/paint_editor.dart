@@ -626,11 +626,30 @@ class PaintEditorState extends State<PaintEditor>
     paintCtrl.setMode(mode);
     paintEditorCallbacks?.handlePaintModeChanged(mode);
     rebuildController.add(null);
-    interactiveViewer.currentState?.setEnableInteraction(
-      mode == PaintMode.moveAndZoom,
-    );
+    _syncViewerInteraction();
     _paintCanvas.currentState?.setState(() {});
     setState(() {});
+  }
+
+  bool get _viewerPanEnabled =>
+      _enableZoom && paintMode == PaintMode.moveAndZoom;
+
+  bool get _viewerScaleEnabled {
+    if (!_enableZoom) return false;
+    if (paintMode == PaintMode.moveAndZoom) return true;
+    return paintEditorConfigs.enableZoomWhileDrawing;
+  }
+
+  void _syncViewerInteraction() {
+    interactiveViewer.currentState?.setPanAndScaleEnabled(
+      pan: _viewerPanEnabled,
+      scale: _viewerScaleEnabled,
+    );
+  }
+
+  void _onPaintViewerMatrixChanged(Matrix4 value) {
+    _paintCanvas.currentState?.cancelActiveDrawing();
+    callbacks.paintEditorCallbacks?.onEditorZoomMatrix4Change?.call(value);
   }
 
   /// Undoes the last action performed in the paint editor.
@@ -1009,7 +1028,9 @@ class PaintEditorState extends State<PaintEditor>
               ? initConfigs.initialZoomMatrix
               : null,
           zoomConfigs: paintEditorConfigs,
-          enableInteraction: paintMode == PaintMode.moveAndZoom,
+          enableInteraction: _viewerPanEnabled || _viewerScaleEnabled,
+          panEnabled: _viewerPanEnabled,
+          scaleEnabled: _viewerScaleEnabled,
           onInteractionStart: (details) {
             callbacks.paintEditorCallbacks?.onEditorZoomScaleStart?.call(
               details,
@@ -1022,8 +1043,7 @@ class PaintEditorState extends State<PaintEditor>
             callbacks.paintEditorCallbacks?.onEditorZoomScaleEnd?.call(details);
             setState(() {});
           },
-          onMatrix4Change:
-              callbacks.paintEditorCallbacks?.onEditorZoomMatrix4Change,
+          onMatrix4Change: _onPaintViewerMatrixChanged,
           child: Stack(
             alignment: Alignment.center,
             fit: StackFit.expand,
@@ -1278,6 +1298,13 @@ class PaintEditorState extends State<PaintEditor>
       ..add(FlagProperty('canRedo', value: canRedo, ifTrue: 'can redo'))
       ..add(
         FlagProperty('_enableZoom', value: _enableZoom, ifTrue: 'zoom enabled'),
+      )
+      ..add(
+        FlagProperty(
+          'enableZoomWhileDrawing',
+          value: paintEditorConfigs.enableZoomWhileDrawing,
+          ifTrue: 'zoom while drawing',
+        ),
       )
       ..add(
         FlagProperty(
