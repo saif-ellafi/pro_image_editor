@@ -572,67 +572,54 @@ void main() {
       expect(viewer.isScaleEnabled, isFalse);
     });
 
-    testWidgets(
-      'right mouse button pans without drawing',
-      (tester) async {
-        await expectMouseButtonPansWithoutDrawing(
-          tester,
-          kSecondaryMouseButton,
-        );
-      },
-    );
+    testWidgets('right mouse button pans without drawing', (tester) async {
+      await expectMouseButtonPansWithoutDrawing(tester, kSecondaryMouseButton);
+    });
 
-    testWidgets(
-      'middle mouse button pans without drawing',
-      (tester) async {
-        await expectMouseButtonPansWithoutDrawing(
-          tester,
-          kMiddleMouseButton,
-        );
-      },
-    );
+    testWidgets('middle mouse button pans without drawing', (tester) async {
+      await expectMouseButtonPansWithoutDrawing(tester, kMiddleMouseButton);
+    });
 
-    testWidgets(
-      'right mouse button pans when click-drag pan is disabled',
-      (tester) async {
-        final viewerKey = GlobalKey<ExtendedInteractiveViewerState>();
-        const childKey = Key('aux-pan-child');
-        await tester.pumpWidget(
-          MaterialApp(
-            home: SizedBox(
-              width: 400,
-              height: 400,
-              child: ExtendedInteractiveViewer(
-                key: viewerKey,
-                panEnabled: false,
-                scaleEnabled: true,
-                zoomConfigs: const PaintEditorConfigs(
-                  enableZoom: true,
-                  boundaryMargin: EdgeInsets.all(double.infinity),
-                ),
-                onInteractionStart: (_) {},
-                onInteractionUpdate: (_) {},
-                onInteractionEnd: (_) {},
-                child: const ColoredBox(key: childKey, color: Colors.red),
+    testWidgets('right mouse button pans when click-drag pan is disabled', (
+      tester,
+    ) async {
+      final viewerKey = GlobalKey<ExtendedInteractiveViewerState>();
+      const childKey = Key('aux-pan-child');
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SizedBox(
+            width: 400,
+            height: 400,
+            child: ExtendedInteractiveViewer(
+              key: viewerKey,
+              panEnabled: false,
+              scaleEnabled: true,
+              zoomConfigs: const PaintEditorConfigs(
+                enableZoom: true,
+                boundaryMargin: EdgeInsets.all(double.infinity),
               ),
+              onInteractionStart: (_) {},
+              onInteractionUpdate: (_) {},
+              onInteractionEnd: (_) {},
+              child: const ColoredBox(key: childKey, color: Colors.red),
             ),
           ),
-        );
-        await tester.pump();
+        ),
+      );
+      await tester.pump();
 
-        final viewer = viewerKey.currentState!;
-        final Offset center = tester.getCenter(find.byKey(childKey));
-        final TestGesture gesture = await tester.startGesture(
-          center,
-          kind: PointerDeviceKind.mouse,
-          buttons: kSecondaryMouseButton,
-        );
-        await gesture.moveBy(const Offset(50, 0));
-        await tester.pump();
-        await gesture.up();
+      final viewer = viewerKey.currentState!;
+      final Offset center = tester.getCenter(find.byKey(childKey));
+      final TestGesture gesture = await tester.startGesture(
+        center,
+        kind: PointerDeviceKind.mouse,
+        buttons: kSecondaryMouseButton,
+      );
+      await gesture.moveBy(const Offset(50, 0));
+      await tester.pump();
+      await gesture.up();
 
-        expect(viewer.transformMatrix4.getTranslation().x, isNot(0));
-      },
-    );
+      expect(viewer.transformMatrix4.getTranslation().x, isNot(0));
+    });
   });
 }
