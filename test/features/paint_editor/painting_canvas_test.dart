@@ -205,7 +205,10 @@ void main() {
               paintCtrl: ctrl,
               eraserMode: EraserMode.partial,
               eraserRadius: 8.0,
-              paintEditorConfigs: const PaintEditorConfigs(enableZoom: true),
+              paintEditorConfigs: const PaintEditorConfigs(
+                enableZoom: true,
+                enableZoomWhileDrawing: true,
+              ),
               onRefresh: () {},
               onCreated: (PaintedModel item) {
                 created++;

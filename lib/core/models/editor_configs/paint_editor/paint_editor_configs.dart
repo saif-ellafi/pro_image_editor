@@ -64,7 +64,7 @@ class PaintEditorConfigs extends ZoomConfigs
     this.isInitiallyFilled = false,
     this.showLayers = true,
     this.enableShareZoomMatrix = true,
-    this.enableZoomWhileDrawing = true,
+    this.enableZoomWhileDrawing = false,
     this.polygonConnectionThreshold = 20,
     this.minStrokeWidth = 1.0,
     this.maxStrokeWidth = 40.0,
@@ -183,9 +183,9 @@ class PaintEditorConfigs extends ZoomConfigs
   /// that stroke is discarded so path coordinates stay in one transform
   /// space. Has no effect when [enableZoom] is `false`.
   ///
-  /// Defaults to `true`. Set to `false` to restore the previous behavior
-  /// where the viewport is frozen until [PaintMode.moveAndZoom] is selected
-  /// and every mouse button draws.
+  /// Defaults to `false` (viewport stays frozen until
+  /// [PaintMode.moveAndZoom] is selected). Set to `true` to navigate while
+  /// drawing.
   final bool enableZoomWhileDrawing;
 
   /// Indicates the initial paint mode.

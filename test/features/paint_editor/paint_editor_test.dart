@@ -535,6 +535,33 @@ void main() {
       expect(viewer.isScaleEnabled, isTrue);
     });
 
+    testWidgets('keeps the viewer frozen by default in a drawing tool', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PaintEditor.memory(
+              mockMemoryImage,
+              key: key,
+              initConfigs: PaintEditorInitConfigs(
+                theme: ThemeData(),
+                configs: const ProImageEditorConfigs(
+                  paintEditor: PaintEditorConfigs(enableZoom: true),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final viewer = key.currentState!.interactiveViewer.currentState!;
+      expect(key.currentState!.paintMode, PaintMode.freeStyle);
+      expect(viewer.isPanEnabled, isFalse);
+      expect(viewer.isScaleEnabled, isFalse);
+    });
+
     testWidgets('freezes the viewer when enableZoomWhileDrawing is false', (
       tester,
     ) async {
