@@ -195,13 +195,14 @@ class CropRotateEditorState extends State<CropRotateEditor>
         StandaloneEditorState<CropRotateEditor, CropRotateEditorInitConfigs>,
         ExtendedLoop,
         CropAreaHistory {
-  /// A global key used to identify the editor content widget.
+  /// A global key used to identify the editor body, the box the image and the
+  /// crop overlay are laid out in.
+  ///
+  /// Pointer positions are converted into the coordinate space of this box, so
+  /// they can be compared against [editorBodySize] no matter where the body
+  /// sits on the screen (embedded editor, app-bar above it or a horizontal
+  /// inset from [CropRotateEditorConfigs.maxWidthFactor]).
   final _editorContentKey = GlobalKey();
-
-  /// An offset helper to keep track of the editor's screen offset.
-  /// This is required for the case the editor is embedded inside the screen.
-  /// Initialized to `Offset.zero`.
-  Offset _editorScreenOffsetHelper = Offset.zero;
 
   final _mouseCursorsKey = GlobalKey<ExtendedRebuildMouseRegionState>();
 
@@ -298,6 +299,41 @@ class CropRotateEditorState extends State<CropRotateEditor>
           ? _mainImageSize.aspectRatio
           : _activeAspectRatio);
 
+  /// Whether any perspective tilt is applied.
+  ///
+  /// While tilted the image no longer covers an axis-aligned rectangle, so the
+  /// bounds math auto-zooms instead of only clamping the translation.
+  bool get _isTilted =>
+      tiltRotateAngle != 0 ||
+      tiltHorizontalAngle != 0 ||
+      tiltVerticalAngle != 0;
+
+  /// The smallest zoom that still keeps [_viewRect] covered by the (possibly
+  /// tilted) image.
+  ///
+  /// Zooming out any further would reveal empty area next to the tilted image,
+  /// so [_setOffsetLimits] pushes the zoom straight back up. Callers that
+  /// reduce the zoom use this as their floor instead of fighting it.
+  double get _minCoveringScale {
+    if (!_isTilted) return 1;
+
+    var fit = fitCropInsideTiltedImage(
+      baseTiltCorners: _baseTiltCorners(),
+      cropSize: _viewRect.size,
+      minScale: 1,
+      maxScale: cropRotateEditorConfigs.maxScale,
+      currentTranslate: translate,
+    );
+
+    /// A crop area that can't be covered at all reports the maximum scale,
+    /// which is an upper bound and would turn this floor into a ceiling. The
+    /// current zoom is returned instead, so callers only stop zooming out and
+    /// never zoom back in through this value.
+    if (!fit.fits) return userScaleFactor;
+
+    return fit.scale;
+  }
+
   /// Indicates whether a locked-aspect-ratio rotation animation is in progress.
   ///
   /// Used to defer the history entry to the end of the crop-area transition
@@ -308,13 +344,36 @@ class CropRotateEditorState extends State<CropRotateEditor>
   double _painterOpacity = 0;
 
   /// The interaction progress for opacity.
+  ///
+  /// Drives how much the area outside the crop area brightens up while the user
+  /// interacts with the crop frame.
   double _interactionOpacityProgress = 0;
+
+  /// Animates [_interactionOpacityProgress].
+  ///
+  /// A controller is required here because the user can grab the crop frame
+  /// again while it is still fading back to its idle state. Restarting the
+  /// transition from `0` would make the overlay jump instead of continuing
+  /// smoothly from its current brightness.
+  late final AnimationController _interactionOpacityCtrl;
+
+  /// The curved animation of [_interactionOpacityCtrl].
+  late final CurvedAnimation _interactionOpacityAnimation;
 
   /// The padding around the screen.
   final double _screenPadding = 20;
 
   /// The starting scale value for pinch gestures.
   double _startingPinchScale = 1;
+
+  /// The scale the recognizer reported on the first update of the running
+  /// pinch gesture.
+  ///
+  /// A pinch is only recognized after the fingers moved past the gesture slop,
+  /// so the first reported scale is already noticeably off `1`. Zooming
+  /// relative to this baseline keeps the image from jumping when the pinch
+  /// starts.
+  double? _pinchScaleBaseline;
 
   /// Helper variable to store the initial scale value at the start of a
   /// scaling gesture.
@@ -357,6 +416,15 @@ class CropRotateEditorState extends State<CropRotateEditor>
   /// The current part of the crop area being interacted with.
   CropAreaPart _currentCropAreaPart = CropAreaPart.none;
 
+  /// The distance between the pointer and the crop handle it grabbed.
+  ///
+  /// The handles have a generous hit area
+  /// ([CropRotateEditorConfigs.mobileCornerDragArea]), so the pointer usually
+  /// sits a couple of pixels next to the edge it dragged. Without compensating
+  /// for that distance the handle jumps onto the pointer with the first move
+  /// event before it starts following it.
+  Offset _cropGrabOffset = Offset.zero;
+
   /// Manager class for handling desktop interactions.
   late final CropDesktopInteractionManager _desktopInteractionManager;
 
@@ -371,8 +439,6 @@ class CropRotateEditorState extends State<CropRotateEditor>
 
   /// The current cursor style.
   MouseCursor _mouseCursor = SystemMouseCursors.basic;
-
-  bool _hasToolbar = true;
 
   /// A flag indicating whether the screen has been resized.
   bool _isScreenResized = false;
@@ -489,6 +555,24 @@ class CropRotateEditorState extends State<CropRotateEditor>
       end: initAngle,
     ).animate(rotateCtrl);
 
+    // Initialize the opacity animation of the area outside the crop area
+    _interactionOpacityCtrl = AnimationController(
+      duration: cropRotateEditorConfigs.opacityOutsideCropAreaDuration,
+      vsync: this,
+    );
+
+    /// The same curve is used in both directions on purpose. A separate
+    /// reverse curve maps the controller value to a different opacity, which
+    /// makes the overlay jump as soon as a transition is reversed midway.
+    _interactionOpacityAnimation =
+        CurvedAnimation(
+          parent: _interactionOpacityCtrl,
+          curve: Curves.decelerate,
+        )..addListener(() {
+          _interactionOpacityProgress = _interactionOpacityAnimation.value;
+          cropPainterKey.currentState?.setForegroundPainter(cropPainter);
+        });
+
     // Initialize scale animation
     double initScale = (initialTransformConfigs?.scaleRotation ?? 1);
     scaleCtrl = AnimationController(
@@ -577,7 +661,25 @@ class CropRotateEditorState extends State<CropRotateEditor>
     _bottomBarScrollCtrl.dispose();
     rotateCtrl.dispose();
     scaleCtrl.dispose();
+    _interactionOpacityAnimation.dispose();
+    _interactionOpacityCtrl.dispose();
     super.dispose();
+  }
+
+  /// Fades the area outside the crop area in or out.
+  ///
+  /// The duration is refreshed on every transition, so a configs change while
+  /// the editor is open takes effect right away instead of keeping the value
+  /// the controller was created with.
+  void _animateInteractionOpacity({required bool visible}) {
+    _interactionOpacityCtrl.duration =
+        cropRotateEditorConfigs.opacityOutsideCropAreaDuration;
+
+    if (visible) {
+      _interactionOpacityCtrl.forward();
+    } else {
+      _interactionOpacityCtrl.reverse();
+    }
   }
 
   @override
@@ -1428,12 +1530,22 @@ class CropRotateEditorState extends State<CropRotateEditor>
 
   void _zoomOutside() async {
     const int frameHelper = 1000 ~/ 60;
-    while (userScaleFactor > 1 && _activeScaleOut) {
+
+    /// A tilted image needs a minimum zoom to keep the crop area covered.
+    /// Without this floor every step is undone by [_setOffsetLimits] right
+    /// away, which leaves the image jittering while the crop area is reset by
+    /// [calcCropRect] on every iteration.
+    final double minZoom = _minCoveringScale;
+
+    while (userScaleFactor > minZoom && _activeScaleOut) {
       double oldZoom = userScaleFactor;
 
       double zoomFactor = 0.025;
-      userScaleFactor -= zoomFactor;
-      userScaleFactor = max(1, userScaleFactor);
+      userScaleFactor = max(minZoom, userScaleFactor - zoomFactor);
+
+      /// Zooming out is a manual zoom change, so the floor the bounds math
+      /// keeps has to follow along.
+      manualScaleFactor = userScaleFactor;
 
       var zoomOutsideWidth = _viewRect.width / oldZoom * userScaleFactor;
       var zoomOutsideHeight = _viewRect.height / oldZoom * userScaleFactor;
@@ -1487,10 +1599,9 @@ class CropRotateEditorState extends State<CropRotateEditor>
     if (_blockInteraction || details.pointerCount > 2) return;
     _blockInteraction = true;
 
-    _editorScreenOffsetHelper = _calculateEditorScreenOffset();
-
     _startingPinchScale = userScaleFactor;
     _startingTranslate = translate;
+    _pinchScaleBaseline = null;
     // Calculate the center offset point from the old zoomed view
     _startingCenterOffset =
         _startingTranslate +
@@ -1505,17 +1616,13 @@ class CropRotateEditorState extends State<CropRotateEditor>
       if (!isDesktop) {
         _currentCropAreaPart = _determineCropAreaPart(details.localFocalPoint);
       }
-
-      loopWithTransitionTiming(
-        (double curveT) {
-          _interactionOpacityProgress = 1 * curveT;
-          cropPainterKey.currentState!.setForegroundPainter(cropPainter);
-        },
-        mounted: mounted,
-        transitionFunction: Curves.decelerate.transform,
-        duration: cropRotateEditorConfigs.opacityOutsideCropAreaDuration,
-      );
+      _animateInteractionOpacity(visible: true);
     }
+
+    /// Recalculated on every start, not only on the first one. The recognizer
+    /// restarts whenever the number of pointers changes, so this keeps the
+    /// dragged handle in place when a finger is lifted from a pinch.
+    _cropGrabOffset = _calcCropGrabOffset(details.localFocalPoint);
 
     _scaleAllowUpdateHelper = false;
     _onScaleAllowUpdateDebounce(() {
@@ -1527,22 +1634,175 @@ class CropRotateEditorState extends State<CropRotateEditor>
     _blockInteraction = false;
   }
 
-  /// Calculates the offset of the editor screen.
+  /// Converts a global pointer position into the local coordinate space of the
+  /// editor body, the box [editorBodySize] describes.
   ///
-  /// This method determines the position of the editor content on the screen
-  /// by converting the local coordinates of the render box to global
-  /// coordinates.
+  /// The body is not aligned with the screen, it sits below the app-bar and can
+  /// be inset horizontally by [CropRotateEditorConfigs.maxWidthFactor], so a
+  /// raw pointer position must not be compared against [editorBodySize].
   ///
-  /// Returns an [Offset] representing the position of the editor content.
-  /// If the editor content context is null, it returns [Offset.zero].
-  Offset _calculateEditorScreenOffset() {
-    if (_editorContentKey.currentContext == null) return Offset.zero;
+  /// Returns `null` while the body has no render object. Falling back to the
+  /// raw global position would silently reintroduce that coordinate mismatch,
+  /// so callers skip their check instead.
+  Offset? _toEditorBodyPosition(Offset globalPosition) {
+    var renderObject = _editorContentKey.currentContext?.findRenderObject();
+    if (renderObject is! RenderBox) return null;
 
-    final RenderBox renderBox =
-        _editorContentKey.currentContext!.findRenderObject() as RenderBox;
-    final Offset position = renderBox.localToGlobal(Offset.zero);
+    return renderObject.globalToLocal(globalPosition);
+  }
 
-    return position;
+  /// Converts a pointer position from the local space of the gesture detector
+  /// into the space the image occupies, measured from its center.
+  Offset _toImageCenterPosition(
+    Offset localPosition, {
+    required double zoom,
+    required Offset translateOffset,
+  }) {
+    return _getRealHitPoint(zoom: zoom, position: localPosition) +
+        translateOffset * zoom;
+  }
+
+  /// Converts a pointer position produced by [_toImageCenterPosition] into the
+  /// coordinate space of [cropRect].
+  Offset _toCropHandlePosition(Offset offset) {
+    double halfViewRectW = _viewRect.width / 2;
+    double halfViewRectH = _viewRect.height / 2;
+
+    double circleGapX = 0;
+    double circleGapY = 0;
+
+    if (cropMode == CropMode.oval) {
+      circleGapX =
+          sqrt(
+            pow(halfViewRectW, 2) - pow(min(offset.dy.abs(), halfViewRectW), 2),
+          ) -
+          halfViewRectW;
+      circleGapY =
+          sqrt(
+            pow(halfViewRectH, 2) - pow(min(offset.dx.abs(), halfViewRectH), 2),
+          ) -
+          halfViewRectH;
+
+      circleGapX *= -offset.dx.sign;
+      circleGapY *= -offset.dy.sign;
+    }
+
+    return Offset(
+      offset.dx + halfViewRectW + _cropSpaceHorizontal / 2 + circleGapX,
+      offset.dy + halfViewRectH + _cropSpaceVertical / 2 + circleGapY,
+    );
+  }
+
+  /// Returns how far the pointer sits away from the crop handle it grabbed.
+  ///
+  /// See [_cropGrabOffset].
+  Offset _calcCropGrabOffset(Offset localPosition) {
+    if (_currentCropAreaPart == CropAreaPart.none ||
+        _currentCropAreaPart == CropAreaPart.inside) {
+      return Offset.zero;
+    }
+
+    Offset pointer = _toCropHandlePosition(
+      _toImageCenterPosition(
+        localPosition,
+        zoom: _startingPinchScale,
+        translateOffset: _startingTranslate,
+      ),
+    );
+
+    return Offset(
+      switch (_currentCropAreaPart) {
+        CropAreaPart.left ||
+        CropAreaPart.topLeft ||
+        CropAreaPart.bottomLeft => pointer.dx - cropRect.left,
+        CropAreaPart.right ||
+        CropAreaPart.topRight ||
+        CropAreaPart.bottomRight => pointer.dx - cropRect.right,
+        _ => 0,
+      },
+      switch (_currentCropAreaPart) {
+        CropAreaPart.top ||
+        CropAreaPart.topLeft ||
+        CropAreaPart.topRight => pointer.dy - cropRect.top,
+        CropAreaPart.bottom ||
+        CropAreaPart.bottomLeft ||
+        CropAreaPart.bottomRight => pointer.dy - cropRect.bottom,
+        _ => 0,
+      },
+    );
+  }
+
+  /// Resizes [rect] from the dragged corner while keeping the locked aspect
+  /// ratio [_ratio], anchored at the opposite corner.
+  ///
+  /// [pointer] is projected onto the diagonal the ratio allows, so the corner
+  /// follows the pointer in both directions instead of tracking its horizontal
+  /// movement only.
+  Rect _resizeCornerToRatio({
+    required CropAreaPart part,
+    required Rect rect,
+    required Offset pointer,
+    required Rect bounds,
+    required double minSize,
+  }) {
+    bool isLeft =
+        part == CropAreaPart.topLeft || part == CropAreaPart.bottomLeft;
+    bool isTop = part == CropAreaPart.topLeft || part == CropAreaPart.topRight;
+
+    double anchorX = isLeft ? rect.right : rect.left;
+    double anchorY = isTop ? rect.bottom : rect.top;
+
+    double pointerWidth = (pointer.dx - anchorX) * (isLeft ? -1 : 1);
+    double pointerHeight = (pointer.dy - anchorY) * (isTop ? -1 : 1);
+
+    /// Closest point on the `height == width * _ratio` diagonal.
+    double width =
+        (pointerWidth + pointerHeight * _ratio) / (1 + _ratio * _ratio);
+
+    double maxWidth = min(
+      isLeft ? anchorX - bounds.left : bounds.right - anchorX,
+      (isTop ? anchorY - bounds.top : bounds.bottom - anchorY) / _ratio,
+    );
+    width = width.safeMinClamp(minSize, maxWidth);
+    double height = width * _ratio;
+
+    return Rect.fromLTRB(
+      isLeft ? anchorX - width : anchorX,
+      isTop ? anchorY - height : anchorY,
+      isLeft ? anchorX : anchorX + width,
+      isTop ? anchorY : anchorY + height,
+    );
+  }
+
+  /// Restores the locked aspect ratio [_ratio] after an edge handle changed one
+  /// side of [rect], growing the opposite axis around the center and keeping
+  /// the result inside [bounds].
+  Rect _resizeEdgeToRatio({
+    required CropAreaPart part,
+    required Rect rect,
+    required Rect bounds,
+  }) {
+    bool fromWidth = part == CropAreaPart.left || part == CropAreaPart.right;
+
+    double width = fromWidth ? rect.width : rect.height / _ratio;
+    width = min(width, min(bounds.width, bounds.height / _ratio));
+
+    Rect result = Rect.fromCenter(
+      center: rect.center,
+      width: width,
+      height: width * _ratio,
+    );
+
+    /// Shift the rect back inside the image when the opposite axis grew over
+    /// one of the edges.
+    double shiftX = 0;
+    double shiftY = 0;
+    if (result.left < bounds.left) shiftX = bounds.left - result.left;
+    if (result.right > bounds.right) shiftX = bounds.right - result.right;
+    if (result.top < bounds.top) shiftY = bounds.top - result.top;
+    if (result.bottom > bounds.bottom) shiftY = bounds.bottom - result.bottom;
+
+    return result.shift(Offset(shiftX, shiftY));
   }
 
   void _onScaleUpdate(ScaleUpdateDetails details) {
@@ -1553,16 +1813,21 @@ class CropRotateEditorState extends State<CropRotateEditor>
     }
     _blockInteraction = true;
     if (details.pointerCount == 2) {
-      setScale(details.scale);
+      /// A degenerate span reports a scale of `0`. Latching that as the
+      /// baseline would leave every following update un-normalized, so the
+      /// update is skipped until the recognizer reports a usable span.
+      if (details.scale > 0) {
+        _pinchScaleBaseline ??= details.scale;
+        setScale(details.scale / _pinchScaleBaseline!);
+      }
     } else {
       if (_currentCropAreaPart != CropAreaPart.none &&
           _currentCropAreaPart != CropAreaPart.inside) {
-        Offset offset =
-            _getRealHitPoint(
-              zoom: _startingPinchScale,
-              position: details.localFocalPoint,
-            ) +
-            _startingTranslate * _startingPinchScale;
+        Offset offset = _toImageCenterPosition(
+          details.localFocalPoint,
+          zoom: _startingPinchScale,
+          translateOffset: _startingTranslate,
+        );
 
         double imgW = _renderedImgConstraints.maxWidth;
         double imgH = _renderedImgConstraints.maxHeight;
@@ -1575,33 +1840,13 @@ class CropRotateEditorState extends State<CropRotateEditor>
             cropRotateEditorConfigs.style.cropCornerLength * 2.25;
         double minCornerDistance = outsidePadding + cornerGap;
 
-        double halfViewRectW = _viewRect.width / 2;
-        double halfViewRectH = _viewRect.height / 2;
+        /// The position of the dragged handle. `_cropGrabOffset` keeps the
+        /// handle where the pointer grabbed it instead of snapping it onto the
+        /// pointer with the first move event.
+        Offset handlePosition = _toCropHandlePosition(offset) - _cropGrabOffset;
 
-        double circleGapX = 0;
-        double circleGapY = 0;
-
-        if (cropMode == CropMode.oval) {
-          circleGapX =
-              sqrt(
-                pow(halfViewRectW, 2) -
-                    pow(min(offset.dy.abs(), halfViewRectW), 2),
-              ) -
-              halfViewRectW;
-          circleGapY =
-              sqrt(
-                pow(halfViewRectH, 2) -
-                    pow(min(offset.dx.abs(), halfViewRectH), 2),
-              ) -
-              halfViewRectH;
-
-          circleGapX *= -offset.dx.sign;
-          circleGapY *= -offset.dy.sign;
-        }
-
-        double dx =
-            offset.dx + halfViewRectW + halfSpaceHorizontal + circleGapX;
-        double dy = offset.dy + halfViewRectH + halfSpaceVertical + circleGapY;
+        double dx = handlePosition.dx;
+        double dy = handlePosition.dy;
 
         double maxRight = cropRect.right + outsidePadding - minCornerDistance;
         double maxBottom = cropRect.bottom + outsidePadding - minCornerDistance;
@@ -1659,136 +1904,145 @@ class CropRotateEditorState extends State<CropRotateEditor>
               doubleInteractiveArea,
         );
 
-        double outsideHitPosY =
-            details.focalPoint.dy -
-            _editorScreenOffsetHelper.dy -
-            (_hasToolbar ? kToolbarHeight : 0) -
-            MediaQuery.paddingOf(context).top;
+        /// Without a body position the pointer can't be compared against
+        /// [editorBodySize], so the zoom-out is skipped rather than triggered
+        /// at the wrong place.
+        Offset? bodyPosition = _toEditorBodyPosition(details.focalPoint);
 
         bool outsideLeft =
-            details.focalPoint.dx - _editorScreenOffsetHelper.dx <
-            zoomOutHitAreaX;
+            bodyPosition != null && bodyPosition.dx < zoomOutHitAreaX;
         bool outsideRight =
-            details.focalPoint.dx - _editorScreenOffsetHelper.dx >
-            editorBodySize.width - zoomOutHitAreaX;
-        bool outsideTop = outsideHitPosY < zoomOutHitAreaY;
+            bodyPosition != null &&
+            bodyPosition.dx > editorBodySize.width - zoomOutHitAreaX;
+        bool outsideTop =
+            bodyPosition != null && bodyPosition.dy < zoomOutHitAreaY;
         bool outsideBottom =
-            outsideHitPosY > editorBodySize.height - zoomOutHitAreaY;
+            bodyPosition != null &&
+            bodyPosition.dy > editorBodySize.height - zoomOutHitAreaY;
 
         // Scale outside when the user move outside the scale area
-        if (!isFreeAspectRatio &&
-            (outsideLeft || outsideRight || outsideTop || outsideBottom)) {
-          if (!_activeScaleOut) {
-            _activeScaleOut = true;
-            _zoomOutside();
-          }
-        } else if (!_activeScaleOut ||
-            (offset.dx.abs() < _viewRect.width / 2 - _interactiveCornerArea)) {
+        bool zoomOutside =
+            !isFreeAspectRatio &&
+            (outsideLeft || outsideRight || outsideTop || outsideBottom);
+        if (zoomOutside && !_activeScaleOut) {
+          _activeScaleOut = true;
+          _zoomOutside();
+        }
+
+        /// [_zoomOutside] clears the flag right away when the zoom already sits
+        /// on its floor, so a crop area that can't zoom out any further keeps
+        /// resizing instead of freezing while the pointer sits in the band.
+        if (!_activeScaleOut ||
+            (!zoomOutside &&
+                offset.dx.abs() <
+                    _viewRect.width / 2 - _interactiveCornerArea)) {
           _activeScaleOut = false;
-          switch (_currentCropAreaPart) {
-            case CropAreaPart.topLeft:
-              cropRect = Rect.fromLTRB(
-                dx.safeMinClamp(minLeft, maxRight),
-                dy.safeMinClamp(minTop, maxBottom),
-                cropRect.right,
-                cropRect.bottom,
-              );
 
-              break;
-            case CropAreaPart.topRight:
-              cropRect = Rect.fromLTRB(
-                cropRect.left,
-                dy.safeMinClamp(minTop, maxBottom),
-                dx.safeMinClamp(cornerGap + cropRect.left, minRight),
-                cropRect.bottom,
-              );
+          bool isCorner =
+              _currentCropAreaPart == CropAreaPart.topLeft ||
+              _currentCropAreaPart == CropAreaPart.topRight ||
+              _currentCropAreaPart == CropAreaPart.bottomLeft ||
+              _currentCropAreaPart == CropAreaPart.bottomRight;
 
-              break;
-            case CropAreaPart.bottomLeft:
-              cropRect = Rect.fromLTRB(
-                dx.safeMinClamp(minLeft, maxRight),
-                cropRect.top,
-                cropRect.right,
-                dy.safeMinClamp(cornerGap + cropRect.top, minBottom),
-              );
-              break;
-            case CropAreaPart.bottomRight:
-              cropRect = Rect.fromLTRB(
-                cropRect.left,
-                cropRect.top,
-                dx.safeMinClamp(cornerGap + cropRect.left, minRight),
-                dy.safeMinClamp(cornerGap + cropRect.top, minBottom),
-              );
-              break;
-            case CropAreaPart.left:
-              cropRect = Rect.fromLTRB(
-                dx.safeMinClamp(minLeft, maxRight),
-                cropRect.top,
-                cropRect.right,
-                cropRect.bottom,
-              );
-              _setOffsetLimits();
-              break;
-            case CropAreaPart.right:
-              cropRect = Rect.fromLTRB(
-                cropRect.left,
-                cropRect.top,
-                dx.safeMinClamp(cornerGap + cropRect.left, minRight),
-                cropRect.bottom,
-              );
-              break;
-            case CropAreaPart.top:
-              cropRect = Rect.fromLTRB(
-                cropRect.left,
-                dy.safeMaxClamp(minTop, maxBottom),
-                cropRect.right,
-                cropRect.bottom,
-              );
-              break;
-            case CropAreaPart.bottom:
-              cropRect = Rect.fromLTRB(
-                cropRect.left,
-                cropRect.top,
-                cropRect.right,
-                dy.safeMinClamp(cornerGap + cropRect.top, minBottom),
-              );
-              break;
-            default:
-              break;
-          }
+          if (_ratio >= 0 && isCorner) {
+            /// A locked ratio anchors the rect at the opposite corner and
+            /// derives both sides from the pointer, so the free-form clamping
+            /// in the switch below would only be overwritten again.
+            cropRect = _resizeCornerToRatio(
+              part: _currentCropAreaPart,
+              rect: cropRect,
+              pointer: Offset(dx, dy),
+              bounds: Rect.fromLTRB(minLeft, minTop, minRight, minBottom),
+              minSize: cornerGap,
+            );
+          } else {
+            switch (_currentCropAreaPart) {
+              case CropAreaPart.topLeft:
+                cropRect = Rect.fromLTRB(
+                  dx.safeMinClamp(minLeft, maxRight),
+                  dy.safeMinClamp(minTop, maxBottom),
+                  cropRect.right,
+                  cropRect.bottom,
+                );
+                break;
+              case CropAreaPart.topRight:
+                cropRect = Rect.fromLTRB(
+                  cropRect.left,
+                  dy.safeMinClamp(minTop, maxBottom),
+                  dx.safeMinClamp(cornerGap + cropRect.left, minRight),
+                  cropRect.bottom,
+                );
+                break;
+              case CropAreaPart.bottomLeft:
+                cropRect = Rect.fromLTRB(
+                  dx.safeMinClamp(minLeft, maxRight),
+                  cropRect.top,
+                  cropRect.right,
+                  dy.safeMinClamp(cornerGap + cropRect.top, minBottom),
+                );
+                break;
+              case CropAreaPart.bottomRight:
+                cropRect = Rect.fromLTRB(
+                  cropRect.left,
+                  cropRect.top,
+                  dx.safeMinClamp(cornerGap + cropRect.left, minRight),
+                  dy.safeMinClamp(cornerGap + cropRect.top, minBottom),
+                );
+                break;
+              case CropAreaPart.left:
+                cropRect = Rect.fromLTRB(
+                  dx.safeMinClamp(minLeft, maxRight),
+                  cropRect.top,
+                  cropRect.right,
+                  cropRect.bottom,
+                );
+                _setOffsetLimits();
+                break;
+              case CropAreaPart.right:
+                cropRect = Rect.fromLTRB(
+                  cropRect.left,
+                  cropRect.top,
+                  dx.safeMinClamp(cornerGap + cropRect.left, minRight),
+                  cropRect.bottom,
+                );
+                break;
+              case CropAreaPart.top:
+                cropRect = Rect.fromLTRB(
+                  cropRect.left,
+                  dy.safeMaxClamp(minTop, maxBottom),
+                  cropRect.right,
+                  cropRect.bottom,
+                );
+                break;
+              case CropAreaPart.bottom:
+                cropRect = Rect.fromLTRB(
+                  cropRect.left,
+                  cropRect.top,
+                  cropRect.right,
+                  dy.safeMinClamp(cornerGap + cropRect.top, minBottom),
+                );
+                break;
+              default:
+                break;
+            }
 
-          if (_ratio >= 0 && cropRect.size.aspectRatio != _ratio) {
-            if (_currentCropAreaPart == CropAreaPart.left ||
-                _currentCropAreaPart == CropAreaPart.right) {
-              cropRect = Rect.fromCenter(
-                center: cropRect.center,
-                width: cropRect.width,
-                height: cropRect.width * _ratio,
-              );
-            } else if (_currentCropAreaPart == CropAreaPart.top ||
-                _currentCropAreaPart == CropAreaPart.bottom) {
-              cropRect = Rect.fromCenter(
-                center: cropRect.center,
-                width: cropRect.height / _ratio,
-                height: cropRect.height,
-              );
-            } else if (_currentCropAreaPart == CropAreaPart.topLeft ||
-                _currentCropAreaPart == CropAreaPart.topRight) {
-              double gapBottom = _viewRect.height - cropRect.bottom;
-              cropRect = Rect.fromLTRB(
-                cropRect.left,
-                _viewRect.height - gapBottom - cropRect.width * _ratio,
-                cropRect.right,
-                cropRect.bottom,
-              );
-            } else if (_currentCropAreaPart == CropAreaPart.bottomLeft ||
-                _currentCropAreaPart == CropAreaPart.bottomRight) {
-              cropRect = Rect.fromLTRB(
-                cropRect.left,
-                cropRect.top,
-                cropRect.right,
-                cropRect.width * _ratio + cropRect.top,
-              );
+            /// An edge handle only changed one side, so the opposite axis is
+            /// grown back around the center to restore the locked ratio.
+            if (_ratio >= 0) {
+              switch (_currentCropAreaPart) {
+                case CropAreaPart.left:
+                case CropAreaPart.right:
+                case CropAreaPart.top:
+                case CropAreaPart.bottom:
+                  cropRect = _resizeEdgeToRatio(
+                    part: _currentCropAreaPart,
+                    rect: cropRect,
+                    bounds: Rect.fromLTRB(minLeft, minTop, minRight, minBottom),
+                  );
+                  break;
+                default:
+                  break;
+              }
             }
           }
         }
@@ -1819,28 +2073,40 @@ class CropRotateEditorState extends State<CropRotateEditor>
       );
     }
 
-    if (_blockInteraction || details.pointerCount > 2) return;
+    /// [ScaleGestureRecognizer] also reports an end every time the number of
+    /// pointers changes, so it fires in the middle of a pinch as soon as the
+    /// second finger touches down. Finalizing the crop here would animate the
+    /// selection back to the view rect and block the following
+    /// [_onScaleStart], which leaves the pinch working with a stale scale
+    /// baseline and makes the zoom jump.
+    ///
+    /// The auto zoom-out is still stopped, otherwise it keeps looping in the
+    /// background and fights the pinch that follows.
+    if (details.pointerCount > 0) {
+      _activeScaleOut = false;
+      return;
+    }
+    if (_blockInteraction) return;
     _blockInteraction = true;
     _interactionActive = false;
 
     _onScaleEndDebounce(() {
       if (_activePointers <= 0) {
         _scaleStarted = false;
-        loopWithTransitionTiming(
-          (double curveT) {
-            _interactionOpacityProgress = 1 - 1 * curveT;
-            cropPainterKey.currentState!.setForegroundPainter(cropPainter);
-          },
-          mounted: mounted,
-          transitionFunction: Curves.decelerate.transform,
-          duration: cropRotateEditorConfigs.opacityOutsideCropAreaDuration,
-        );
+        _animateInteractionOpacity(visible: false);
       }
     });
 
     if (cropRect != _viewRect) {
+      /// A degenerate crop rect has nothing to animate back. Returning without
+      /// releasing [_blockInteraction] would freeze every following gesture.
+      ///
       /// Return is important for tests
-      if (cropRect.isEmpty) return;
+      if (cropRect.isEmpty) {
+        _activeScaleOut = false;
+        _blockInteraction = false;
+        return;
+      }
 
       Rect initRect = Rect.fromCenter(
         center: _viewRect.center,
@@ -1903,6 +2169,13 @@ class CropRotateEditorState extends State<CropRotateEditor>
           );
 
           cropRect = interpolatedRect(startCropRect, targetCropRect, curveT);
+
+          /// While tilted, [_setOffsetLimits] auto-zooms and never goes below
+          /// `manualScaleFactor`. Keeping that floor in sync with the animated
+          /// zoom lets the bounds only lift it further where the tilt requires
+          /// it. Without this the tilt bounds overwrite the zoom on every frame
+          /// and the image jumps around while the crop area animates back.
+          manualScaleFactor = userScaleFactor;
           _setOffsetLimits(
             rect: _ratio < 0
                 ? interpolatedRect(initRect, targetCropRect, curveT)
@@ -2019,12 +2292,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
     final double imgH = _renderedImgConstraints.maxHeight;
     if (imgW == 0 || imgH == 0) return true;
 
-    final bool isTilted =
-        tiltRotateAngle != 0 ||
-        tiltHorizontalAngle != 0 ||
-        tiltVerticalAngle != 0;
-
-    if (!isTilted) {
+    if (!_isTilted) {
       // Fast path: axis-aligned clamp (unchanged behavior). Keep the manual
       // zoom floor in sync so a following tilt zooms relative to it.
       _clampTranslateAxisAligned(r);
@@ -2296,7 +2564,6 @@ class CropRotateEditorState extends State<CropRotateEditor>
       isTiltEditorVisible: _isTiltEditorActive,
       tiltMode: _tiltMode,
       child: SafeArea(
-        key: _editorContentKey,
         top: cropRotateEditorConfigs.safeArea.top,
         bottom: cropRotateEditorConfigs.safeArea.bottom,
         left: cropRotateEditorConfigs.safeArea.left,
@@ -2364,14 +2631,11 @@ class CropRotateEditorState extends State<CropRotateEditor>
   /// back, rotate, aspect ratio, and done.
   PreferredSizeWidget? _buildAppBar(BoxConstraints constraints) {
     if (cropRotateEditorConfigs.widgets.appBar != null) {
-      var customToolbar = cropRotateEditorConfigs.widgets.appBar!.call(
+      return cropRotateEditorConfigs.widgets.appBar!.call(
         this,
         rebuildController.stream,
       );
-      _hasToolbar = customToolbar != null;
-      return customToolbar;
     }
-    _hasToolbar = true;
     return CropEditorAppbar(
       configs: configs.cropRotateEditor,
       i18n: i18n.cropRotateEditor,
@@ -2437,6 +2701,7 @@ class CropRotateEditorState extends State<CropRotateEditor>
             });
           },
           child: Stack(
+            key: _editorContentKey,
             children: [
               if (_showFakeHero)
                 _buildFakeHero()
